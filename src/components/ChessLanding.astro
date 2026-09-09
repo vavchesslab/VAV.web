@@ -1,0 +1,114 @@
+---
+import ColorMenu from './ColorMenu.astro';
+
+const props = Astro.props;
+const accent = props.accent;
+const squareLight = props.squareLight;
+const squareDark = props.squareDark;
+const buttonText = props.buttonText || '#121918';
+const activeColor = props.activeColor;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Ajedrez Website</title>
+		<script is:inline>
+			(() => {
+				const savedTheme = localStorage.getItem('ajedrez-theme');
+				const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				document.documentElement.dataset.theme = savedTheme || preferredTheme;
+			})();
+		</script>
+	</head>
+	<body style={`--accent: ${accent}; --square-light: ${squareLight}; --square-dark: ${squareDark}; --button-text: ${buttonText};`}>
+		<div id="intro-animation" class="intro-animation" aria-hidden="true">
+			<div id="intro-animation-container" class="intro-animation-container"></div>
+		</div>
+		<main class="page-content min-h-screen px-5 py-6 sm:px-8 lg:px-0">
+			<nav class="nav-divider mx-auto max-w-6xl pb-5">
+				<a class="flex items-center gap-3 font-semibold tracking-tight" href="/">
+					<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="h-10 w-auto">
+					<span>Volver a Vertex <span class="text-(--muted)"> ChessLab</span></span>
+				</a>
+				<ColorMenu activeColor={activeColor} />
+				<button id="theme-switcher" class="switcher" type="button" role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y oscuro">
+					<span class="text-sm" aria-hidden="true">☼</span>
+					<span class="switcher-track"><span class="switcher-thumb"></span></span>
+					<span class="text-sm" aria-hidden="true">☾</span>
+				</button>
+				<span class="nav-line" aria-hidden="true"></span>
+			</nav>
+
+			<section class="mx-auto grid max-w-6xl gap-12 py-16 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:py-0">
+				<div>
+					<p class="mb-5 text-sm font-semibold uppercase tracking-[0.22em] text-(--accent)">Piezas únicas y personalizables</p>
+					<h1 class="max-w-2xl text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza aquí.</h1>
+					<p class="mt-7 max-w-xl text-lg leading-8 text-(--muted)">Creamos <b>piezas de ajedrez y tableros únicos</b>, pensados para quienes disfrutan del juego y también valoran el diseño. Trabajamos con materiales de excelente calidad y durabilidad, cuidando cada detalle para conseguir productos atractivos, resistentes y hechos para acompañarte en el tiempo.</p>
+					<div class="mt-9 flex flex-wrap gap-3">
+						<a class="rounded-full bg-(--accent) px-6 py-3 font-semibold text-(--button-text) transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--accent)/20" href="#partidas">Contactar</a>
+						<a class="rounded-full border border-(--line) px-6 py-3 font-semibold transition hover:border-(--accent)" href="#club">Conocer tableros</a>
+					</div>
+				</div>
+				<div id="partidas" class="board-wrap" aria-label="Tablero de ajedrez decorativo">
+					<video class="board-video" autoplay muted loop playsinline aria-label="Animación de un tablero de ajedrez">
+						<source src="/Roto360.webm" type="video/webm" />
+					</video>
+				</div>
+			</section>
+
+			<section id="club" class="mx-auto grid gap-4 bg-[#242424] pt-8 sm:grid-cols-3 text-center h-120">
+				<div><strong class="text-2xl">Columna 1</strong><p class="mt-1 text-sm text-(--muted)">Fila 1</p></div>
+				<div><strong class="text-2xl">Columna 2</strong><p class="mt-1 text-sm text-(--muted)">Fila 2</p></div>
+				<div><strong class="text-2xl">Columna 3</strong><p class="mt-1 text-sm text-(--muted)">Fila 3</p></div>
+			</section>
+		</main>
+
+		<script is:inline>
+			(() => {
+			const updateLogo = () => {
+				const logo = document.querySelector('#logo');
+				const theme = document.documentElement.dataset.theme;
+				if (logo) logo.src = theme === 'dark'
+					? 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png'
+					: 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png';
+			};
+
+			updateLogo();
+			const switcher = document.querySelector('#theme-switcher');
+			switcher?.addEventListener('click', () => {
+				const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+				document.documentElement.dataset.theme = nextTheme;
+				localStorage.setItem('ajedrez-theme', nextTheme);
+				switcher.setAttribute('aria-checked', String(nextTheme === 'dark'));
+				updateLogo();
+			});
+			if (document.documentElement.dataset.theme === 'dark') switcher?.setAttribute('aria-checked', 'true');
+			})();
+		</script>
+
+		<script>
+			import lottie from 'lottie-web';
+			(() => {
+			const revealPage = () => {
+				document.querySelector('.page-content')?.classList.add('is-visible');
+				document.querySelector('.nav-line')?.classList.add('is-visible');
+				document.querySelector('.nav-divider')?.classList.add('is-visible');
+				document.querySelector('#intro-animation')?.classList.add('is-hidden');
+			};
+			lottie.loadAnimation({
+				container: document.querySelector('#intro-animation-container') as Element,
+				renderer: 'svg',
+				loop: false,
+				autoplay: true,
+				path: `/${document.documentElement.dataset.theme === 'dark' ? 'vav_bk' : 'vav_wh'}.json?v=${Date.now()}`
+			});
+			window.setTimeout(revealPage, 4000);
+			})();
+		</script>
+	</body>
+</html>

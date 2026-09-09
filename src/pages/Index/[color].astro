@@ -1,0 +1,18 @@
+---
+import IndexColor1 from '../../components/Index_Color1.astro';
+import IndexColor2 from '../../components/Index_Color2.astro';
+import IndexColor3 from '../../components/Index_Color3.astro';
+import '../../styles/global.css';
+
+export function getStaticPaths() {
+	return [
+		{ params: { color: '1' }, props: { ColorPage: IndexColor1 } },
+		{ params: { color: '2' }, props: { ColorPage: IndexColor2 } },
+		{ params: { color: '3' }, props: { ColorPage: IndexColor3 } }
+	];
+}
+
+const { ColorPage } = Astro.props;
+---
+
+<ColorPage />

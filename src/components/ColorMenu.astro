@@ -1,0 +1,12 @@
+---
+const { activeColor } = Astro.props;
+---
+
+<details class="color-menu">
+	<summary>COLOR</summary>
+	<div class="color-menu-options">
+		<a class:list={{ active: activeColor === '1' }} href="/Index/1">Color1</a>
+		<a class:list={{ active: activeColor === '2' }} href="/Index/2">Color2</a>
+		<a class:list={{ active: activeColor === '3' }} href="/Index/3">Color3</a>
+	</div>
+</details>
