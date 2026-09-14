@@ -1,18 +1,23 @@
 ---
-import IndexColor1 from '../../components/Index_Color1.astro';
-import IndexColor2 from '../../components/Index_Color2.astro';
-import IndexColor3 from '../../components/Index_Color3.astro';
+import Version2Landing from '../../components/Version2Landing.astro';
 import '../../styles/global.css';
 
 export function getStaticPaths() {
 	return [
-		{ params: { color: '1' }, props: { ColorPage: IndexColor1 } },
-		{ params: { color: '2' }, props: { ColorPage: IndexColor2 } },
-		{ params: { color: '3' }, props: { ColorPage: IndexColor3 } }
+		{ params: { color: '1' } },
+		{ params: { color: '2' } },
+		{ params: { color: '3' } }
 	];
 }
 
-const { ColorPage } = Astro.props;
+type ColorKey = '1' | '2' | '3';
+const colorMap = {
+	'1': { accent: '#147d72', buttonText: '#ffffff' },
+	'2': { accent: '#e81c3e', buttonText: '#ffffff' },
+	'3': { accent: '#7c3aed', buttonText: '#121918' }
+} satisfies Record<ColorKey, { accent: string; buttonText: string }>;
+const color = Astro.params.color as ColorKey;
+const selected = colorMap[color] ?? colorMap['2'];
 ---
 
-<ColorPage />
+<Version2Landing {...selected} activeColor={color ?? '2'} showVersionToggle={false} />

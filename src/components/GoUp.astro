@@ -1,0 +1,76 @@
+---
+---
+
+<button id="go-up-button" class="go-up-button" type="button" aria-label="Volver arriba">
+  <svg class="go-up-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</button>
+
+<style>
+  .go-up-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    background: rgba(12, 18, 22, 0.75);
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .go-up-button.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .go-up-button:hover {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--button-text, #ffffff);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+
+  .go-up-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+</style>
+
+<script>
+  const goUpBtn = document.getElementById('go-up-button');
+
+  const toggleVisibility = () => {
+    if (!goUpBtn) return;
+    if (window.scrollY > 300) {
+      goUpBtn.classList.add('is-visible');
+    } else {
+      goUpBtn.classList.remove('is-visible');
+    }
+  };
+
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility();
+
+  goUpBtn?.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+</script>

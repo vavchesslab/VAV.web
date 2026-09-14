@@ -1,0 +1,153 @@
+---
+const {
+  title = '¿TENÉS DUDAS O UNA IDEA EN MENTE?',
+  subtitle = 'Escribínos y te asesoramos para personalizar tu juego de ajedrez ideal.',
+  imageSrc = 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png'
+} = Astro.props;
+---
+
+<section id="partidas" class="contacto-section" aria-label="Sección de contacto">
+  <div class="contacto__inner">
+    <p class="mt-0 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent) text-center">Contacto</p>
+    
+    <div class="contacto__header text-center mb-8">
+      <h2 class="text-3xl font-semibold sm:text-4xl text-white tracking-tight">{title}</h2>
+      <p class="mt-2 text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
+    </div>
+
+    <div class="contacto__container">
+      <!-- Izquierda: Imagen por defecto -->
+      <div class="contacto__left">
+        <div class="contacto__image-wrapper">
+          <img src={imageSrc} alt="Contacto VAV" class="contacto__image" />
+        </div>
+      </div>
+
+      <!-- Línea divisoria central -->
+      <div class="contacto__divider" aria-hidden="true"></div>
+
+      <!-- Derecha: Texto y Botón Contactar -->
+      <div class="contacto__right">
+        <h3 class="text-2xl font-bold text-white mb-3">Ponete en contacto con nosotros</h3>
+        <p class="text-base text-(--muted) max-w-md leading-relaxed">
+          Elegí o diseñá las piezas
+        </p>
+        <p class="text-base text-(--muted) mb-6 max-w-md leading-relaxed">
+          y el tablero perfecto para vos.
+        </p>
+        <a 
+          href="https://ig.me/m/vavchesslab" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="contacto__button rounded-full bg-(--accent) px-8 py-4 font-semibold text-(--button-text) transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--accent)/20 inline-flex items-center gap-2"
+        >
+          <span>Contactar</span>
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contacto-section {
+    width: 100%;
+    padding: 4rem 0 16rem;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--accent) 18%, transparent) 25%,
+      color-mix(in srgb, var(--accent) 28%, transparent) 75%,
+      transparent 100%
+    );
+    color: var(--foreground, #ffffff);
+  }
+
+  .contacto__inner {
+    width: min(100%, 1200px);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .contacto__container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 2.5rem 0;
+  }
+
+  .contacto__left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .contacto__image-wrapper {
+    width: 100%;
+    max-width: 320px;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+  }
+
+  .contacto__image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .contacto__divider {
+    width: 1px;
+    height: 80%;
+    min-height: 180px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.2) 80%,
+      transparent
+    );
+  }
+
+  .contacto__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .contacto__container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 1.5rem;
+    }
+
+    .contacto__divider {
+      width: 80%;
+      height: 1px;
+      min-height: 1px;
+      margin: 0 auto;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.2) 80%,
+        transparent
+      );
+    }
+
+    .contacto__right {
+      align-items: center;
+      text-align: center;
+    }
+  }
+</style>

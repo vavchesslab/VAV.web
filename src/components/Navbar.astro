@@ -1,0 +1,113 @@
+---
+import ColorMenu from './ColorMenu.astro';
+
+const { activeColor = '2', basePath = '/Index', showVersionToggle = false } = Astro.props;
+---
+
+<header class="sticky-nav-header">
+	<nav class="nav-divider is-visible mx-auto max-w-[1600px] px-6 py-4">
+		<div class="version-two-brand">
+			<a class="flex items-center gap-3 font-semibold tracking-tight" href="/">
+				<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="pb-2 h-12 w-auto">
+				<span class="font-bold">Volver a Vertex</span>
+			</a>
+			<ColorMenu activeColor={activeColor} basePath={basePath} />
+		</div>
+		<div class="nav-actions">
+			<a class="version-two-nav-link is-active" href="#home" data-nav="home">Home</a>
+			<a class="version-two-nav-link" href="#laboratorio" data-nav="laboratorio">Laboratorio</a>
+			<a class="version-two-nav-link" href="#galeria" data-nav="galeria">Galería</a>
+			<a class="version-two-nav-link" href="#partidas" data-nav="partidas">Contacto</a>
+			{showVersionToggle && <a class="version-toggle" href="/">Volver al original</a>}
+		</div>
+		<button id="version2-theme-switcher" class="switcher" type="button" role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y oscuro">
+			<span class="text-sm" aria-hidden="true">☼</span>
+			<span class="switcher-track"><span class="switcher-thumb"></span></span>
+			<span class="text-sm" aria-hidden="true">☾</span>
+		</button>
+		<span class="nav-line" aria-hidden="true"></span>
+	</nav>
+</header>
+
+<style>
+	.sticky-nav-header {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		width: 100%;
+		background: color-mix(in srgb, var(--background) 92%, transparent);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+</style>
+
+<script>
+	const navLinks = document.querySelectorAll<HTMLAnchorElement>('.version-two-nav-link[data-nav]');
+	const sections = document.querySelectorAll<HTMLElement>('section[id]');
+
+	let isManualScroll = false;
+	let manualScrollTimeout: number | undefined;
+
+	const setActiveNav = (id: string) => {
+		navLinks.forEach((link) => {
+			if (link.getAttribute('data-nav') === id) {
+				link.classList.add('is-active');
+			} else {
+				link.classList.remove('is-active');
+			}
+		});
+	};
+
+	navLinks.forEach((link) => {
+		link.addEventListener('click', (e) => {
+			const navId = link.getAttribute('data-nav');
+			if (!navId) return;
+
+			isManualScroll = true;
+			clearTimeout(manualScrollTimeout);
+
+			if (navId === 'home') {
+				e.preventDefault();
+				setActiveNav('home');
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			} else {
+				const targetSection = document.getElementById(navId);
+				if (targetSection) {
+					e.preventDefault();
+					setActiveNav(navId);
+					targetSection.scrollIntoView({ behavior: 'smooth' });
+				}
+			}
+
+			manualScrollTimeout = window.setTimeout(() => {
+				isManualScroll = false;
+			}, 1000);
+		});
+	});
+
+	const observerOptions = {
+		root: null,
+		rootMargin: '-30% 0px -40% 0px',
+		threshold: 0
+	};
+
+	const observer = new IntersectionObserver((entries) => {
+		if (isManualScroll) return;
+		entries.forEach((entry) => {
+			if (entry.isIntersecting) {
+				const id = entry.target.getAttribute('id');
+				if (id && ['home', 'laboratorio', 'galeria', 'partidas'].includes(id)) {
+					setActiveNav(id);
+				}
+			}
+		});
+	}, observerOptions);
+
+	sections.forEach((section) => {
+		const id = section.getAttribute('id');
+		if (id && ['home', 'laboratorio', 'galeria', 'partidas'].includes(id)) {
+			observer.observe(section);
+		}
+	});
+</script>

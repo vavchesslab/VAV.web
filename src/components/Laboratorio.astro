@@ -1,0 +1,1796 @@
+---
+const {
+  modelSrc = '/caballo.glb',
+  title = 'OBJETOS 3D',
+  subtitle = 'Vista interactiva del objeto'
+} = Astro.props;
+---
+
+<section id="laboratorio" class="model-showcase" aria-labelledby="model-showcase-title">
+  <div class="model-showcase__inner">
+    <div class="text-center mb-6">
+      <p class="mt-6 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent)">Laboratorio</p>
+      <p class="text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
+    </div>
+    <div class="model-showcase__layout">
+      <div id="model-showcase-viewer" class="model-showcase__viewer" data-model-src={modelSrc}>
+        <div class="model-showcase__top-bar">
+          <div class="model-showcase__palette" role="group" aria-label="Elegir entre piezas y tableros">
+            <button type="button" class="theme-option is-active" data-mode="piece" aria-label="Mostrar pieza">
+              Piezas
+            </button>
+            <button type="button" class="theme-option" data-mode="board" data-model="/tablero.glb" aria-label="Mostrar tablero">
+              Tableros
+            </button>
+          </div>
+
+          <div class="piece-team-controls" role="group" aria-label="Elegir bando de piezas">
+            <button type="button" class="piece-team-btn is-active" data-team="Blancas" aria-label="Personalizar Piezas Blancas">
+              Blancas
+            </button>
+            <button type="button" class="piece-team-btn" data-team="Negras" aria-label="Personalizar Piezas Negras">
+              Negras
+            </button>
+          </div>
+        </div>
+
+        <div class="model-showcase__piece-nav" aria-label="Navegación entre piezas">
+          <button type="button" class="piece-nav-button piece-nav-button--prev" data-direction="-1" aria-label="Pieza anterior">
+            <svg class="piece-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="piece-nav-button piece-nav-button--next" data-direction="1" aria-label="Siguiente pieza">
+            <svg class="piece-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="group-color-controls" aria-label="Colores del tablero">
+          <label class="group-color-picker" for="white-squares-color-picker">
+            <span>Color 1</span>
+            <input id="white-squares-color-picker" type="hidden" value="#f3f3f3" data-target="Blancas" />
+            <div class="board-color-palette" data-target="Blancas" role="group" aria-label="Elegir color 1"></div>
+          </label>
+          <button type="button" class="match-pieces-btn" id="match-pieces-btn">
+            Emparejar<br />color de piezas
+          </button>
+          <label class="group-color-picker" for="black-squares-color-picker">
+            <span>Color 2</span>
+            <input id="black-squares-color-picker" type="hidden" value="#1f1f1f" data-target="Negras" />
+            <div class="board-color-palette" data-target="Negras" role="group" aria-label="Elegir color 2"></div>
+          </label>
+        </div>
+
+        <div class="model-showcase__controls">
+          <div class="model-color-picker">
+            <div class="model-color-picker__header">
+              <span>Color</span>
+            </div>
+            <input id="piece-color-picker" type="hidden" value="#efece7" />
+            <div class="color-palette" role="group" aria-label="Elegir color de la pieza">
+              <div class="color-palette__column" aria-label="Grises">
+                <button type="button" class="color-swatch" style="--swatch: #ffffff" data-color="#ffffff" aria-label="Blanco"></button>
+                <button type="button" class="color-swatch" style="--swatch: #d9d9d9" data-color="#d9d9d9" aria-label="Gris claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #aaaaaa" data-color="#aaaaaa" aria-label="Gris medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #777777" data-color="#777777" aria-label="Gris medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #444444" data-color="#444444" aria-label="Gris oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #111111" data-color="#111111" aria-label="Negro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Azules">
+                <button type="button" class="color-swatch" style="--swatch: #dbeafe" data-color="#dbeafe" aria-label="Azul muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #93c5fd" data-color="#93c5fd" aria-label="Azul claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #60a5fa" data-color="#60a5fa" aria-label="Azul medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #2563eb" data-color="#2563eb" aria-label="Azul medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #1d4ed8" data-color="#1d4ed8" aria-label="Azul oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #172554" data-color="#172554" aria-label="Azul muy oscuro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Rojos">
+                <button type="button" class="color-swatch" style="--swatch: #fee2e2" data-color="#fee2e2" aria-label="Rojo muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #fca5a5" data-color="#fca5a5" aria-label="Rojo claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #f87171" data-color="#f87171" aria-label="Rojo medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #dc2626" data-color="#dc2626" aria-label="Rojo medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #b91c1c" data-color="#b91c1c" aria-label="Rojo oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #450a0a" data-color="#450a0a" aria-label="Rojo muy oscuro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Verdes">
+                <button type="button" class="color-swatch" style="--swatch: #dcfce7" data-color="#dcfce7" aria-label="Verde muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #86efac" data-color="#86efac" aria-label="Verde claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #4ade80" data-color="#4ade80" aria-label="Verde medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #16a34a" data-color="#16a34a" aria-label="Verde medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #15803d" data-color="#15803d" aria-label="Verde oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #052e16" data-color="#052e16" aria-label="Verde muy oscuro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Amarillos">
+                <button type="button" class="color-swatch" style="--swatch: #fef9c3" data-color="#fef9c3" aria-label="Amarillo muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #fde68a" data-color="#fde68a" aria-label="Amarillo claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #facc15" data-color="#facc15" aria-label="Amarillo medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #eab308" data-color="#eab308" aria-label="Amarillo medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #a16207" data-color="#a16207" aria-label="Amarillo oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #422006" data-color="#422006" aria-label="Amarillo muy oscuro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Violetas y rosas">
+                <button type="button" class="color-swatch" style="--swatch: #fce7f3" data-color="#fce7f3" aria-label="Rosa muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #f9a8d4" data-color="#f9a8d4" aria-label="Rosa claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #e879f9" data-color="#e879f9" aria-label="Fucsia claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #c026d3" data-color="#c026d3" aria-label="Violeta rosado"></button>
+                <button type="button" class="color-swatch" style="--swatch: #7e22ce" data-color="#7e22ce" aria-label="Violeta oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #3b0764" data-color="#3b0764" aria-label="Violeta muy oscuro"></button>
+              </div>
+              <div class="color-palette__column" aria-label="Naranjas">
+                <button type="button" class="color-swatch" style="--swatch: #ffedd5" data-color="#ffedd5" aria-label="Naranja muy claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #fdba74" data-color="#fdba74" aria-label="Naranja claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #fb923c" data-color="#fb923c" aria-label="Naranja medio claro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #ea580c" data-color="#ea580c" aria-label="Naranja medio"></button>
+                <button type="button" class="color-swatch" style="--swatch: #c2410c" data-color="#c2410c" aria-label="Naranja oscuro"></button>
+                <button type="button" class="color-swatch" style="--swatch: #431407" data-color="#431407" aria-label="Naranja muy oscuro"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="model-fallback">Cargando modelo...</div>
+        <p class="model-showcase__model-name" aria-live="polite">Caballo</p>
+        <button type="button" class="model-showcase__continue" aria-controls="model-showcase-editor" aria-expanded="false">
+          Continuar
+          <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button type="button" class="model-showcase__back" aria-controls="model-showcase-viewer" aria-hidden="true">
+          <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Volver
+        </button>
+      </div>
+
+      <aside id="model-showcase-editor" class="model-showcase__editor" aria-label="Visor del resultado final" aria-hidden="true">
+        <div class="model-showcase__editor-header">
+          <div class="model-showcase__editor-title">
+            <p>Resultado final</p>
+          </div>
+          <div class="final-colors-summary" aria-label="Colores seleccionados">
+            <span class="final-color-chip" title="Piezas Blancas"><span class="final-color-dot" id="final-dot-white-piece"></span> Blancas</span>
+            <span class="final-color-chip" title="Piezas Negras"><span class="final-color-dot" id="final-dot-black-piece"></span> Negras</span>
+            <span class="final-color-chip" title="Casillas Color 1"><span class="final-color-dot" id="final-dot-white-board"></span> C1</span>
+            <span class="final-color-chip" title="Casillas Color 2"><span class="final-color-dot" id="final-dot-black-board"></span> C2</span>
+          </div>
+        </div>
+        <div id="final-model-container" class="final-model-container">
+          <div class="final-model-fallback">Cargando resultado final...</div>
+        </div>
+        <div class="model-showcase__editor-summary">
+          <span>Vista Completa 3D</span>
+          <small class="final-hint">Gira y explora el conjunto</small>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .model-showcase {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 2rem 0 5rem;
+    background: #050d0f;
+  }
+
+  .model-showcase__inner {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    width: min(100%, 1500px);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .model-showcase__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    align-items: center;
+    justify-items: center;
+    transition: grid-template-columns 0.85s cubic-bezier(0.22, 1, 0.36, 1), gap 0.85s ease;
+  }
+
+  .model-showcase__layout.is-revealed {
+    grid-template-columns: minmax(0, 520px) minmax(260px, 1fr);
+    gap: 4rem;
+    justify-items: stretch;
+  }
+
+  .model-showcase__editor {
+    --editor-width: 600px;
+    --editor-height: 600px;
+    display: none;
+    gap: 1.25rem;
+    padding: 1.1rem 1rem 1rem;
+    width: min(var(--editor-width), 100%);
+    height: var(--editor-height);
+    justify-self: start;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 1.3rem;
+    background: rgba(12, 22, 26, 0.8);
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.2);
+    color: #f5f5f5;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-2rem) scale(0.98);
+    transform-origin: left center;
+    transition: opacity 0.55s ease 0.28s, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+  }
+
+  .model-showcase__layout.is-revealed .model-showcase__editor {
+    display: grid;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0) scale(1);
+  }
+
+  .model-showcase__layout.is-revealed .model-showcase__viewer {
+    transform: translateX(0);
+    width: min(520px, 100%);
+  }
+
+  .model-showcase__viewer {
+    transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .model-showcase__editor-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .model-showcase__editor-header p {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .model-showcase__editor-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .model-showcase__back {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.7rem 0.95rem;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    color: #f13e3e;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .model-showcase__layout.is-revealed .model-showcase__back {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .model-showcase__button-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: 0 0 auto;
+    stroke-width: 2.2;
+    transition: transform 0.25s ease;
+  }
+
+  .model-showcase__continue:hover .model-showcase__button-icon {
+    transform: translateX(0.15rem);
+  }
+
+  .model-showcase__back:hover .model-showcase__button-icon {
+    transform: translateX(-0.15rem);
+  }
+
+  .model-showcase__back:hover,
+  .model-showcase__back:focus-visible {
+    border-color: #f13e3e;
+    background: rgba(241, 62, 62, 0.12);
+    color: #ff6b6b;
+  }
+
+  .piece-team-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .piece-team-btn {
+    appearance: none;
+    border: 0;
+    border-radius: 0.65rem;
+    padding: 0.45rem 0.8rem;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .piece-team-btn:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .piece-team-btn.is-active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+  }
+
+  .final-colors-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .final-color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .final-color-dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: inline-block;
+  }
+
+  .final-model-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: linear-gradient(145deg, rgba(14, 28, 32, 0.95), rgba(6, 14, 16, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .final-model-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .final-model-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.06em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  .final-hint {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.68rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  .model-showcase__editor-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .model-showcase__editor-summary strong {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .model-showcase__viewer {
+    --viewer-width: 760px;
+    --viewer-height: 600px;
+    position: relative;
+    width: min(var(--viewer-width), 100%);
+    height: var(--viewer-height);
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(151, 190, 184, 0.34);
+    border-radius: 1.3rem;
+    background: linear-gradient(135deg, rgba(18, 44, 40, 0.95), rgba(121, 131, 128, 0.8));
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.35);
+    overflow: visible;
+  }
+
+  .model-showcase__viewer::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    height: 55%;
+    border-radius: 0 0 1.3rem 1.3rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+    content: '';
+    pointer-events: none;
+  }
+
+  :global(.model-showcase__viewer canvas) {
+    display: block;
+    position: relative;
+    z-index: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 1.3rem !important;
+  }
+
+  .model-showcase__continue {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 0.95rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 0.6rem 1.2rem color-mix(in srgb, var(--accent) 35%, transparent);
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .model-showcase__continue:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 86%, white);
+    transform: translateY(-2px);
+  }
+
+  .model-showcase__continue:focus-visible {
+    outline: 2px solid #d9f3ff;
+    outline-offset: 3px;
+  }
+
+  .model-showcase__layout.is-revealed .model-showcase__continue {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.5rem);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .model-showcase__layout.is-revealed .model-showcase__back {
+    transition: opacity 0.35s ease 0.2s, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  @media (max-width: 900px) {
+    .model-showcase__layout.is-revealed {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .model-showcase__layout.is-revealed .model-showcase__editor {
+      width: min(var(--editor-width), 100%);
+      height: var(--editor-height);
+      transform: translateY(1rem) scale(0.98);
+    }
+
+    .model-showcase__layout.is-revealed .model-showcase__editor {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .model-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    opacity: 0.9;
+  }
+
+  .model-showcase__controls {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    top: auto;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    justify-content: flex-end;
+  }
+
+  .model-reload-button {
+    padding: 0.48rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(12, 18, 22, 0.72);
+    color: #f5f5f5;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .model-reload-button:hover {
+    border-color: rgba(255, 255, 255, 0.42);
+    background: rgba(12, 18, 22, 0.92);
+    transform: translateY(-1px);
+  }
+
+  .model-reload-button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  .model-color-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 0.9rem;
+    background: rgba(12, 18, 22, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    color: #f5f5f5;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .model-color-picker__header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+
+  .model-color-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #ffffff;
+  }
+
+  .color-palette {
+    display: grid;
+    grid-template-columns: repeat(7, 1.05rem);
+    gap: 0.28rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.55rem;
+    background: rgba(4, 9, 11, 0.72);
+  }
+
+  .color-palette__column {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .color-swatch {
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.22rem;
+    background: var(--swatch);
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .color-swatch:hover,
+  .color-swatch.is-selected {
+    z-index: 1;
+    transform: scale(1.18);
+    box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .model-showcase__top-bar {
+    position: absolute;
+    top: 0.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .model-showcase__palette {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 0.9rem;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 0;
+  }
+
+  .model-showcase__piece-nav {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    z-index: 10;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 2.8rem;
+    gap: 44rem;
+    padding: 0 0.65rem;
+    pointer-events: none;
+    box-sizing: border-box;
+    transform: translateY(-50%);
+  }
+
+  .model-showcase__piece-nav.is-visible {
+    display: flex;
+  }
+
+  .piece-nav-button {
+    position: relative;
+    z-index: 11;
+    pointer-events: auto;
+    flex: 0 0 3.4rem;
+    width: 3.4rem;
+    height: 3.4rem;
+    min-width: 3.4rem;
+    min-height: 3.4rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #f4f4f4;
+    font-size: 1.45rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+    font-family: sans-serif;
+    letter-spacing: -0.08em;
+    text-align: center;
+    vertical-align: middle;
+    transform: translateY(0);
+  }
+
+  .piece-nav-icon {
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+    flex: 0 0 auto;
+  }
+
+  .piece-nav-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+  }
+
+  .group-color-controls {
+    position: absolute;
+    top: 4.5rem;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: auto;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .match-pieces-btn {
+    pointer-events: auto;
+    padding: 0.55rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.9rem;
+    background: rgba(12, 18, 22, 0.75);
+    color: #f5f5f5;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.35;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  }
+
+  .match-pieces-btn:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .group-color-picker {
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 0.9rem;
+    background: rgba(12, 18, 22, 0.55);
+    color: #f5f5f5;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .group-color-picker span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+
+  .board-color-palette {
+    display: grid;
+    grid-template-columns: repeat(7, 1.05rem);
+    gap: 0.28rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.55rem;
+    background: rgba(4, 9, 11, 0.72);
+  }
+
+  :global(.board-color-palette .color-palette__column) {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  :global(.board-color-palette .color-swatch) {
+    display: block;
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.22rem;
+    background: var(--swatch);
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  :global(.board-color-palette .color-swatch:hover),
+  :global(.board-color-palette .color-swatch.is-selected) {
+    z-index: 1;
+    transform: scale(1.18);
+    box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .theme-option {
+    appearance: none;
+    border: 0;
+    border-radius: 0.7rem;
+    padding: 0.55rem 0.9rem;
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .theme-option:hover {
+    transform: translateY(-1px);
+  }
+
+  .theme-option.is-active {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 8px 16px rgba(0, 0, 0, 0.18);
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .model-showcase__content {
+    max-width: 42rem;
+    margin: 1.5rem auto 0;
+    text-align: center;
+  }
+
+  .model-showcase__eyebrow {
+    margin: 0 0 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #f13e3e;
+  }
+
+  .model-showcase__content h2 {
+    margin: 0;
+    font-size: clamp(2rem, 2vw + 1rem, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    color: #ffffff;
+  }
+
+  .model-showcase__content p:last-child {
+    margin: 0.8rem auto 0;
+    max-width: 34rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.7;
+  }
+
+  .model-showcase__model-name {
+    position: absolute;
+    right: auto;
+    bottom: 1.75rem;
+    left: 50%;
+    z-index: 3;
+    margin: 0;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+    transform: translateX(-50%);
+  }
+</style>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+  const STORAGE_KEY = 'chess_custom_color_config';
+
+  const defaultChessConfig = {
+    pieces: {
+      Blancas: '#efece7',
+      Negras: '#1f1f1f'
+    },
+    board: {
+      Blancas: '#f3f3f3',
+      Negras: '#1f1f1f'
+    }
+  };
+
+  const loadSavedState = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          pieces: {
+            Blancas: parsed.pieces?.Blancas || defaultChessConfig.pieces.Blancas,
+            Negras: parsed.pieces?.Negras || defaultChessConfig.pieces.Negras
+          },
+          board: {
+            Blancas: parsed.board?.Blancas || defaultChessConfig.board.Blancas,
+            Negras: parsed.board?.Negras || defaultChessConfig.board.Negras
+          }
+        };
+      }
+    } catch (e) {
+      console.warn('No se pudo acceder a localStorage', e);
+    }
+    return {
+      pieces: { ...defaultChessConfig.pieces },
+      board: { ...defaultChessConfig.board }
+    };
+  };
+
+  const chessConfig = loadSavedState();
+  let activePieceTeam = 'Blancas'; // 'Blancas' | 'Negras'
+
+  const saveState = () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(chessConfig));
+    } catch (e) {
+      console.warn('No se pudo guardar en localStorage', e);
+    }
+  };
+
+  const mount = document.querySelector('.model-showcase__viewer');
+  const showcaseLayout = document.querySelector('.model-showcase__layout');
+  const continueButton = document.querySelector('.model-showcase__continue');
+  const backButton = document.querySelector('.model-showcase__back');
+  const editor = document.querySelector('.model-showcase__editor');
+  const colorPicker = document.querySelector('#piece-color-picker');
+  const colorSwatches = document.querySelectorAll('.color-swatch');
+  const reloadButton = document.querySelector('.model-reload-button');
+  const whiteSquaresColorPicker = document.querySelector('#white-squares-color-picker');
+  const blackSquaresColorPicker = document.querySelector('#black-squares-color-picker');
+  const groupColorControls = document.querySelector('.group-color-controls');
+  const themeButtons = document.querySelectorAll('.theme-option');
+  const pieceNav = document.querySelector('.model-showcase__piece-nav');
+  const pieceNavButtons = document.querySelectorAll('.piece-nav-button');
+  const groupColorInputs = document.querySelectorAll('.group-color-picker input');
+  const boardColorPalettes = document.querySelectorAll('.board-color-palette');
+  const matchPiecesBtn = document.querySelector('#match-pieces-btn');
+  const modelName = document.querySelector('.model-showcase__model-name');
+  const pieceTeamButtons = document.querySelectorAll('.piece-team-btn');
+  const pieceTeamControls = document.querySelector('.piece-team-controls');
+  const finalContainer = document.querySelector('#final-model-container');
+  const viewerModeLabel = document.querySelector('#viewer-mode-label');
+
+  // Summary dots in final preview
+  const updateSummaryDots = () => {
+    const dotPieceWhite = document.querySelector('#final-dot-white-piece');
+    const dotPieceBlack = document.querySelector('#final-dot-black-piece');
+    const dotBoardWhite = document.querySelector('#final-dot-white-board');
+    const dotBoardBlack = document.querySelector('#final-dot-black-board');
+
+    if (dotPieceWhite) dotPieceWhite.style.backgroundColor = chessConfig.pieces.Blancas;
+    if (dotPieceBlack) dotPieceBlack.style.backgroundColor = chessConfig.pieces.Negras;
+    if (dotBoardWhite) dotBoardWhite.style.backgroundColor = chessConfig.board.Blancas;
+    if (dotBoardBlack) dotBoardBlack.style.backgroundColor = chessConfig.board.Negras;
+  };
+
+  updateSummaryDots();
+
+  // Initialize form controls with current state
+  if (colorPicker) colorPicker.value = chessConfig.pieces[activePieceTeam];
+  if (whiteSquaresColorPicker) whiteSquaresColorPicker.value = chessConfig.board.Blancas;
+  if (blackSquaresColorPicker) blackSquaresColorPicker.value = chessConfig.board.Negras;
+
+  const syncColorSwatches = () => {
+    colorSwatches.forEach((swatch) => {
+      swatch.classList.toggle('is-selected', swatch.dataset.color === colorPicker?.value);
+    });
+  };
+
+  const paletteColors = Array.from(colorSwatches)
+    .map((swatch) => swatch.dataset.color)
+    .filter(Boolean);
+
+  boardColorPalettes.forEach((palette) => {
+    for (let columnIndex = 0; columnIndex < 7; columnIndex += 1) {
+      const column = document.createElement('div');
+      column.className = 'color-palette__column';
+      column.setAttribute('aria-label', `Familia de color ${columnIndex + 1}`);
+
+      paletteColors.slice(columnIndex * 6, columnIndex * 6 + 6).forEach((color) => {
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'color-swatch';
+        swatch.dataset.color = color;
+        swatch.style.setProperty('--swatch', color);
+        swatch.setAttribute('aria-label', `Elegir ${color}`);
+        column.appendChild(swatch);
+      });
+
+      palette.appendChild(column);
+    }
+  });
+
+  const syncBoardSwatches = () => {
+    boardColorPalettes.forEach((palette) => {
+      const target = palette.dataset.target;
+      const input = document.querySelector(`[data-target="${target}"]`);
+      palette.querySelectorAll('.color-swatch').forEach((swatch) => {
+        swatch.classList.toggle('is-selected', swatch.dataset.color === input?.value);
+      });
+    });
+  };
+
+  const pieceModels = ['/caballo.glb', '/alfil.glb', '/reina.glb', '/torre.glb', '/peon.glb', '/rey.glb'];
+  let currentPieceIndex = 0;
+  let modelRoot = null;
+  let currentScene = null;
+  let currentRenderer = null;
+  let currentCamera = null;
+  let currentControls = null;
+  let activeModelMode = 'piece';
+  const modelCache = new Map();
+
+  // Final 3D Scene variables
+  let finalScene = null;
+  let finalRenderer = null;
+  let finalCamera = null;
+  let finalControls = null;
+  let finalModelRoot = null;
+  let finalAnimationFrame = null;
+
+  const ensureScene = () => {
+    if (!mount || currentScene) return;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x081a1d);
+    currentScene = scene;
+
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
+    camera.position.set(0, 2.1, 8);
+    currentCamera = camera;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    currentRenderer = renderer;
+    mount.appendChild(renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+    scene.add(ambient);
+
+    const directional = new THREE.DirectionalLight(0xffffff, 1.8);
+    directional.position.set(8, 10, 6);
+    scene.add(directional);
+
+    const fillLight = new THREE.DirectionalLight(0x9fc5e8, 1.0);
+    fillLight.position.set(-6, 6, -4);
+    scene.add(fillLight);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.enableZoom = true;
+    controls.minDistance = 2;
+    controls.maxDistance = 40;
+    currentControls = controls;
+
+    const resize = () => {
+      const width = mount.clientWidth;
+      const height = mount.clientHeight;
+      if (width === 0 || height === 0) return;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    const tick = () => {
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    };
+
+    tick();
+  };
+
+  const cloneModelWithMaterials = (source) => {
+    const clone = source.clone(true);
+    clone.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material = Array.isArray(child.material)
+          ? child.material.map((m) => m.clone())
+          : child.material.clone();
+      }
+    });
+    return clone;
+  };
+
+  const applyMeshColor = (child, targetColor) => {
+    if (!child.isMesh) return;
+    if (child.material) {
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.forEach((mat) => {
+        if (mat.color) {
+          mat.color.set(targetColor);
+        }
+        mat.needsUpdate = true;
+      });
+    } else {
+      child.material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(targetColor),
+        metalness: 0.15,
+        roughness: 0.8
+      });
+    }
+  };
+
+  const applyBoardColors = (object) => {
+    if (!object) return;
+    object.traverse((child) => {
+      if (!child.isMesh) return;
+      const meshName = (child.name || '').toLowerCase();
+      const parentName = (child.parent?.name || '').toLowerCase();
+
+      const isBlackSquare = meshName === 'negras' || meshName.includes('negra') || meshName.includes('black');
+      const targetColor = isBlackSquare ? chessConfig.board.Negras : chessConfig.board.Blancas;
+
+      applyMeshColor(child, targetColor);
+    });
+  };
+
+  const updateCurrentPieceColor = () => {
+    const targetColor = chessConfig.pieces[activePieceTeam];
+    if (colorPicker) colorPicker.value = targetColor;
+    syncColorSwatches();
+
+    if (modelRoot && activeModelMode === 'piece') {
+      modelRoot.traverse((child) => {
+        applyMeshColor(child, targetColor);
+      });
+    }
+
+    updateSummaryDots();
+    if (finalModelRoot) {
+      applyFinalModelColors(finalModelRoot);
+    }
+  };
+
+  const applyFinalModelColors = (model) => {
+    if (!model) return;
+
+    model.traverse((child) => {
+      if (!child.isMesh) return;
+
+      const name = (child.name || '').toLowerCase();
+      const parentName = (child.parent?.name || '').toLowerCase();
+      const uName = (child.userData?.name || '').toLowerCase();
+
+      // Check hierarchy for collection keywords
+      let cur = child.parent;
+      let hierarchy = '';
+      while (cur) {
+        hierarchy += ' ' + (cur.name || '');
+        cur = cur.parent;
+      }
+      hierarchy = hierarchy.toLowerCase();
+
+      let targetColor = chessConfig.pieces.Blancas;
+
+      const isBoard =
+        name.includes('plane') ||
+        parentName.includes('blancas') ||
+        name === 'negras' ||
+        hierarchy.includes('tablero') ||
+        hierarchy.includes('board') ||
+        name.includes('board') ||
+        name.includes('tablero');
+
+      if (isBoard) {
+        const isBlackSquare =
+          name === 'negras' ||
+          name.includes('negra') ||
+          name.includes('black') ||
+          name.includes('oscur') ||
+          hierarchy.includes('negra') ||
+          hierarchy.includes('black');
+
+        targetColor = isBlackSquare ? chessConfig.board.Negras : chessConfig.board.Blancas;
+      } else {
+        // Piece classification
+        const isBlackPieceCollection =
+          hierarchy.includes('piezas negras') ||
+          hierarchy.includes('piezas_negras') ||
+          hierarchy.includes('black_pieces') ||
+          parentName.includes('piezas negras') ||
+          parentName.includes('piezas_negras');
+
+        const isWhitePieceCollection =
+          hierarchy.includes('piezas blancas') ||
+          hierarchy.includes('piezas_blancas') ||
+          hierarchy.includes('white_pieces') ||
+          parentName.includes('piezas blancas') ||
+          parentName.includes('piezas_blancas');
+
+        if (isBlackPieceCollection) {
+          targetColor = chessConfig.pieces.Negras;
+        } else if (isWhitePieceCollection) {
+          targetColor = chessConfig.pieces.Blancas;
+        } else {
+          // Identify by .001 / 001 name suffix or negative Z coordinate in chessboard layout
+          const has001 = name.includes('001') || uName.includes('001') || name.includes('negra') || name.includes('black');
+          const isNegativeZ = child.position.z < -0.005;
+
+          if (has001 || isNegativeZ) {
+            targetColor = chessConfig.pieces.Negras;
+          } else {
+            targetColor = chessConfig.pieces.Blancas;
+          }
+        }
+      }
+
+      applyMeshColor(child, targetColor);
+      child.castShadow = true;
+      child.receiveShadow = true;
+    });
+  };
+
+  const ensureFinalScene = () => {
+    if (!finalContainer) return;
+    if (finalScene) {
+      if (finalRenderer && finalCamera) {
+        finalRenderer.setSize(finalContainer.clientWidth, finalContainer.clientHeight);
+        finalCamera.aspect = finalContainer.clientWidth / (finalContainer.clientHeight || 1);
+        finalCamera.updateProjectionMatrix();
+      }
+      if (finalModelRoot) {
+        applyFinalModelColors(finalModelRoot);
+      }
+      finalRenderer.render(finalScene, finalCamera);
+      return;
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060f12);
+    finalScene = scene;
+
+    const camera = new THREE.PerspectiveCamera(38, finalContainer.clientWidth / (finalContainer.clientHeight || 1), 0.1, 1000);
+    camera.position.set(0, 6.5, 8.5);
+    finalCamera = camera;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(finalContainer.clientWidth, finalContainer.clientHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    finalRenderer = renderer;
+    finalContainer.appendChild(renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+    scene.add(ambient);
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.8);
+    dirLight1.position.set(8, 12, 6);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x9fc5e8, 1.0);
+    dirLight2.position.set(-8, 6, -6);
+    scene.add(dirLight2);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.enableZoom = true;
+    controls.minDistance = 3;
+    controls.maxDistance = 30;
+    controls.target.set(0, 0.8, 0);
+    finalControls = controls;
+
+    const resizeFinal = () => {
+      if (!finalContainer || !finalRenderer || !finalCamera) return;
+      const width = finalContainer.clientWidth;
+      const height = finalContainer.clientHeight;
+      if (width === 0 || height === 0) return;
+      finalRenderer.setSize(width, height);
+      finalCamera.aspect = width / height;
+      finalCamera.updateProjectionMatrix();
+    };
+
+    window.addEventListener('resize', resizeFinal);
+
+    const tick = () => {
+      controls.update();
+      renderer.render(scene, camera);
+      finalAnimationFrame = requestAnimationFrame(tick);
+    };
+
+    tick();
+
+    const fallback = finalContainer.querySelector('.final-model-fallback');
+    const loader = new GLTFLoader();
+
+    loader.load(
+      '/resultadofinal.glb',
+      (gltf) => {
+        finalModelRoot = gltf.scene;
+
+        finalModelRoot.position.set(0, 0, 0);
+        finalModelRoot.rotation.set(0, 0, 0);
+        finalModelRoot.scale.set(1, 1, 1);
+        finalModelRoot.updateMatrixWorld(true);
+
+        const box = new THREE.Box3().setFromObject(finalModelRoot);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        finalModelRoot.position.x -= center.x;
+        finalModelRoot.position.y -= box.min.y;
+        finalModelRoot.position.z -= center.z;
+
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        finalModelRoot.scale.setScalar(5.2 / maxDim);
+        finalModelRoot.rotation.y = -0.5;
+
+        applyFinalModelColors(finalModelRoot);
+        scene.add(finalModelRoot);
+
+        if (fallback) fallback.remove();
+        resizeFinal();
+        controls.enabled = false;
+        controls.enableRotate = false;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        if (finalAnimationFrame !== null) {
+          cancelAnimationFrame(finalAnimationFrame);
+          finalAnimationFrame = null;
+        }
+        renderer.render(scene, camera);
+      },
+      undefined,
+      (error) => {
+        console.warn('resultadofinal.glb no se pudo cargar:', error);
+        if (fallback) {
+          fallback.innerHTML = 'Coloca <strong>resultadofinal.glb</strong> en la carpeta <code>public/</code> para visualizar el tablero completo aquí.';
+        }
+      }
+    );
+  };
+
+  const reloadFinalScene = () => {
+    if (!finalContainer) return;
+
+    if (finalAnimationFrame !== null) {
+      cancelAnimationFrame(finalAnimationFrame);
+      finalAnimationFrame = null;
+    }
+
+    finalControls?.dispose();
+    finalScene?.traverse((child) => {
+      if (!child.isMesh) return;
+      child.geometry?.dispose();
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.forEach((material) => material?.dispose());
+    });
+    finalRenderer?.dispose();
+    finalRenderer?.domElement.remove();
+
+    finalScene = null;
+    finalRenderer = null;
+    finalCamera = null;
+    finalControls = null;
+    finalModelRoot = null;
+
+    if (!finalContainer.querySelector('.final-model-fallback')) {
+      const fallback = document.createElement('div');
+      fallback.className = 'final-model-fallback';
+      fallback.textContent = 'Cargando resultado final...';
+      finalContainer.appendChild(fallback);
+    }
+
+    ensureFinalScene();
+  };
+
+  reloadButton?.addEventListener('click', () => {
+    reloadButton.setAttribute('disabled', 'true');
+    reloadFinalScene();
+    window.setTimeout(() => reloadButton.removeAttribute('disabled'), 1200);
+  });
+
+  continueButton?.addEventListener('click', () => {
+    if (!mount || !showcaseLayout || showcaseLayout.classList.contains('is-revealed')) return;
+
+    const initialRect = mount.getBoundingClientRect();
+    showcaseLayout.style.transition = 'none';
+    showcaseLayout.classList.add('is-revealed');
+    continueButton.setAttribute('aria-expanded', 'true');
+    backButton?.setAttribute('aria-hidden', 'false');
+    editor?.setAttribute('aria-hidden', 'false');
+
+    mount.style.transition = 'none';
+    mount.style.width = `${initialRect.width}px`;
+    void mount.offsetWidth;
+
+    const finalRect = mount.getBoundingClientRect();
+    const offsetX = initialRect.left - finalRect.left;
+    const offsetY = initialRect.top - finalRect.top;
+
+    mount.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    void mount.offsetWidth;
+
+    requestAnimationFrame(() => {
+      showcaseLayout.style.transition = '';
+      mount.style.transition = '';
+      mount.style.width = '';
+      mount.style.transform = 'translate(0, 0)';
+    });
+
+    setTimeout(() => {
+      ensureFinalScene();
+      if (finalModelRoot) {
+        applyFinalModelColors(finalModelRoot);
+      }
+    }, 250);
+  });
+
+  backButton?.addEventListener('click', () => {
+    if (!mount || !showcaseLayout || !showcaseLayout.classList.contains('is-revealed')) return;
+
+    const initialRect = mount.getBoundingClientRect();
+    showcaseLayout.style.transition = 'none';
+    mount.style.transition = 'none';
+    showcaseLayout.classList.remove('is-revealed');
+    continueButton?.setAttribute('aria-expanded', 'false');
+    backButton?.setAttribute('aria-hidden', 'true');
+    editor?.setAttribute('aria-hidden', 'true');
+
+    mount.style.width = '';
+    void mount.offsetWidth;
+
+    const finalRect = mount.getBoundingClientRect();
+    const offsetX = initialRect.left - finalRect.left;
+    const offsetY = initialRect.top - finalRect.top;
+
+    mount.style.width = `${initialRect.width}px`;
+    mount.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    void mount.offsetWidth;
+
+    requestAnimationFrame(() => {
+      showcaseLayout.style.transition = '';
+      mount.style.transition = '';
+      mount.style.width = '';
+      mount.style.transform = 'translate(0, 0)';
+    });
+  });
+
+  matchPiecesBtn?.addEventListener('click', () => {
+    chessConfig.pieces.Blancas = chessConfig.board.Blancas;
+    chessConfig.pieces.Negras = chessConfig.board.Negras;
+    saveState();
+
+    if (colorPicker && activeModelMode === 'piece') {
+      colorPicker.value = chessConfig.pieces[activePieceTeam];
+      syncColorSwatches();
+    }
+
+    if (modelRoot && activeModelMode === 'piece') {
+      const targetColor = chessConfig.pieces[activePieceTeam];
+      modelRoot.traverse((child) => {
+        applyMeshColor(child, targetColor);
+      });
+    }
+
+    updateSummaryDots();
+    if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+  });
+
+  // Team Selector (Blancas / Negras)
+  pieceTeamButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const team = btn.dataset.team;
+      if (!team) return;
+      activePieceTeam = team;
+
+      pieceTeamButtons.forEach((b) => b.classList.toggle('is-active', b.dataset.team === activePieceTeam));
+      updateCurrentPieceColor();
+    });
+  });
+
+  groupColorInputs.forEach((input) => {
+    ['input', 'change'].forEach((eventType) => {
+      input.addEventListener(eventType, (event) => {
+        const targetName = event.target.dataset.target;
+        if (!targetName) return;
+
+        chessConfig.board[targetName] = event.target.value;
+        saveState();
+
+        if (activeModelMode === 'board' && modelRoot) {
+          applyBoardColors(modelRoot);
+        }
+
+        updateSummaryDots();
+        if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+      });
+    });
+  });
+
+  boardColorPalettes.forEach((palette) => {
+    palette.addEventListener('click', (event) => {
+      const swatch = event.target.closest('.color-swatch');
+      const targetName = palette.dataset.target;
+      const nextColor = swatch?.dataset.color;
+      const input = document.querySelector(`[data-target="${targetName}"]`);
+      if (!targetName || !nextColor || !input) return;
+
+      input.value = nextColor;
+      chessConfig.board[targetName] = nextColor;
+      saveState();
+
+      if (activeModelMode === 'board' && modelRoot) {
+        applyBoardColors(modelRoot);
+      }
+
+      updateSummaryDots();
+      if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+      syncBoardSwatches();
+    });
+  });
+
+  syncBoardSwatches();
+
+  const syncThemeButtons = () => {
+    themeButtons.forEach((button) => {
+      const isPieceButton = button.dataset.mode === 'piece';
+      const isBoardButton = button.dataset.mode === 'board';
+      const isActive = activeModelMode === 'piece' ? isPieceButton : isBoardButton;
+      button.classList.toggle('is-active', isActive);
+      button.style.transform = isActive ? 'translateY(-2px) scale(1.01)' : 'translateY(0)';
+
+      if (viewerModeLabel) {
+        viewerModeLabel.textContent = activeModelMode === 'piece' ? 'Piezas' : 'Tableros';
+      }
+    });
+  };
+
+  const updateControlsVisibility = () => {
+    if (colorPicker) {
+      colorPicker.closest('.model-showcase__controls').style.display = activeModelMode === 'piece' ? 'flex' : 'none';
+      if (activeModelMode === 'piece') {
+        colorPicker.value = chessConfig.pieces[activePieceTeam];
+      }
+    }
+    if (pieceTeamControls) {
+      pieceTeamControls.style.display = activeModelMode === 'piece' ? 'inline-flex' : 'none';
+    }
+    if (groupColorControls) {
+      groupColorControls.style.display = activeModelMode === 'board' ? 'flex' : 'none';
+    }
+    if (pieceNav) {
+      pieceNav.classList.toggle('is-visible', activeModelMode === 'piece');
+    }
+    syncThemeButtons();
+  };
+
+  const prepareModelObject = (object, isBoard) => {
+    object.position.set(0, 0, 0);
+    object.rotation.set(0, 0, 0);
+    object.scale.set(1, 1, 1);
+    object.rotation.y = isBoard ? -0.8 : -1.6;
+    object.updateMatrixWorld(true);
+
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const targetSize = isBoard ? maxDim : size.y || 1;
+    const scale = (isBoard ? 3.6 : 4.2) / targetSize;
+    object.scale.setScalar(scale);
+    object.updateMatrixWorld(true);
+
+    const centeredBox = new THREE.Box3().setFromObject(object);
+    const centered = centeredBox.getCenter(new THREE.Vector3());
+    object.position.x -= centered.x;
+    if (isBoard) {
+      object.position.y -= centered.y;
+      object.position.y += -1.4;
+    } else {
+      object.position.y -= centeredBox.min.y;
+      object.position.y += 1.1;
+    }
+    object.position.z -= centered.z;
+
+    if (isBoard) {
+      applyBoardColors(object);
+    } else {
+      const targetColor = chessConfig.pieces[activePieceTeam];
+      object.traverse((child) => {
+        applyMeshColor(child, targetColor);
+      });
+    }
+
+    return object;
+  };
+
+  const updateCameraForMode = (isBoard) => {
+    if (!currentControls || !currentCamera) return;
+    const targetY = isBoard ? -0.5 : 3.2;
+    const camX = isBoard ? 0 : 4.8;
+    const camY = isBoard ? 4.5 : 5.4;
+    const camZ = isBoard ? 8.5 : 9.2;
+
+    currentControls.target.set(0, targetY, 0);
+    currentCamera.position.set(camX, camY, camZ);
+    currentControls.update();
+  };
+
+  const loadModel = (modelUrl) => {
+    if (!mount) return;
+
+    activeModelMode = modelUrl.includes('tablero') ? 'board' : 'piece';
+    if (modelName) {
+      modelName.textContent = modelUrl.includes('rey.glb')
+        ? 'Rey'
+        : modelUrl.includes('alfil.glb')
+          ? 'Alfil'
+          : modelUrl.includes('reina.glb')
+            ? 'Reina'
+            : modelUrl.includes('torre.glb')
+              ? 'Torre'
+              : modelUrl.includes('peon.glb')
+                ? 'Peón'
+                : 'Caballo';
+      modelName.hidden = activeModelMode !== 'piece';
+    }
+    if (activeModelMode === 'piece') {
+      const index = pieceModels.indexOf(modelUrl);
+      if (index >= 0) currentPieceIndex = index;
+    }
+    updateControlsVisibility();
+    ensureScene();
+
+    const fallback = mount.querySelector('.model-fallback');
+    const isBoard = activeModelMode === 'board';
+
+    if (modelRoot && currentScene) {
+      currentScene.remove(modelRoot);
+      modelRoot = null;
+    }
+
+    const cached = modelCache.get(modelUrl);
+    if (cached) {
+      const object = cloneModelWithMaterials(cached);
+      modelRoot = prepareModelObject(object, isBoard);
+      currentScene.add(modelRoot);
+      if (fallback) fallback.remove();
+      updateCameraForMode(isBoard);
+      return;
+    }
+
+    const loader = new GLTFLoader();
+    loader.load(
+      modelUrl,
+      (gltf) => {
+        const rawScene = gltf.scene;
+        modelCache.set(modelUrl, rawScene);
+
+        const object = prepareModelObject(cloneModelWithMaterials(rawScene), isBoard);
+        modelRoot = object;
+        currentScene.add(modelRoot);
+
+        if (fallback) fallback.remove();
+        updateCameraForMode(isBoard);
+      },
+      undefined,
+      (error) => {
+        console.error('No se pudo cargar el modelo 3D:', error);
+        if (fallback) {
+          fallback.textContent = 'No se pudo cargar el modelo';
+        }
+      }
+    );
+  };
+
+  const navigatePiece = (direction) => {
+    if (activeModelMode !== 'piece') return;
+    currentPieceIndex = (currentPieceIndex + direction + pieceModels.length) % pieceModels.length;
+    const nextModel = pieceModels[currentPieceIndex];
+    loadModel(nextModel);
+  };
+
+  pieceNavButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const direction = Number(button.dataset.direction || 0);
+      navigatePiece(direction);
+    });
+  });
+
+  themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const selectedMode = button.dataset.mode;
+
+      if (selectedMode === 'board') {
+        loadModel('/tablero.glb');
+        return;
+      }
+
+      loadModel(pieceModels[currentPieceIndex]);
+
+      if (groupColorControls) {
+        groupColorControls.style.display = 'none';
+      }
+    });
+  });
+
+  const modelUrl = mount?.dataset.modelSrc || pieceModels[0];
+  currentPieceIndex = pieceModels.indexOf(modelUrl) >= 0 ? pieceModels.indexOf(modelUrl) : 0;
+  updateControlsVisibility();
+  loadModel(modelUrl);
+
+  ['input', 'change'].forEach((eventType) => {
+    colorPicker?.addEventListener(eventType, (event) => {
+      const nextColor = event.target.value;
+      chessConfig.pieces[activePieceTeam] = nextColor;
+      saveState();
+      updateCurrentPieceColor();
+    });
+  });
+
+  colorSwatches.forEach((swatch) => {
+    swatch.addEventListener('click', () => {
+      const nextColor = swatch.dataset.color;
+      if (!nextColor || !colorPicker) return;
+      colorPicker.value = nextColor;
+      chessConfig.pieces[activePieceTeam] = nextColor;
+      saveState();
+      updateCurrentPieceColor();
+    });
+  });
+
+  syncColorSwatches();
+</script>

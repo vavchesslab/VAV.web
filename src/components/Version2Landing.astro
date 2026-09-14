@@ -1,0 +1,92 @@
+---
+import Navbar from './Navbar.astro';
+import Laboratorio from './Laboratorio.astro';
+import Galeria from './Galeria.astro';
+import Contacto from './Contacto.astro';
+import Footer from './Footer.astro';
+import GoUp from './GoUp.astro';
+
+const props = Astro.props;
+const accent = props.accent || '#e81c3e';
+const buttonText = props.buttonText || '#ffffff';
+const activeColor = props.activeColor || '2';
+const showVersionToggle = props.showVersionToggle ?? true;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div id="intro-animation" class="intro-animation is-hidden" aria-hidden="true">
+			<div id="intro-animation-container" class="intro-animation-container"></div>
+		</div>
+
+		<div class="version-two-shell" style={`--accent: ${accent}; --button-text: ${buttonText};`}>
+			<Navbar activeColor={activeColor} basePath="/Index" showVersionToggle={showVersionToggle} />
+
+			<main class="page-content is-visible min-h-screen py-0">
+				<section id="home" class="version-two-hero mx-auto max-w-full">
+					<video class="version-two-video" autoplay muted loop playsinline aria-label="Animación de un tablero de ajedrez">
+						<source src="/AjedrezFinal.webm" type="video/webm" />
+					</video>
+					<div class="version-two-copy">
+						<p class="version-two-eyebrow mb-5 text-sm font-semibold uppercase tracking-[0.22em]">Piezas únicas y personalizables</p>
+						<h1 class="text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza aquí.</h1>
+						<p class="max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos <b>piezas de ajedrez y tableros únicos</b>, pensados para quienes disfrutan del juego y también valoran el diseño. Trabajamos con materiales de excelente calidad y durabilidad, cuidando cada detalle para conseguir productos atractivos, resistentes y hechos para acompañarte en el tiempo.</p>
+						<div class="mt-9 flex flex-wrap justify-center gap-3">
+							<a class="rounded-full bg-(--accent) px-6 py-3 font-semibold text-(--button-text) transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--accent)/20" href="https://ig.me/m/vavchesslab" target="_blank" rel="noopener noreferrer">Contactar</a>
+							<a class="rounded-full border border-(--line) px-6 py-3 font-semibold text-white transition hover:border-(--accent)" href="#club">Conocer tableros</a>
+						</div>
+					</div>
+				</section>
+
+				<Laboratorio
+					modelSrc="/caballo.glb"
+					title="Tu pieza 3D"
+					subtitle="Personaliza un tablero y piezas a gusto"
+				/>
+
+				<Galeria />
+
+				<Contacto />
+			</main>
+
+			<Footer />
+
+			<GoUp />
+		</div>
+
+		<script is:inline>
+			(() => {
+				document.querySelector('.page-content')?.classList.add('is-visible');
+				document.querySelector('.nav-divider')?.classList.add('is-visible');
+
+				const updateLogo = () => {
+					const logo = document.querySelector('#logo');
+					const theme = document.documentElement.dataset.theme;
+					if (logo) logo.src = theme === 'dark'
+						? 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png'
+						: 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png';
+				};
+
+				const savedTheme = localStorage.getItem('ajedrez-theme');
+				const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				document.documentElement.dataset.theme = savedTheme || preferredTheme;
+				updateLogo();
+
+				const switcher = document.querySelector('#version2-theme-switcher');
+				switcher?.addEventListener('click', () => {
+					const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+					document.documentElement.dataset.theme = nextTheme;
+					localStorage.setItem('ajedrez-theme', nextTheme);
+					switcher.setAttribute('aria-checked', String(nextTheme === 'dark'));
+					updateLogo();
+				});
+				if (document.documentElement.dataset.theme === 'dark') switcher?.setAttribute('aria-checked', 'true');
+			})();
+		</script>
+
+	</body>
+</html>

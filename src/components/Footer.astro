@@ -1,0 +1,36 @@
+---
+---
+
+<footer class="footer-container">
+	<div class="footer__inner mx-auto max-w-[1600px] px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+		<div class="flex items-center gap-3 font-semibold tracking-tight">
+			<img id="footer-logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="h-10 w-auto" />
+			<span class="font-bold text-white text-base">Volver a Vertex</span>
+		</div>
+
+		<div class="flex items-center gap-6 text-sm text-(--muted)">
+			<a href="#home" class="hover:text-(--accent) transition">Home</a>
+			<a href="#laboratorio" class="hover:text-(--accent) transition">Laboratorio</a>
+			<a href="#galeria" class="hover:text-(--accent) transition">Galería</a>
+			<a href="#partidas" class="hover:text-(--accent) transition">Contacto</a>
+		</div>
+
+		<p class="text-xs text-(--muted) text-center sm:text-right">
+			&copy; {new Date().getFullYear()} Volver a Vertex. Todos los derechos reservados.
+		</p>
+	</div>
+</footer>
+
+<style>
+	.footer-container {
+		position: relative;
+		z-index: 50;
+		margin-top: -12rem;
+		padding-bottom: 12rem;
+		width: 100%;
+		background: color-mix(in srgb, var(--background) 92%, transparent);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+</style>

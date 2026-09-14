@@ -1,0 +1,178 @@
+---
+const {
+  title = 'NUESTRAS PIEZAS Y TABLEROS',
+  subtitle = 'Explora la colección completa de nuestros diseños exclusivos'
+} = Astro.props;
+---
+
+<section id="galeria" class="galeria-section mt-15" aria-label="Galería de imágenes">
+  <div class="galeria__inner">
+    <p class="mt-0 mb-1 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent) text-center">Galería</p>
+    
+    <div class="galeria__header text-center mb-6">
+      <p class="mt-1 text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
+    </div>
+
+    <div class="galeria__grid">
+      <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Rey & Reina</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Colección Clásica</h3>
+            <p>Diseño pulido en resina de alta densidad</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Tablero Artesanal</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Tablero Premium</h3>
+            <p>Acabado mate con detalles contrastantes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+
+            <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+
+            <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+      
+    <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+            
+      <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+        
+      <div class="galeria__item group">
+        <div class="galeria__card">
+          <div class="galeria__image-placeholder">
+            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
+          </div>
+          <div class="galeria__caption">
+            <h3>Piezas de Autor</h3>
+            <p>Escultura geométrica de precisión</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .galeria-section {
+    width: 100%;
+    padding: 0 0 5rem;
+    background: transparent;
+  }
+
+  .galeria__inner {
+    width: min(100%, 1500px);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .galeria__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .galeria__card {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 44, 40, 0.4);
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .galeria__card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .galeria__image-placeholder {
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(20, 125, 114, 0.25), rgba(12, 22, 26, 0.8));
+  }
+
+  .galeria__caption {
+    padding: 1.25rem 1.5rem;
+    background: rgba(8, 20, 23, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .galeria__caption h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .galeria__caption p {
+    margin: 0.35rem 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.65);
+  }
+</style>
