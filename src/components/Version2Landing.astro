@@ -17,16 +17,23 @@ const showVersionToggle = props.showVersionToggle ?? true;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script is:inline>
+			(() => {
+				const savedTheme = localStorage.getItem('ajedrez-theme');
+				const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				document.documentElement.dataset.theme = savedTheme || preferredTheme;
+			})();
+		</script>
 	</head>
 	<body>
-		<div id="intro-animation" class="intro-animation is-hidden" aria-hidden="true">
+		<div id="intro-animation" class="intro-animation" aria-hidden="true">
 			<div id="intro-animation-container" class="intro-animation-container"></div>
 		</div>
 
 		<div class="version-two-shell" style={`--accent: ${accent}; --button-text: ${buttonText};`}>
 			<Navbar activeColor={activeColor} basePath="/Index" showVersionToggle={showVersionToggle} />
 
-			<main class="page-content is-visible min-h-screen py-0">
+			<main class="page-content min-h-screen py-0">
 				<section id="home" class="version-two-hero mx-auto max-w-full">
 					<video class="version-two-video" autoplay muted loop playsinline aria-label="Animación de un tablero de ajedrez">
 						<source src="/AjedrezFinal.webm" type="video/webm" />
@@ -60,9 +67,6 @@ const showVersionToggle = props.showVersionToggle ?? true;
 
 		<script is:inline>
 			(() => {
-				document.querySelector('.page-content')?.classList.add('is-visible');
-				document.querySelector('.nav-divider')?.classList.add('is-visible');
-
 				const updateLogo = () => {
 					const logo = document.querySelector('#logo');
 					const theme = document.documentElement.dataset.theme;
@@ -88,5 +92,40 @@ const showVersionToggle = props.showVersionToggle ?? true;
 			})();
 		</script>
 
+		<script>
+			import lottie from 'lottie-web';
+
+			(() => {
+				const container = document.querySelector('#intro-animation-container');
+				const introEl = document.querySelector('#intro-animation');
+				if (!container || !introEl) return;
+
+				let revealed = false;
+				const revealPage = () => {
+					if (revealed) return;
+					revealed = true;
+					document.querySelector('.page-content')?.classList.add('is-visible');
+					document.querySelector('.nav-divider')?.classList.add('is-visible');
+					introEl.classList.add('is-hidden');
+				};
+
+				const theme = document.documentElement.dataset.theme || 'dark';
+				const animFile = theme === 'dark' ? 'vav_wh.json' : 'vav_bk.json';
+
+				const anim = lottie.loadAnimation({
+					container: container as Element,
+					renderer: 'svg',
+					loop: false,
+					autoplay: true,
+					path: `/${animFile}?v=${Date.now()}`
+				});
+
+				anim.addEventListener('complete', () => {
+					setTimeout(revealPage, 300);
+				});
+
+				window.setTimeout(revealPage, 3500);
+			})();
+		</script>
 	</body>
 </html>
