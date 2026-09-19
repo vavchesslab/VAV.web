@@ -1155,6 +1155,8 @@ const {
     };
 
     window.addEventListener('resize', resize);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(mount);
     resize();
 
     const tick = () => {
