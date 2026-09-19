@@ -67,6 +67,7 @@ const searchFolder = async (folder: string): Promise<GalleryImage[]> => {
         'Content-Type': 'application/json'
       },
       cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
       body: JSON.stringify({
         expression,
         sort_by: [{ created_at: 'desc' }],
@@ -97,13 +98,12 @@ const searchFolder = async (folder: string): Promise<GalleryImage[]> => {
 export const getCloudinaryGallery = async (): Promise<GalleryCategory[]> => {
   if (!cloudName || !apiKey || !apiSecret) return [];
 
-  try {
-    return await Promise.all(categoryNames.map(async (name) => ({
-      name,
-      images: await searchFolder(`${galleryFolder}/${name}`)
-    })));
-  } catch (error) {
-    console.error('No se pudo cargar la galería de Cloudinary:', error);
-    return [];
-  }
+  return Promise.all(categoryNames.map(async (name) => {
+    try {
+      return { name, images: await searchFolder(`${galleryFolder}/${name}`) };
+    } catch (error) {
+      console.error(`No se pudo cargar el álbum ${name}:`, error);
+      return { name, images: [] };
+    }
+  }));
 };
