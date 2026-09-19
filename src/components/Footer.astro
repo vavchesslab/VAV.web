@@ -2,10 +2,12 @@
 ---
 
 <footer class="footer-container">
-	<div class="footer__inner mx-auto max-w-[1600px] px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+	<div class="footer__inner mx-auto max-w-[1600px] px-0 py-20 flex flex-col sm:flex-row items-center justify-between gap-6">
 		<div class="flex items-center gap-3 font-semibold tracking-tight">
-			<img id="footer-logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="h-10 w-auto" />
-			<span class="font-bold text-white text-base">Volver a Vertex</span>
+			<img id="footer-logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png" alt="VAV Logo" class="h-8 w-auto" />
+			<p class="text-xs text-(--muted) text-start">
+				&copy; {new Date().getFullYear()} Volver a Vertex. <br>Todos los derechos reservados.
+			</p>
 		</div>
 
 		<div class="flex items-center gap-6 text-sm text-(--muted)">
@@ -15,9 +17,17 @@
 			<a href="#partidas" class="hover:text-(--accent) transition">Contacto</a>
 		</div>
 
-		<p class="text-xs text-(--muted) text-center sm:text-right">
-			&copy; {new Date().getFullYear()} Volver a Vertex. Todos los derechos reservados.
-		</p>
+		<div>
+			<a href="https://www.instagram.com/vavchesslab/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 hover:text-(--accent) transition">
+				<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2" />
+					<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" />
+					<circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+				</svg>
+				<span>/vavchesslab</span>
+			</a>
+		</div>
+
 	</div>
 </footer>
 
@@ -25,10 +35,9 @@
 	.footer-container {
 		position: relative;
 		z-index: 50;
-		margin-top: -12rem;
-		padding-bottom: 12rem;
+		padding-bottom: 0rem;
 		width: 100%;
-		background: color-mix(in srgb, var(--background) 92%, transparent);
+		background: var(--background);
 		backdrop-filter: blur(16px);
 		-webkit-backdrop-filter: blur(16px);
 		border-top: 1px solid rgba(255, 255, 255, 0.08);

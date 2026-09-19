@@ -10,6 +10,7 @@
 <style>
   .go-up-button {
     position: fixed;
+    isolation: isolate;
     bottom: 2rem;
     right: 2rem;
     z-index: 90;
@@ -21,6 +22,7 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 50%;
     background: rgba(12, 18, 22, 0.75);
+    overflow: hidden;
     color: #ffffff;
     cursor: pointer;
     opacity: 0;
@@ -29,7 +31,7 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.2s ease, color 0.2s ease;
   }
 
   .go-up-button.is-visible {
@@ -40,13 +42,14 @@
 
   .go-up-button:hover {
     border-color: var(--accent);
-    background: var(--accent);
     color: var(--button-text, #ffffff);
     transform: translateY(-3px);
     box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 40%, transparent);
   }
 
   .go-up-icon {
+    position: relative;
+    z-index: 1;
     width: 1.35rem;
     height: 1.35rem;
   }

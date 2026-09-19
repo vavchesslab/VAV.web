@@ -452,7 +452,7 @@ const {
     height: var(--viewer-height);
     display: grid;
     place-items: center;
-    border: 1px solid rgba(151, 190, 184, 0.34);
+    border: 1px solid color-mix(in srgb, var(--gold-light) 70%, transparent);
     border-radius: 1.3rem;
     background: linear-gradient(135deg, rgba(18, 44, 40, 0.95), rgba(121, 131, 128, 0.8));
     box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.35);
@@ -490,10 +490,10 @@ const {
     align-items: center;
     gap: 0.55rem;
     padding: 0.7rem 0.95rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--gold-base);
     border-radius: 999px;
-    background: var(--accent);
-    color: #ffffff;
+    background: linear-gradient(115deg, var(--gold-deep) 0%, var(--gold-base) 22%, var(--gold-light) 45%, var(--gold-bright) 65%, var(--gold-shadow) 100%);
+    color: #2d1a05;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -501,13 +501,13 @@ const {
     cursor: pointer;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 0.6rem 1.2rem color-mix(in srgb, var(--accent) 35%, transparent);
+    box-shadow: 0 0.6rem 1.2rem color-mix(in srgb, var(--gold-base) 35%, transparent);
     transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   }
 
   .model-showcase__continue:hover {
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 86%, white);
+    border-color: var(--gold-light);
+    background: linear-gradient(115deg, var(--gold-shadow) 0%, var(--gold-bright) 35%, var(--gold-light) 60%, var(--gold-base) 100%);
     transform: translateY(-2px);
   }
 
@@ -708,6 +708,7 @@ const {
 
   .piece-nav-button {
     position: relative;
+    isolation: isolate;
     z-index: 11;
     pointer-events: auto;
     flex: 0 0 3.4rem;
@@ -715,10 +716,10 @@ const {
     height: 3.4rem;
     min-width: 3.4rem;
     min-height: 3.4rem;
-    border: none;
+    border: 2px solid transparent;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    color: #f4f4f4;
+    background: transparent;
+    color: var(--gold-base);
     font-size: 1.45rem;
     line-height: 1;
     display: inline-flex;
@@ -730,12 +731,26 @@ const {
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
     font-family: sans-serif;
     letter-spacing: -0.08em;
     text-align: center;
     vertical-align: middle;
     transform: translateY(0);
+  }
+
+  .piece-nav-button::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 2px;
+    border-radius: inherit;
+    background: linear-gradient(115deg, var(--gold-deep) 0%, var(--gold-base) 22%, var(--gold-light) 45%, var(--gold-bright) 65%, var(--gold-shadow) 100%);
+    content: '';
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
   }
 
   .piece-nav-icon {
@@ -746,7 +761,6 @@ const {
   }
 
   .piece-nav-button:hover {
-    background: rgba(255, 255, 255, 0.18);
     transform: translateY(-1px);
   }
 

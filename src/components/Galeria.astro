@@ -1,8 +1,12 @@
 ---
+import { getCloudinaryGallery } from '../lib/cloudinary';
+
 const {
   title = 'NUESTRAS PIEZAS Y TABLEROS',
   subtitle = 'Explora la colección completa de nuestros diseños exclusivos'
 } = Astro.props;
+
+const categories = await getCloudinaryGallery();
 ---
 
 <section id="galeria" class="galeria-section mt-15" aria-label="Galería de imágenes">
@@ -13,111 +17,167 @@ const {
       <p class="mt-1 text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
     </div>
 
-    <div class="galeria__grid">
-      <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Rey & Reina</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Colección Clásica</h3>
-            <p>Diseño pulido en resina de alta densidad</p>
-          </div>
-        </div>
+    {categories.length > 0 && (
+      <div class="galeria__selector-wrap">
+        <label for="galeria-album">Elegí un álbum</label>
+        <select id="galeria-album" class="galeria__selector">
+          {categories.map((category, index) => (
+            <option value={`album-${index}`}>{category.name}</option>
+          ))}
+        </select>
       </div>
+    )}
 
-      <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Tablero Artesanal</span>
+    <div class="galeria__categories">
+      {categories.map((category, index) => (
+        <section class="galeria__category" data-album={`album-${index}`} hidden={index !== 0}>
+          <div class="galeria__grid">
+            {category.images.map((image) => (
+              <article class="galeria__item group">
+                <div class="galeria__card">
+                  <div class="galeria__image-placeholder">
+                    <button class="galeria__image-button" type="button" data-lightbox-src={image.url} data-lightbox-alt={`${category.name}: ${image.title}`} data-lightbox-title={image.title} data-lightbox-category={category.name} aria-label={`Ver ${image.title} en grande`}>
+                      <img src={image.url} alt={`${category.name}: ${image.title}`} loading="lazy" width={image.width} height={image.height} />
+                    </button>
+                  </div>
+                  <div class="galeria__caption">
+                    <h3>{image.title}</h3>
+                    <p>{category.name}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
-          <div class="galeria__caption">
-            <h3>Tablero Premium</h3>
-            <p>Acabado mate con detalles contrastantes</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
-
-            <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
-
-            <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
-      
-    <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
-            
-      <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
-        
-      <div class="galeria__item group">
-        <div class="galeria__card">
-          <div class="galeria__image-placeholder">
-            <span class="text-2xl font-bold text-white/80">Caballo & Torre</span>
-          </div>
-          <div class="galeria__caption">
-            <h3>Piezas de Autor</h3>
-            <p>Escultura geométrica de precisión</p>
-          </div>
-        </div>
-      </div>
+        </section>
+      ))}
     </div>
+
+    {categories.length === 0 && (
+      <p class="galeria__empty">No hay álbumes disponibles en este momento.</p>
+    )}
+  </div>
+
+  <div class="galeria__lightbox" id="galeria-lightbox" hidden role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+    <div class="galeria__lightbox-toolbar">
+      <div>
+        <p id="galeria-lightbox-category" class="galeria__lightbox-category"></p>
+        <h2 id="galeria-lightbox-title" class="galeria__lightbox-title"></h2>
+      </div>
+      <button class="galeria__lightbox-close" type="button" aria-label="Cerrar imagen ampliada">&times;</button>
+    </div>
+    <div class="galeria__lightbox-viewer">
+      <button id="galeria-lightbox-prev" class="galeria__lightbox-arrow" type="button" aria-label="Imagen anterior">&#8592;</button>
+      <img id="galeria-lightbox-image" class="galeria__lightbox-image" alt="" />
+      <button id="galeria-lightbox-next" class="galeria__lightbox-arrow" type="button" aria-label="Imagen siguiente">&#8594;</button>
+    </div>
+    <div id="galeria-lightbox-thumbnails" class="galeria__lightbox-thumbnails" aria-label="Miniaturas del álbum"></div>
+    <p id="galeria-lightbox-position" class="galeria__lightbox-position" aria-live="polite"></p>
   </div>
 </section>
+
+<script>
+  const albumSelector = document.querySelector<HTMLSelectElement>('#galeria-album');
+  const albums = document.querySelectorAll<HTMLElement>('[data-album]');
+
+  albumSelector?.addEventListener('change', () => {
+    albums.forEach((album) => {
+      album.hidden = album.dataset.album !== albumSelector.value;
+    });
+  });
+
+  const lightbox = document.querySelector<HTMLElement>('#galeria-lightbox');
+  const lightboxImage = document.querySelector<HTMLImageElement>('#galeria-lightbox-image');
+  const lightboxCategory = document.querySelector<HTMLElement>('#galeria-lightbox-category');
+  const lightboxTitle = document.querySelector<HTMLElement>('#galeria-lightbox-title');
+  const lightboxPrev = document.querySelector<HTMLButtonElement>('#galeria-lightbox-prev');
+  const lightboxNext = document.querySelector<HTMLButtonElement>('#galeria-lightbox-next');
+  const lightboxThumbnails = document.querySelector<HTMLElement>('#galeria-lightbox-thumbnails');
+  const lightboxPosition = document.querySelector<HTMLElement>('#galeria-lightbox-position');
+  const lightboxClose = document.querySelector<HTMLButtonElement>('.galeria__lightbox-close');
+  const imageButtons = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]');
+  let activeButtons: HTMLButtonElement[] = [];
+  let activeIndex = 0;
+
+  if (lightbox) document.body.append(lightbox);
+
+  const renderThumbnails = () => {
+    if (!lightboxThumbnails) return;
+    lightboxThumbnails.replaceChildren(...activeButtons.map((button, index) => {
+      const thumbnail = document.createElement('button');
+      thumbnail.type = 'button';
+      thumbnail.className = 'galeria__lightbox-thumbnail';
+      thumbnail.setAttribute('aria-label', `Ver ${button.dataset.lightboxTitle || 'imagen'} ${index + 1}`);
+      thumbnail.addEventListener('click', () => showImage(index));
+      const image = document.createElement('img');
+      image.src = button.dataset.lightboxSrc || '';
+      image.alt = button.dataset.lightboxAlt || '';
+      thumbnail.append(image);
+      return thumbnail;
+    }));
+  };
+
+  const showImage = (index: number) => {
+    if (!lightboxImage || activeButtons.length === 0) return;
+    activeIndex = (index + activeButtons.length) % activeButtons.length;
+    const button = activeButtons[activeIndex];
+    lightboxImage.src = button.dataset.lightboxSrc || '';
+    lightboxImage.alt = button.dataset.lightboxAlt || '';
+    if (lightboxCategory) lightboxCategory.textContent = button.dataset.lightboxCategory || '';
+    if (lightboxTitle) lightboxTitle.textContent = button.dataset.lightboxTitle || '';
+    if (lightboxPosition) lightboxPosition.textContent = `Imagen ${activeIndex + 1} de ${activeButtons.length}`;
+    lightboxThumbnails?.querySelectorAll<HTMLButtonElement>('.galeria__lightbox-thumbnail').forEach((thumbnail, thumbnailIndex) => {
+      thumbnail.classList.toggle('is-active', thumbnailIndex === activeIndex);
+      if (thumbnailIndex === activeIndex) thumbnail.setAttribute('aria-current', 'true');
+      else thumbnail.removeAttribute('aria-current');
+    });
+  };
+
+  const closeLightbox = () => {
+    if (!lightbox || !lightboxImage) return;
+    lightbox.hidden = true;
+    lightboxImage.removeAttribute('src');
+    document.body.style.overflow = '';
+  };
+
+  imageButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!lightbox || !lightboxImage) return;
+      const album = button.closest<HTMLElement>('[data-album]');
+      activeButtons = Array.from(album?.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]') || []);
+      activeIndex = activeButtons.indexOf(button);
+      renderThumbnails();
+      showImage(activeIndex);
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  lightboxPrev?.addEventListener('click', () => showImage(activeIndex - 1));
+  lightboxNext?.addEventListener('click', () => showImage(activeIndex + 1));
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+  lightbox?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target instanceof Element && !target.closest('.galeria__lightbox-image, .galeria__lightbox-arrow, .galeria__lightbox-thumbnail, .galeria__lightbox-close')) {
+      closeLightbox();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && lightbox && !lightbox.hidden) closeLightbox();
+    if (event.key === 'ArrowLeft' && lightbox && !lightbox.hidden) showImage(activeIndex - 1);
+    if (event.key === 'ArrowRight' && lightbox && !lightbox.hidden) showImage(activeIndex + 1);
+  });
+</script>
 
 <style>
   .galeria-section {
     width: 100%;
     padding: 0 0 5rem;
     background: transparent;
+  }
+
+  section.galeria-section {
+    scroll-margin-top: 112px;
   }
 
   .galeria__inner {
@@ -131,6 +191,43 @@ const {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-top: 1rem;
+  }
+
+  .galeria__selector-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 2rem auto 1.5rem;
+  }
+
+  .galeria__selector-wrap label {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .galeria__selector {
+    min-width: 13rem;
+    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    color: var(--foreground);
+    background: var(--surface);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .galeria__selector:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .galeria__empty {
+    margin: 2rem 0;
+    color: var(--muted);
+    text-align: center;
   }
 
   .galeria__card {
@@ -151,10 +248,193 @@ const {
 
   .galeria__image-placeholder {
     height: 280px;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, rgba(20, 125, 114, 0.25), rgba(12, 22, 26, 0.8));
+  }
+
+  .galeria__image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .galeria__image-button {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .galeria__image-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .galeria__lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  .galeria__lightbox[hidden] {
+    display: none;
+  }
+
+  .galeria__lightbox-image {
+    max-width: min(82vw, 1100px);
+    max-height: min(68vh, 720px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 0.35rem;
+    box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.55);
+  }
+
+  .galeria__lightbox-toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: min(100%, 1100px);
+    min-height: 4rem;
+    margin: 0 auto 0.5rem;
+    color: #fff;
+  }
+
+  .galeria__lightbox-category {
+    margin: 0 0 0.25rem;
+    color: var(--gold-bright);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .galeria__lightbox-title {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    line-height: 1.1;
+  }
+
+  .galeria__lightbox-viewer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: clamp(0.5rem, 3vw, 2rem);
+    width: 100%;
+    min-height: 0;
+  }
+
+  .galeria__lightbox-arrow {
+    flex: 0 0 auto;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .galeria__lightbox-arrow:hover,
+  .galeria__lightbox-arrow:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .galeria__lightbox-thumbnails {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: min(100%, 1100px);
+    min-height: 4.5rem;
+    margin: 0.75rem auto 0;
+    overflow-x: auto;
+    padding: 0.25rem;
+  }
+
+  .galeria__lightbox-position {
+    min-height: 1.25rem;
+    margin: 0.25rem 0 0;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  .galeria__lightbox-thumbnails :global(.galeria__lightbox-thumbnail) {
+    flex: 0 0 4.5rem;
+    height: 3.5rem;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background: transparent;
+    opacity: 0.62;
+    cursor: pointer;
+  }
+
+  .galeria__lightbox-thumbnails :global(.galeria__lightbox-thumbnail.is-active) {
+    border-color: #e8c031;
+    opacity: 1;
+    box-shadow: 0 0 0 1px #e8c031, 0 0 0.75rem rgba(232, 192, 49, 0.45);
+  }
+
+  .galeria__lightbox-thumbnails :global(.galeria__lightbox-thumbnail img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .galeria__lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .galeria__lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  @media (max-width: 640px) {
+    .galeria__lightbox {
+      padding: 1rem;
+    }
+
+    .galeria__lightbox-viewer {
+      gap: 0.35rem;
+    }
+
+    .galeria__lightbox-arrow {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .galeria__lightbox-image {
+      max-width: 78vw;
+      max-height: 68vh;
+    }
+
+    .galeria__lightbox-thumbnails {
+      justify-content: flex-start;
+    }
   }
 
   .galeria__caption {
@@ -167,7 +447,10 @@ const {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #ffffff;
+    background: linear-gradient(to top, var(--gold-deep) 0%, var(--gold-base) 22%, var(--gold-light) 45%, var(--gold-bright) 65%, var(--gold-shadow) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .galeria__caption p {

@@ -1,153 +1,217 @@
 ---
 const {
-  title = '¿TENÉS DUDAS O UNA IDEA EN MENTE?',
-  subtitle = 'Escribínos y te asesoramos para personalizar tu juego de ajedrez ideal.',
-  imageSrc = 'https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png'
+  title = '¿QUERÉS SABER MÁS?',
+  subtitle = 'Escribínos para conocer valores, colores disponibles y modelos de nuestros juegos.',
+  imageSrc = 'https://res.cloudinary.com/lp0nhnzi/image/upload/v1789705399/IMG_0676_PS_02.png'
 } = Astro.props;
 ---
 
-<section id="partidas" class="contacto-section" aria-label="Sección de contacto">
+<section id="partidas" class="contacto-section" style={`--contact-image: url("${imageSrc}")`} aria-label="Sección de contacto">
   <div class="contacto__inner">
-    <p class="mt-0 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent) text-center">Contacto</p>
-    
-    <div class="contacto__header text-center mb-8">
-      <h2 class="text-3xl font-semibold sm:text-4xl text-white tracking-tight">{title}</h2>
-      <p class="mt-2 text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
-    </div>
+    <div class="contacto__content">
+      <p class="contacto__eyebrow">Contacto</p>
 
-    <div class="contacto__container">
-      <!-- Izquierda: Imagen por defecto -->
-      <div class="contacto__left">
-        <div class="contacto__image-wrapper">
-          <img src={imageSrc} alt="Contacto VAV" class="contacto__image" />
-        </div>
+      <div class="contacto__header">
+        <h2>{title}</h2>
+        <p>{subtitle}</p>
       </div>
 
-      <!-- Línea divisoria central -->
       <div class="contacto__divider" aria-hidden="true"></div>
 
-      <!-- Derecha: Texto y Botón Contactar -->
-      <div class="contacto__right">
-        <h3 class="text-2xl font-bold text-white mb-3">Ponete en contacto con nosotros</h3>
-        <p class="text-base text-(--muted) max-w-md leading-relaxed">
-          Elegí o diseñá las piezas
-        </p>
-        <p class="text-base text-(--muted) mb-6 max-w-md leading-relaxed">
-          y el tablero perfecto para vos.
-        </p>
-        <a 
-          href="https://ig.me/m/vavchesslab" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="contacto__button rounded-full bg-(--accent) px-8 py-4 font-semibold text-(--button-text) transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--accent)/20 inline-flex items-center gap-2"
-        >
-          <span>Contactar</span>
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
+      <div class="contacto__details">
+        <h3>Consultá por tu juego</h3>
+        <p>Te contamos todo lo que necesitás saber sobre nuestros juegos disponibles.</p>
       </div>
+
+      <a
+        href="https://ig.me/m/vavchesslab"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="contacto__button"
+      >
+        <span>Contactar</span>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6" />
+        </svg>
+      </a>
     </div>
   </div>
 </section>
 
 <style>
   .contacto-section {
+    position: relative;
+    isolation: isolate;
     width: 100%;
-    padding: 4rem 0 16rem;
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      color-mix(in srgb, var(--accent) 18%, transparent) 25%,
-      color-mix(in srgb, var(--accent) 28%, transparent) 75%,
-      transparent 100%
-    );
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
     color: var(--foreground, #ffffff);
   }
 
+  .contacto-section::before {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-color: #27010e;
+    background-image: var(--contact-image);
+    background-position: left center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    content: '';
+  }
+
+  .contacto-section::after {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0%,
+      rgba(0, 0, 0, 0.05) 18%,
+      rgba(0, 0, 0, 0.16) 30%,
+      rgba(0, 0, 0, 0.38) 42%,
+      rgba(0, 0, 0, 0.68) 54%,
+      rgba(0, 0, 0, 0.9) 66%,
+      rgba(0, 0, 0, 0.98) 78%,
+      #000 100%
+    );
+    content: '';
+  }
+
   .contacto__inner {
-    width: min(100%, 1200px);
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-
-  .contacto__container {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 2.5rem;
-    padding: 2.5rem 0;
-  }
-
-  .contacto__left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .contacto__image-wrapper {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    max-width: 320px;
-    height: 240px;
-    display: flex;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.82fr);
     align-items: center;
-    justify-content: center;
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 1.5rem;
+    padding: 5rem clamp(1.5rem, 3vw, 3rem);
   }
 
-  .contacto__image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+  .contacto__content {
+    grid-column: 2;
+    width: min(100%, 23rem);
+    margin-left: auto;
+    margin-right: 6rem;
+    margin-bottom: 3rem;
+    padding: 1rem 0;
+  }
+
+  .contacto__eyebrow {
+    margin: 0 0 1rem;
+    color: #e8c031;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .contacto__header h2 {
+    max-width: none;
+    color: #fff;
+    font-size: clamp(1.8rem, 2vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 2.8rem;
+    white-space: nowrap;
+  }
+
+  .contacto__header p,
+  .contacto__details p {
+    color: rgba(255, 255, 255, 0.67);
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .contacto__header p {
+    max-width: 22rem;
+    margin: 1rem 0 0;
   }
 
   .contacto__divider {
-    width: 1px;
-    height: 80%;
-    min-height: 180px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(255, 255, 255, 0.2) 20%,
-      rgba(255, 255, 255, 0.2) 80%,
-      transparent
-    );
+    width: 3.5rem;
+    height: 1px;
+    margin: 2.8rem 0 2.45rem;
+    background: rgba(255, 255, 255, 0.3);
   }
 
-  .contacto__right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+  .contacto__details h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .contacto__details p {
+    max-width: 24rem;
+    margin: 0.5rem 0 1.45rem;
+    font-size: 0.92rem;
+  }
+
+  .contacto__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.78rem 1.55rem;
+    border-radius: 999px;
+    color: #2e2e2e;
+    background: #e8c031;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 180ms ease, transform 180ms ease;
+  }
+
+  .contacto__button:hover {
+    background: #f2d15a;
+    transform: translateY(-2px);
+  }
+
+  .contacto__button svg {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   @media (max-width: 768px) {
-    .contacto__container {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      padding: 1.5rem;
+    .contacto-section {
+      min-height: 100vh;
+      min-height: 100svh;
     }
 
-    .contacto__divider {
-      width: 80%;
-      height: 1px;
-      min-height: 1px;
-      margin: 0 auto;
+    .contacto-section::after {
       background: linear-gradient(
-        to right,
-        transparent,
-        rgba(255, 255, 255, 0.2) 20%,
-        rgba(255, 255, 255, 0.2) 80%,
-        transparent
+        180deg,
+        rgba(0, 0, 0, 0.04) 0%,
+        rgba(0, 0, 0, 0.28) 38%,
+        rgba(0, 0, 0, 0.94) 72%,
+        rgba(0, 0, 0, 0.98) 100%
       );
     }
 
-    .contacto__right {
-      align-items: center;
-      text-align: center;
+    .contacto-section::before {
+      background-size: contain;
+    }
+
+    .contacto__inner {
+      display: flex;
+      align-items: flex-end;
+      padding: 3rem 1.5rem;
+    }
+
+    .contacto__content {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .contacto__header h2 {
+      font-size: 1.8rem;
     }
   }
 </style>

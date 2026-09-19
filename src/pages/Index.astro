@@ -1,14 +1,6 @@
 ---
-import Version2Landing from '../components/Version2Landing.astro';
+import ColorSetup from '../components/ColorSetup.astro';
 import '../styles/global.css';
-
-const colors = {
-  accent: '#e81c3e',
-  squareLight: '#e81c3e',
-  squareDark: '#e81c3e',
-  buttonText: '#ffffff'
-};
 ---
 
-<Version2Landing {...colors} activeColor="2" showVersionToggle={false} />
-
+<ColorSetup />

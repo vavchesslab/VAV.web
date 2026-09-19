@@ -7,9 +7,13 @@ import Footer from './Footer.astro';
 import GoUp from './GoUp.astro';
 
 const props = Astro.props;
-const accent = props.accent || '#e81c3e';
+const accent = props.accent || '#147d72';
 const buttonText = props.buttonText || '#ffffff';
-const activeColor = props.activeColor || '2';
+const goldDeep = props.goldDeep || '#8f5b16';
+const goldBase = props.goldBase || '#d4a72c';
+const goldLight = props.goldLight || '#fff1a8';
+const goldBright = props.goldBright || '#f2c94c';
+const goldShadow = props.goldShadow || '#9b681c';
 const showVersionToggle = props.showVersionToggle ?? true;
 ---
 
@@ -30,8 +34,8 @@ const showVersionToggle = props.showVersionToggle ?? true;
 			<div id="intro-animation-container" class="intro-animation-container"></div>
 		</div>
 
-		<div class="version-two-shell" style={`--accent: ${accent}; --button-text: ${buttonText};`}>
-			<Navbar activeColor={activeColor} basePath="/Index" showVersionToggle={showVersionToggle} />
+		<div class="version-two-shell" style={`--accent: ${accent}; --button-text: ${buttonText}; --gold-deep: ${goldDeep}; --gold-base: ${goldBase}; --gold-light: ${goldLight}; --gold-bright: ${goldBright}; --gold-shadow: ${goldShadow};`}>
+			<Navbar showVersionToggle={showVersionToggle} />
 
 			<main class="page-content min-h-screen py-0">
 				<section id="home" class="version-two-hero mx-auto max-w-full">
@@ -41,10 +45,10 @@ const showVersionToggle = props.showVersionToggle ?? true;
 					<div class="version-two-copy">
 						<p class="version-two-eyebrow mb-5 text-sm font-semibold uppercase tracking-[0.22em]">Piezas únicas y personalizables</p>
 						<h1 class="text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza aquí.</h1>
-						<p class="max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos <b>piezas de ajedrez y tableros únicos</b>, pensados para quienes disfrutan del juego y también valoran el diseño. Trabajamos con materiales de excelente calidad y durabilidad, cuidando cada detalle para conseguir productos atractivos, resistentes y hechos para acompañarte en el tiempo.</p>
+						<p class="max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas de ajedrez y tableros únicos de forma <b>totalmente artesanal</b>, pensados para quienes disfrutan del juego y también valoran el diseño. Trabajamos con materiales de excelente calidad y durabilidad, cuidando cada detalle para conseguir productos atractivos, resistentes y hechos para acompañarte en el tiempo.</p>
 						<div class="mt-9 flex flex-wrap justify-center gap-3">
-							<a class="rounded-full bg-(--accent) px-6 py-3 font-semibold text-(--button-text) transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-(--accent)/20" href="https://ig.me/m/vavchesslab" target="_blank" rel="noopener noreferrer">Contactar</a>
-							<a class="rounded-full border border-(--line) px-6 py-3 font-semibold text-white transition hover:border-(--accent)" href="#club">Conocer tableros</a>
+							<a class="contact-button rounded-full px-6 py-3 font-semibold transition" href="https://ig.me/m/vavchesslab" target="_blank" rel="noopener noreferrer">Contactar</a>
+							<a class="work-button rounded-full border px-6 py-3 font-semibold transition" href="#galeria">Nuestros trabajos</a>
 						</div>
 					</div>
 				</section>

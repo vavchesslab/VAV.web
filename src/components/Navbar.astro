@@ -1,17 +1,17 @@
 ---
-import ColorMenu from './ColorMenu.astro';
-
-const { activeColor = '2', basePath = '/Index', showVersionToggle = false } = Astro.props;
+const { showVersionToggle = false } = Astro.props;
 ---
 
 <header class="sticky-nav-header">
 	<nav class="nav-divider is-visible mx-auto max-w-[1600px] px-6 py-4">
 		<div class="version-two-brand">
-			<a class="flex items-center gap-3 font-semibold tracking-tight" href="/">
-				<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="pb-2 h-12 w-auto">
+			<a class="flex items-center gap-3 font-semibold tracking-tight" href="#home">
+				<span class="navbar-logo-wrap">
+					<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="pb-2 h-12 w-auto">
+					<img src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="" aria-hidden="true" class="navbar-logo-gold pb-2 h-12 w-auto">
+				</span>
 				<span class="font-bold">Volver a Vertex</span>
 			</a>
-			<ColorMenu activeColor={activeColor} basePath={basePath} />
 		</div>
 		<div class="nav-actions">
 			<a class="version-two-nav-link is-active" href="#home" data-nav="home">Home</a>
@@ -19,6 +19,7 @@ const { activeColor = '2', basePath = '/Index', showVersionToggle = false } = As
 			<a class="version-two-nav-link" href="#galeria" data-nav="galeria">Galería</a>
 			<a class="version-two-nav-link" href="#partidas" data-nav="partidas">Contacto</a>
 			{showVersionToggle && <a class="version-toggle" href="/">Volver al original</a>}
+			<span class="nav-active-indicator" aria-hidden="true"></span>
 		</div>
 		<button id="version2-theme-switcher" class="switcher" type="button" role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y oscuro">
 			<span class="text-sm" aria-hidden="true">☼</span>
@@ -40,23 +41,53 @@ const { activeColor = '2', basePath = '/Index', showVersionToggle = false } = As
 		-webkit-backdrop-filter: blur(16px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
+
+	.navbar-logo-wrap {
+		position: relative;
+		display: inline-flex;
+		overflow: hidden;
+	}
+
+	.navbar-logo-gold {
+		position: absolute;
+		inset: 0;
+		filter: brightness(0) saturate(100%) invert(76%) sepia(81%) saturate(850%) hue-rotate(3deg) brightness(96%);
+		clip-path: inset(100% 0 0);
+		transition: clip-path 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.version-two-brand a:hover .navbar-logo-gold,
+	.version-two-brand a:focus-visible .navbar-logo-gold {
+		clip-path: inset(0 0 0);
+	}
 </style>
 
 <script>
 	const navLinks = document.querySelectorAll<HTMLAnchorElement>('.version-two-nav-link[data-nav]');
 	const sections = document.querySelectorAll<HTMLElement>('section[id]');
+	const navActions = document.querySelector<HTMLElement>('.nav-actions');
+	const activeIndicator = document.querySelector<HTMLElement>('.nav-active-indicator');
 
 	let isManualScroll = false;
 	let manualScrollTimeout: number | undefined;
 
 	const setActiveNav = (id: string) => {
+		let activeLink: HTMLAnchorElement | undefined;
 		navLinks.forEach((link) => {
 			if (link.getAttribute('data-nav') === id) {
 				link.classList.add('is-active');
+				activeLink = link;
 			} else {
 				link.classList.remove('is-active');
 			}
 		});
+
+		if (activeLink && navActions && activeIndicator) {
+			const actionsRect = navActions.getBoundingClientRect();
+			const linkRect = activeLink.getBoundingClientRect();
+			activeIndicator.style.width = `${linkRect.width}px`;
+			activeIndicator.style.transform = `translateX(${linkRect.left - actionsRect.left}px)`;
+		}
 	};
 
 	navLinks.forEach((link) => {
@@ -85,6 +116,9 @@ const { activeColor = '2', basePath = '/Index', showVersionToggle = false } = As
 			}, 1000);
 		});
 	});
+
+	setActiveNav(document.querySelector<HTMLAnchorElement>('.version-two-nav-link.is-active')?.dataset.nav || 'home');
+	window.addEventListener('resize', () => setActiveNav(document.querySelector<HTMLAnchorElement>('.version-two-nav-link.is-active')?.dataset.nav || 'home'));
 
 	const observerOptions = {
 		root: null,
