@@ -1489,10 +1489,19 @@ const {
   backButton?.addEventListener('click', () => {
     if (!mount || !showcaseLayout || !showcaseLayout.classList.contains('is-revealed')) return;
 
+    const layoutTransition = showcaseLayout.style.transition;
+    const viewerTransition = mount.style.transition;
+    showcaseLayout.style.transition = 'none';
+    mount.style.transition = 'none';
     showcaseLayout.classList.remove('is-revealed');
     continueButton?.setAttribute('aria-expanded', 'false');
     backButton?.setAttribute('aria-hidden', 'true');
     editor?.setAttribute('aria-hidden', 'true');
+
+    requestAnimationFrame(() => {
+      showcaseLayout.style.transition = layoutTransition;
+      mount.style.transition = viewerTransition;
+    });
   });
 
   matchPiecesBtn?.addEventListener('click', () => {
