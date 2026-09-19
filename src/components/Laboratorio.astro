@@ -1661,20 +1661,16 @@ const {
   });
 
   matchPiecesBtn?.addEventListener('click', () => {
-    chessConfig.pieces.Blancas = chessConfig.board.Blancas;
-    chessConfig.pieces.Negras = chessConfig.board.Negras;
+    chessConfig.board.Blancas = chessConfig.pieces.Blancas;
+    chessConfig.board.Negras = chessConfig.pieces.Negras;
+    if (whiteSquaresColorPicker) whiteSquaresColorPicker.value = chessConfig.board.Blancas;
+    if (blackSquaresColorPicker) blackSquaresColorPicker.value = chessConfig.board.Negras;
     saveState();
 
-    if (colorPicker && activeModelMode === 'piece') {
-      colorPicker.value = chessConfig.pieces[activePieceTeam];
-      syncColorSwatches();
-    }
+    syncBoardSwatches();
 
-    if (modelRoot && activeModelMode === 'piece') {
-      const targetColor = chessConfig.pieces[activePieceTeam];
-      modelRoot.traverse((child) => {
-        applyMeshColor(child, targetColor);
-      });
+    if (modelRoot && activeModelMode === 'board') {
+      applyBoardColors(modelRoot);
     }
 
     updateSummaryDots();
