@@ -894,11 +894,12 @@ const {
   .board-color-toggle svg {
     width: 1rem;
     height: 1rem;
+    transform: rotate(180deg);
     transition: transform 0.3s ease;
   }
 
-  .group-color-picker.is-collapsed .board-color-toggle {
-    transform: rotate(180deg);
+  .group-color-picker.is-collapsed .board-color-toggle svg {
+    transform: rotate(0deg);
   }
 
   .match-pieces-btn {
