@@ -67,9 +67,14 @@ const {
           <div class="model-color-picker">
             <div class="model-color-picker__header">
               <span>Color</span>
+              <button type="button" class="model-color-toggle" aria-expanded="true" aria-controls="piece-color-palette" aria-label="Colapsar selector de color">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
             </div>
             <input id="piece-color-picker" type="hidden" value="#efece7" />
-            <div class="color-palette" role="group" aria-label="Elegir color de la pieza">
+            <div id="piece-color-palette" class="color-palette" role="group" aria-label="Elegir color de la pieza">
               <div class="color-palette__column" aria-label="Grises">
                 <button type="button" class="color-swatch" style="--swatch: #ffffff" data-color="#ffffff" aria-label="Blanco"></button>
                 <button type="button" class="color-swatch" style="--swatch: #d9d9d9" data-color="#d9d9d9" aria-label="Gris claro"></button>
@@ -624,14 +629,48 @@ const {
   }
 
   .model-color-picker__header {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
     gap: 0.4rem;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #ffffff;
+  }
+
+  .model-color-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .model-color-toggle:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .model-color-toggle svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    transition: transform 0.2s ease;
+  }
+
+  .model-color-picker.is-collapsed .color-palette {
+    display: none;
+  }
+
+  .model-color-picker.is-collapsed .model-color-toggle svg {
+    transform: rotate(-90deg);
   }
 
   .model-color-icon {
@@ -1012,6 +1051,8 @@ const {
   const backButton = document.querySelector('.model-showcase__back');
   const editor = document.querySelector('.model-showcase__editor');
   const colorPicker = document.querySelector('#piece-color-picker');
+  const colorPickerPanel = document.querySelector('.model-color-picker');
+  const colorPickerToggle = document.querySelector('.model-color-toggle');
   const colorSwatches = document.querySelectorAll('.color-swatch');
   const reloadButton = document.querySelector('.model-reload-button');
   const whiteSquaresColorPicker = document.querySelector('#white-squares-color-picker');
@@ -1028,6 +1069,13 @@ const {
   const pieceTeamControls = document.querySelector('.piece-team-controls');
   const finalContainer = document.querySelector('#final-model-container');
   const viewerModeLabel = document.querySelector('#viewer-mode-label');
+
+  colorPickerToggle?.addEventListener('click', () => {
+    if (!colorPickerPanel || !colorPickerToggle) return;
+    const isCollapsed = colorPickerPanel.classList.toggle('is-collapsed');
+    colorPickerToggle.setAttribute('aria-expanded', String(!isCollapsed));
+    colorPickerToggle.setAttribute('aria-label', isCollapsed ? 'Desplegar selector de color' : 'Colapsar selector de color');
+  });
 
   // Summary dots in final preview
   const updateSummaryDots = () => {
