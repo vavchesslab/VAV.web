@@ -76,6 +76,7 @@ var searchFolder = async (folder) => {
 				"Content-Type": "application/json"
 			},
 			cache: "no-store",
+			signal: AbortSignal.timeout(8e3),
 			body: JSON.stringify({
 				expression,
 				sort_by: [{ created_at: "desc" }],
@@ -96,15 +97,20 @@ var searchFolder = async (folder) => {
 	return images;
 };
 var getCloudinaryGallery = async () => {
-	try {
-		return await Promise.all(categoryNames.map(async (name) => ({
-			name,
-			images: await searchFolder(`${galleryFolder}/${name}`)
-		})));
-	} catch (error) {
-		console.error("No se pudo cargar la galería de Cloudinary:", error);
-		return [];
-	}
+	return Promise.all(categoryNames.map(async (name) => {
+		try {
+			return {
+				name,
+				images: await searchFolder(`${galleryFolder}/${name}`)
+			};
+		} catch (error) {
+			console.error(`No se pudo cargar el álbum ${name}:`, error);
+			return {
+				name,
+				images: []
+			};
+		}
+	}));
 };
 //#endregion
 //#region src/components/Galeria.astro

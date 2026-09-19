@@ -2,7 +2,7 @@ import { C as LocalImageUsedWrongly, H as RemoteImageNotAllowed, J as Unsupporte
 import { _ as inferRemoteSize$1, b as isRemoteAllowed, c as isRemotePath, f as removeQueryString, l as joinPaths, v as fetchWithRedirects } from "./path_BNg5dzWD.mjs";
 import { b as createAstro, f as addAttribute, l as renderTemplate, t as spreadAttributes, u as maybeRenderHead, v as unescapeHTML } from "./server_BuAIcLXN.mjs";
 import { t as createComponent } from "./compiler_-FtsM7Lg.mjs";
-import { t as __exportAll } from "./Index_8AeY81nM.mjs";
+import { t as __exportAll } from "./Index_SaZJeZhd.mjs";
 import * as mime from "mrmime";
 //#region node_modules/astro/dist/assets/utils/imageKind.js
 function isESMImportedImage(src) {
@@ -312,7 +312,7 @@ var cssFitValues = [
 ];
 async function getConfiguredImageService() {
 	if (!globalThis?.astroAsset?.imageService) {
-		const { default: service } = await import("./sharp_BdyTh1k7.mjs").catch((e) => {
+		const { default: service } = await import("./sharp_34LIftSE.mjs").catch((e) => {
 			const error = new AstroError(InvalidImageService);
 			error.cause = e;
 			throw error;
