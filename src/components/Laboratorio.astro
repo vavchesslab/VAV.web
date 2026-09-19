@@ -65,6 +65,9 @@ const {
           <button type="button" class="match-pieces-btn" id="match-pieces-btn">
             Emparejar<br />color de piezas
           </button>
+          <button type="button" class="match-pieces-btn swap-board-colors-btn" id="swap-board-colors-btn" aria-label="Invertir Color 1 y Color 2">
+            Invertir<br />colores
+          </button>
           <div class="group-color-picker">
             <div class="group-color-picker__header">
               <span>Color 2</span>
@@ -1161,6 +1164,7 @@ const {
   const groupColorInputs = document.querySelectorAll('.group-color-picker input');
   const boardColorPalettes = document.querySelectorAll('.board-color-palette');
   const matchPiecesBtn = document.querySelector('#match-pieces-btn');
+  const swapBoardColorsBtn = document.querySelector('#swap-board-colors-btn');
   const boardColorToggles = document.querySelectorAll('.board-color-toggle');
   const modelName = document.querySelector('.model-showcase__model-name');
   const pieceTeamButtons = document.querySelectorAll('.piece-team-btn');
@@ -1668,6 +1672,23 @@ const {
     saveState();
 
     syncBoardSwatches();
+
+    if (modelRoot && activeModelMode === 'board') {
+      applyBoardColors(modelRoot);
+    }
+
+    updateSummaryDots();
+    if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+  });
+
+  swapBoardColorsBtn?.addEventListener('click', () => {
+    const currentColor1 = chessConfig.board.Blancas;
+    chessConfig.board.Blancas = chessConfig.board.Negras;
+    chessConfig.board.Negras = currentColor1;
+    if (whiteSquaresColorPicker) whiteSquaresColorPicker.value = chessConfig.board.Blancas;
+    if (blackSquaresColorPicker) blackSquaresColorPicker.value = chessConfig.board.Negras;
+    syncBoardSwatches();
+    saveState();
 
     if (modelRoot && activeModelMode === 'board') {
       applyBoardColors(modelRoot);
