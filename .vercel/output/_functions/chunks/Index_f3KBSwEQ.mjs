@@ -65,7 +65,7 @@ var getDeliveryUrl = (publicId, format) => {
 };
 var searchFolder = async (folder) => {
 	const expression = `asset_folder:"${folder}" AND resource_type:image`;
-	const authorization = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
+	const authorization = btoa(`${apiKey}:${apiSecret}`);
 	const images = [];
 	let nextCursor;
 	do {
