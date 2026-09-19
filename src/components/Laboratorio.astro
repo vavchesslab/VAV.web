@@ -62,12 +62,16 @@ const {
               <div class="board-color-palette" data-target="Blancas" role="group" aria-label="Elegir color 1"></div>
             </div>
           </div>
-          <button type="button" class="match-pieces-btn" id="match-pieces-btn">
-            Emparejar<br />color de piezas
-          </button>
-          <button type="button" class="match-pieces-btn swap-board-colors-btn" id="swap-board-colors-btn" aria-label="Invertir Color 1 y Color 2">
-            Invertir<br />colores
-          </button>
+          <div class="match-pieces-actions">
+            <button type="button" class="match-pieces-btn" id="match-pieces-btn">
+              Emparejar<br />color de piezas
+            </button>
+            <button type="button" class="swap-board-colors-btn" id="swap-board-colors-btn" aria-label="Invertir Color 1 y Color 2" title="Invertir colores">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7h10l-3-3m3 3-3 3M17 17H7l3 3m-3-3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
           <div class="group-color-picker">
             <div class="group-color-picker__header">
               <span>Color 2</span>
@@ -924,6 +928,37 @@ const {
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
     transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  }
+
+  .match-pieces-actions {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    pointer-events: auto;
+  }
+
+  .swap-board-colors-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.9rem;
+    color: #f5f5f5;
+    background: rgba(12, 18, 22, 0.75);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .swap-board-colors-btn:hover {
+    border-color: var(--gold-base);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .swap-board-colors-btn svg {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   .match-pieces-btn:hover {
