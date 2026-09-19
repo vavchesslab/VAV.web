@@ -15,15 +15,6 @@ const {
     <div class="model-showcase__layout">
       <div id="model-showcase-viewer" class="model-showcase__viewer" data-model-src={modelSrc}>
         <div class="model-showcase__top-bar">
-          <div class="model-showcase__palette" role="group" aria-label="Elegir entre piezas y tableros">
-            <button type="button" class="theme-option is-active" data-mode="piece" aria-label="Mostrar pieza">
-              Piezas
-            </button>
-            <button type="button" class="theme-option" data-mode="board" data-model="/tablero.glb" aria-label="Mostrar tablero">
-              Tableros
-            </button>
-          </div>
-
           <div class="piece-team-controls" role="group" aria-label="Elegir bando de piezas">
             <button type="button" class="piece-team-btn is-active" data-team="Blancas" aria-label="Personalizar Piezas Blancas">
               Blancas
@@ -32,6 +23,15 @@ const {
               Negras
             </button>
           </div>
+        </div>
+
+        <div class="model-showcase__palette" role="group" aria-label="Elegir entre piezas y tableros">
+          <button type="button" class="theme-option is-active" data-mode="piece" aria-label="Mostrar pieza">
+            Piezas
+          </button>
+          <button type="button" class="theme-option" data-mode="board" data-model="/tablero.glb" aria-label="Mostrar tablero">
+            Tableros
+          </button>
         </div>
 
         <div class="model-showcase__piece-nav" aria-label="Navegación entre piezas">
@@ -182,10 +182,17 @@ const {
             <p>Resultado final</p>
           </div>
           <div class="final-colors-summary" aria-label="Colores seleccionados">
-            <span class="final-color-chip" title="Piezas Blancas"><span class="final-color-dot" id="final-dot-white-piece"></span> Blancas</span>
-            <span class="final-color-chip" title="Piezas Negras"><span class="final-color-dot" id="final-dot-black-piece"></span> Negras</span>
-            <span class="final-color-chip" title="Casillas Color 1"><span class="final-color-dot" id="final-dot-white-board"></span> C1</span>
-            <span class="final-color-chip" title="Casillas Color 2"><span class="final-color-dot" id="final-dot-black-board"></span> C2</span>
+            <div class="final-colors-group">
+              <span class="final-colors-label">Piezas</span>
+              <span class="final-color-chip" title="Piezas Blancas"><span class="final-color-dot" id="final-dot-white-piece"></span> Blancas</span>
+              <span class="final-color-chip" title="Piezas Negras"><span class="final-color-dot" id="final-dot-black-piece"></span> Negras</span>
+            </div>
+            <span class="final-colors-divider" aria-hidden="true"></span>
+            <div class="final-colors-group">
+              <span class="final-colors-label">Tablero</span>
+              <span class="final-color-chip" title="Casillas Color 1"><span class="final-color-dot" id="final-dot-white-board"></span> C1</span>
+              <span class="final-color-chip" title="Casillas Color 2"><span class="final-color-dot" id="final-dot-black-board"></span> C2</span>
+            </div>
           </div>
         </div>
         <div id="final-model-container" class="final-model-container">
@@ -352,31 +359,21 @@ const {
     align-items: center;
     gap: 0.15rem;
     padding: 0.2rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--accent);
     border-radius: 0.65rem;
     background: rgba(255, 255, 255, 0.015);
     opacity: 0.82;
     transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
-  .piece-team-controls::before {
-    margin: 0 0.3rem 0 0.2rem;
-    color: rgba(255, 255, 255, 0.42);
-    content: 'Bando';
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
   .piece-team-btn {
     appearance: none;
     border: 0;
     border-radius: 0.45rem;
-    padding: 0.32rem 0.55rem;
+    padding: 0.4rem 0.72rem;
     background: transparent;
     color: rgba(255, 255, 255, 0.52);
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -391,7 +388,7 @@ const {
 
   .piece-team-btn.is-active {
     background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--gold-light);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     transform: none;
   }
@@ -399,8 +396,27 @@ const {
   .final-colors-summary {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .final-colors-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .final-colors-label {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .final-colors-divider {
+    align-self: stretch;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.55);
   }
 
   .final-color-chip {
@@ -763,24 +779,29 @@ const {
 
   .model-showcase__top-bar {
     position: absolute;
-    top: 0.9rem;
+    top: 2.4rem;
     left: 50%;
-    transform: translateX(-50%);
     z-index: 3;
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
+    transform: translateX(-50%);
   }
 
   .model-showcase__palette {
+    position: absolute;
+    top: -1.15rem;
+    left: 50%;
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.35rem;
     border: 1px solid rgba(255,255,255,0.14);
     border-radius: 0.9rem;
-    background: rgba(255,255,255,0.03);
+    background: var(--accent);
     margin-bottom: 0;
+    transform: translateX(-50%);
   }
 
   .model-showcase__piece-nav {
@@ -1058,7 +1079,7 @@ const {
     border-radius: 0.7rem;
     padding: 0.55rem 0.9rem;
     background: transparent;
-    color: rgba(255,255,255,0.8);
+    color: #1e1e1e;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -1074,7 +1095,7 @@ const {
 
   .theme-option.is-active {
     background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
-    color: #ffffff;
+    color: #1e1e1e;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 8px 16px rgba(0, 0, 0, 0.18);
     transform: translateY(-2px) scale(1.01);
   }
@@ -1135,7 +1156,7 @@ const {
 
   const defaultChessConfig = {
     pieces: {
-      Blancas: '#efece7',
+      Blancas: '#ffffff',
       Negras: '#1f1f1f'
     },
     board: {
@@ -1151,7 +1172,7 @@ const {
         const parsed = JSON.parse(saved);
         return {
           pieces: {
-            Blancas: parsed.pieces?.Blancas || defaultChessConfig.pieces.Blancas,
+            Blancas: parsed.pieces?.Blancas === '#efece7' ? '#ffffff' : parsed.pieces?.Blancas || defaultChessConfig.pieces.Blancas,
             Negras: parsed.pieces?.Negras || defaultChessConfig.pieces.Negras
           },
           board: {
@@ -1428,6 +1449,8 @@ const {
   const applyFinalModelColors = (model) => {
     if (!model) return;
 
+    const worldPosition = new THREE.Vector3();
+
     model.traverse((child) => {
       if (!child.isMesh) return;
 
@@ -1448,7 +1471,6 @@ const {
 
       const isBoard =
         name.includes('plane') ||
-        parentName.includes('blancas') ||
         name === 'negras' ||
         hierarchy.includes('tablero') ||
         hierarchy.includes('board') ||
@@ -1486,9 +1508,9 @@ const {
         } else if (isWhitePieceCollection) {
           targetColor = chessConfig.pieces.Blancas;
         } else {
-          // Identify by .001 / 001 name suffix or negative Z coordinate in chessboard layout
           const has001 = name.includes('001') || uName.includes('001') || name.includes('negra') || name.includes('black');
-          const isNegativeZ = child.position.z < -0.005;
+          child.getWorldPosition(worldPosition);
+          const isNegativeZ = worldPosition.z < -0.005;
 
           if (has001 || isNegativeZ) {
             targetColor = chessConfig.pieces.Negras;
@@ -1581,7 +1603,7 @@ const {
     loader.load(
       '/resultadofinal.glb',
       (gltf) => {
-        finalModelRoot = gltf.scene;
+        finalModelRoot = cloneModelWithMaterials(gltf.scene);
 
         finalModelRoot.position.set(0, 0, 0);
         finalModelRoot.rotation.set(0, 0, 0);
@@ -1600,8 +1622,9 @@ const {
         finalModelRoot.scale.setScalar(5.2 / maxDim);
         finalModelRoot.rotation.y = -0.5;
 
-        applyFinalModelColors(finalModelRoot);
         scene.add(finalModelRoot);
+        finalModelRoot.updateMatrixWorld(true);
+        applyFinalModelColors(finalModelRoot);
 
         if (fallback) fallback.remove();
         resizeFinal();
