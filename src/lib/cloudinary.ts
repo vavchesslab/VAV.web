@@ -55,7 +55,7 @@ const searchFolder = async (folder: string): Promise<GalleryImage[]> => {
   if (!cloudName || !apiKey || !apiSecret) return [];
 
   const expression = `asset_folder:"${folder}" AND resource_type:image`;
-  const authorization = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+  const authorization = btoa(`${apiKey}:${apiSecret}`);
   const images: GalleryImage[] = [];
   let nextCursor: string | undefined;
 
