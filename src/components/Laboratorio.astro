@@ -671,6 +671,8 @@ const {
 
   .model-color-picker.is-collapsed .color-palette {
     max-height: 0;
+    padding: 0;
+    border-width: 0;
     opacity: 0;
     transform: translateY(-0.35rem);
   }
@@ -700,7 +702,7 @@ const {
     max-height: 20rem;
     opacity: 1;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.3s ease;
+    transition: max-height 0.3s ease, padding 0.3s ease, border-width 0.3s ease, opacity 0.2s ease, transform 0.3s ease;
   }
 
   .color-palette__column {
