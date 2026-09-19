@@ -48,24 +48,29 @@ const {
         </div>
 
         <div class="group-color-controls" aria-label="Colores del tablero">
-          <button type="button" class="board-color-toggle" aria-expanded="true" aria-label="Colapsar colores del tablero">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <label class="group-color-picker" for="white-squares-color-picker">
-            <span>Color 1</span>
-            <input id="white-squares-color-picker" type="hidden" value="#f3f3f3" data-target="Blancas" />
-            <div class="board-color-palette" data-target="Blancas" role="group" aria-label="Elegir color 1"></div>
-          </label>
-          <button type="button" class="match-pieces-btn" id="match-pieces-btn">
-            Emparejar<br />color de piezas
-          </button>
-          <label class="group-color-picker" for="black-squares-color-picker">
-            <span>Color 2</span>
-            <input id="black-squares-color-picker" type="hidden" value="#1f1f1f" data-target="Negras" />
-            <div class="board-color-palette" data-target="Negras" role="group" aria-label="Elegir color 2"></div>
-          </label>
+          <div class="board-color-header">
+            <span>Colores del tablero</span>
+            <button type="button" class="board-color-toggle" aria-expanded="true" aria-label="Colapsar colores del tablero">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="board-color-options">
+            <label class="group-color-picker" for="white-squares-color-picker">
+              <span>Color 1</span>
+              <input id="white-squares-color-picker" type="hidden" value="#f3f3f3" data-target="Blancas" />
+              <div class="board-color-palette" data-target="Blancas" role="group" aria-label="Elegir color 1"></div>
+            </label>
+            <button type="button" class="match-pieces-btn" id="match-pieces-btn">
+              Emparejar<br />color de piezas
+            </button>
+            <label class="group-color-picker" for="black-squares-color-picker">
+              <span>Color 2</span>
+              <input id="black-squares-color-picker" type="hidden" value="#1f1f1f" data-target="Negras" />
+              <div class="board-color-palette" data-target="Negras" role="group" aria-label="Elegir color 2"></div>
+            </label>
+          </div>
         </div>
 
         <div class="model-showcase__controls">
@@ -847,21 +852,38 @@ const {
   .group-color-controls {
     position: absolute;
     top: 4.5rem;
-    left: 0.9rem;
-    right: 0.9rem;
+    left: 50%;
     bottom: auto;
     z-index: 3;
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    width: min(26rem, calc(100% - 2rem));
+    padding: 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.9rem;
+    background: rgba(12, 18, 22, 0.72);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    pointer-events: auto;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+  }
+
+  .board-color-header {
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    pointer-events: none;
+    min-height: 1.8rem;
+    padding: 0 0.2rem 0 0.35rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .board-color-toggle {
-    position: absolute;
-    top: -0.2rem;
-    left: 50%;
-    z-index: 2;
     display: inline-grid;
     place-items: center;
     width: 1.8rem;
@@ -873,7 +895,6 @@ const {
     background: #263c3c;
     cursor: pointer;
     pointer-events: auto;
-    transform: translateX(-50%);
     transition: background 0.2s ease, transform 0.3s ease;
   }
 
@@ -888,20 +909,24 @@ const {
   }
 
   .group-color-controls.is-collapsed .board-color-toggle {
-    transform: translateX(-50%) rotate(180deg);
+    transform: rotate(180deg);
   }
 
-  .group-color-controls .group-color-picker,
-  .group-color-controls .match-pieces-btn {
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  .board-color-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    max-height: 18rem;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.3s ease;
   }
 
-  .group-color-controls.is-collapsed .group-color-picker,
-  .group-color-controls.is-collapsed .match-pieces-btn {
+  .group-color-controls.is-collapsed .board-color-options {
+    max-height: 0;
     opacity: 0;
-    pointer-events: none;
     transform: translateY(-0.6rem);
-    visibility: hidden;
+    pointer-events: none;
   }
 
   .match-pieces-btn {
