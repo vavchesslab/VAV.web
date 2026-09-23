@@ -40,10 +40,6 @@ const categories = await getCloudinaryGallery();
                       <img src={image.url} alt={`${category.name}: ${image.title}`} loading="lazy" width={image.width} height={image.height} />
                     </button>
                   </div>
-                  <div class="galeria__caption">
-                    <h3>{image.title}</h3>
-                    <p>{category.name}</p>
-                  </div>
                 </div>
               </article>
             ))}
