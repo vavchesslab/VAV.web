@@ -1627,7 +1627,7 @@ const {
     });
   };
 
-  const pieceModels = ['/caballo.glb', '/alfil.glb', '/reina.glb', '/torre.glb', '/peon.glb', '/rey.glb'];
+  const pieceModels = ['/caballo.glb', '/alfil.glb', '/reina_regular.glb', '/torre.glb', '/peon.glb', '/rey_regular.glb'];
   let currentPieceIndex = 0;
   let modelRoot = null;
   let currentScene = null;
@@ -2200,11 +2200,11 @@ const {
 
     activeModelMode = modelUrl.includes('tablero') ? 'board' : 'piece';
     if (modelName) {
-      modelName.textContent = modelUrl.includes('rey.glb')
+      modelName.textContent = modelUrl.includes('rey_regular.glb')
         ? 'Rey'
         : modelUrl.includes('alfil.glb')
           ? 'Alfil'
-          : modelUrl.includes('reina.glb')
+          : modelUrl.includes('reina_regular.glb')
             ? 'Reina'
             : modelUrl.includes('torre.glb')
               ? 'Torre'
