@@ -197,12 +197,42 @@ const {
         </div>
         <div id="final-model-container" class="final-model-container">
           <div class="final-model-fallback">Cargando resultado final...</div>
+          <div class="final-model-views" aria-label="Perspectivas del resultado final">
+            <figure class="final-model-view final-model-view--main" data-view="principal" tabindex="0" role="button" aria-label="Ampliar vista principal">
+              <div class="final-model-canvas"></div>
+              <figcaption>Vista principal</figcaption>
+            </figure>
+            <figure class="final-model-view" data-view="side" tabindex="0" role="button" aria-label="Ampliar lateral cercana">
+              <div class="final-model-canvas"></div>
+              <figcaption>Lateral cercana</figcaption>
+            </figure>
+            <figure class="final-model-view" data-view="top" tabindex="0" role="button" aria-label="Ampliar vista superior">
+              <div class="final-model-canvas"></div>
+              <figcaption>Vista superior</figcaption>
+            </figure>
+            <figure class="final-model-view" data-view="opposite" tabindex="0" role="button" aria-label="Ampliar perspectiva diagonal">
+              <div class="final-model-canvas"></div>
+              <figcaption>Perspectiva diagonal</figcaption>
+            </figure>
+          </div>
         </div>
         <div class="model-showcase__editor-summary">
           <span>Vista Completa 3D</span>
           <small class="final-hint">Gira y explora el conjunto</small>
         </div>
       </aside>
+    </div>
+  </div>
+
+  <div class="final-model-lightbox" id="final-model-lightbox" hidden role="dialog" aria-modal="true" aria-labelledby="final-model-lightbox-title">
+    <div class="final-model-lightbox__panel">
+      <div class="final-model-lightbox__header">
+        <h2 id="final-model-lightbox-title">Vista principal</h2>
+        <button class="final-model-lightbox__close" type="button" aria-label="Cerrar vista ampliada">&times;</button>
+      </div>
+      <button id="final-model-lightbox-prev" class="final-model-lightbox__arrow final-model-lightbox__arrow--prev" type="button" aria-label="Perspectiva anterior">&#8592;</button>
+      <img id="final-model-lightbox-image" class="final-model-lightbox__image" alt="" />
+      <button id="final-model-lightbox-next" class="final-model-lightbox__arrow final-model-lightbox__arrow--next" type="button" aria-label="Perspectiva siguiente">&#8594;</button>
     </div>
   </div>
 </section>
@@ -444,18 +474,206 @@ const {
     width: 100%;
     height: 100%;
     min-height: 420px;
-    display: grid;
-    place-items: center;
     border-radius: 1rem;
     overflow: hidden;
     background: linear-gradient(145deg, rgba(14, 28, 32, 0.95), rgba(6, 14, 16, 0.98));
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .final-model-views {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    min-width: 0;
+    padding: 0.65rem;
+    box-sizing: border-box;
+  }
+
+  .final-model-view {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.8rem;
+    background: rgba(4, 12, 14, 0.7);
+    cursor: zoom-in;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .final-model-view:hover,
+  .final-model-view:focus-visible {
+    border-color: rgba(255, 255, 255, 0.42);
+    outline: none;
+    transform: translateY(-2px);
+  }
+
+  .final-model-view--main {
+    grid-row: 1 / -1;
+  }
+
+  .final-model-canvas,
+  .final-model-container canvas {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .final-model-canvas {
+    position: absolute;
+    inset: 0;
+  }
+
   .final-model-container canvas {
     display: block;
     width: 100% !important;
     height: 100% !important;
+  }
+
+  .final-model-view figcaption {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.55rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.35rem;
+    background: rgba(0, 0, 0, 0.45);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .final-model-lightbox {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: rgba(1, 6, 8, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .final-model-lightbox[hidden] {
+    display: none;
+  }
+
+  .final-model-lightbox__panel {
+    position: relative;
+    width: min(100%, 1000px);
+    max-height: calc(100vh - 2rem);
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    background: #071215;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
+  }
+
+  .final-model-lightbox__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 0.25rem 0.75rem;
+  }
+
+  .final-model-lightbox__header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .final-model-lightbox__close {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .final-model-lightbox__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.42);
+    color: #ffffff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .final-model-lightbox__arrow:hover,
+  .final-model-lightbox__arrow:focus-visible {
+    border-color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.16);
+    outline: none;
+  }
+
+  .final-model-lightbox__arrow--prev {
+    left: -1.35rem;
+  }
+
+  .final-model-lightbox__arrow--next {
+    right: -1.35rem;
+  }
+
+  .final-model-lightbox__image {
+    display: block;
+    width: 100%;
+    max-height: calc(100vh - 6rem);
+    object-fit: contain;
+    border-radius: 0.65rem;
+    background: #060f12;
+  }
+
+  @media (max-width: 640px) {
+    .final-model-lightbox__panel {
+      width: calc(100% - 2.5rem);
+      padding: 0.7rem;
+    }
+
+    .final-model-lightbox__arrow {
+      width: 2.35rem;
+      height: 2.35rem;
+    }
+
+    .final-model-lightbox__arrow--prev {
+      left: -1.15rem;
+    }
+
+    .final-model-lightbox__arrow--next {
+      right: -1.15rem;
+    }
   }
 
   .final-model-fallback {
@@ -1226,7 +1444,111 @@ const {
   const pieceTeamButtons = document.querySelectorAll('.piece-team-btn');
   const pieceTeamControls = document.querySelector('.piece-team-controls');
   const finalContainer = document.querySelector('#final-model-container');
+  const finalViews = document.querySelectorAll<HTMLElement>('.final-model-view');
+  const finalLightbox = document.querySelector<HTMLElement>('#final-model-lightbox');
+  const finalLightboxImage = document.querySelector<HTMLImageElement>('#final-model-lightbox-image');
+  const finalLightboxTitle = document.querySelector<HTMLElement>('#final-model-lightbox-title');
+  const finalLightboxClose = document.querySelector<HTMLButtonElement>('.final-model-lightbox__close');
+  const finalLightboxPrev = document.querySelector<HTMLButtonElement>('#final-model-lightbox-prev');
+  const finalLightboxNext = document.querySelector<HTMLButtonElement>('#final-model-lightbox-next');
   const viewerModeLabel = document.querySelector('#viewer-mode-label');
+  let finalLightboxRenderer = null;
+  let activeFinalViewIndex = 0;
+
+  if (finalLightbox && finalLightbox.parentElement !== document.body) {
+    document.body.append(finalLightbox);
+  }
+
+  const refreshFinalViews = () => {
+    if (!finalScene) return;
+    finalRenderers.forEach(({ renderer, camera, element }) => {
+      const width = element.clientWidth;
+      const height = element.clientHeight;
+      if (width === 0 || height === 0) return;
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.render(finalScene, camera);
+    });
+  };
+
+  const closeFinalLightbox = () => {
+    if (!finalLightbox) return;
+    finalLightbox.hidden = true;
+    if (finalLightboxImage) finalLightboxImage.removeAttribute('src');
+    document.body.style.overflow = '';
+    requestAnimationFrame(() => {
+      refreshFinalViews();
+      requestAnimationFrame(refreshFinalViews);
+    });
+  };
+
+  const renderFinalLightboxView = (viewIndex) => {
+    const view = finalViews[viewIndex];
+    const canvas = view?.querySelector<HTMLCanvasElement>('canvas');
+    const title = view?.querySelector('figcaption')?.textContent || 'Resultado final';
+    if (!view || !canvas || !finalLightboxImage) return;
+
+    const selectedView = finalRenderers[viewIndex];
+    if (finalScene && selectedView) {
+      if (!finalLightboxRenderer) {
+        finalLightboxRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+        finalLightboxRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+        finalLightboxRenderer.toneMappingExposure = 1.1;
+      }
+      const renderWidth = Math.min(1800, Math.max(1000, window.innerWidth * 2));
+      const renderHeight = Math.min(1400, Math.max(700, window.innerHeight * 2));
+      const highResolutionCamera = selectedView.camera.clone();
+      highResolutionCamera.aspect = renderWidth / renderHeight;
+      highResolutionCamera.updateProjectionMatrix();
+      finalLightboxRenderer.setPixelRatio(1);
+      finalLightboxRenderer.setSize(renderWidth, renderHeight, false);
+      finalLightboxRenderer.render(finalScene, highResolutionCamera);
+      finalLightboxImage.src = finalLightboxRenderer.domElement.toDataURL('image/png');
+    } else {
+      finalLightboxImage.src = canvas.toDataURL('image/png');
+    }
+
+    activeFinalViewIndex = viewIndex;
+    finalLightboxImage.alt = title;
+    if (finalLightboxTitle) finalLightboxTitle.textContent = title;
+  };
+
+  const openFinalLightbox = (view) => {
+    const canvas = view.querySelector<HTMLCanvasElement>('canvas');
+    if (!canvas || !finalLightbox || !finalLightboxImage) return;
+
+    renderFinalLightboxView(Array.from(finalViews).indexOf(view));
+    finalLightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+  };
+
+  const showAdjacentFinalView = (direction) => {
+    const nextIndex = (activeFinalViewIndex + direction + finalViews.length) % finalViews.length;
+    renderFinalLightboxView(nextIndex);
+  };
+
+  finalViews.forEach((view) => {
+    view.addEventListener('click', () => openFinalLightbox(view));
+    view.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openFinalLightbox(view);
+      }
+    });
+  });
+
+  finalLightboxClose?.addEventListener('click', closeFinalLightbox);
+  finalLightboxPrev?.addEventListener('click', () => showAdjacentFinalView(-1));
+  finalLightboxNext?.addEventListener('click', () => showAdjacentFinalView(1));
+  finalLightbox?.addEventListener('click', (event) => {
+    if (event.target === finalLightbox) closeFinalLightbox();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && finalLightbox && !finalLightbox.hidden) closeFinalLightbox();
+    if (event.key === 'ArrowLeft' && finalLightbox && !finalLightbox.hidden) showAdjacentFinalView(-1);
+    if (event.key === 'ArrowRight' && finalLightbox && !finalLightbox.hidden) showAdjacentFinalView(1);
+  });
 
   boardColorToggles.forEach((toggle) => {
     toggle.addEventListener('click', () => {
@@ -1317,11 +1639,9 @@ const {
 
   // Final 3D Scene variables
   let finalScene = null;
-  let finalRenderer = null;
-  let finalCamera = null;
-  let finalControls = null;
+  let finalRenderers = [];
+  let finalCameras = [];
   let finalModelRoot = null;
-  let finalAnimationFrame = null;
 
   const ensureScene = () => {
     if (!mount || currentScene) return;
@@ -1529,33 +1849,24 @@ const {
   const ensureFinalScene = () => {
     if (!finalContainer) return;
     if (finalScene) {
-      if (finalRenderer && finalCamera) {
-        finalRenderer.setSize(finalContainer.clientWidth, finalContainer.clientHeight);
-        finalCamera.aspect = finalContainer.clientWidth / (finalContainer.clientHeight || 1);
-        finalCamera.updateProjectionMatrix();
-      }
       if (finalModelRoot) {
         applyFinalModelColors(finalModelRoot);
       }
-      finalRenderer.render(finalScene, finalCamera);
+      finalRenderers.forEach(({ renderer, camera, element }) => {
+        const width = element.clientWidth;
+        const height = element.clientHeight;
+        if (width === 0 || height === 0) return;
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.render(finalScene, camera);
+      });
       return;
     }
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x060f12);
     finalScene = scene;
-
-    const camera = new THREE.PerspectiveCamera(38, finalContainer.clientWidth / (finalContainer.clientHeight || 1), 0.1, 1000);
-    camera.position.set(0, 6.5, 8.5);
-    finalCamera = camera;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(finalContainer.clientWidth, finalContainer.clientHeight);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
-    finalRenderer = renderer;
-    finalContainer.appendChild(renderer.domElement);
 
     const ambient = new THREE.AmbientLight(0xffffff, 1.4);
     scene.add(ambient);
@@ -1568,34 +1879,34 @@ const {
     dirLight2.position.set(-8, 6, -6);
     scene.add(dirLight2);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.enablePan = false;
-    controls.enableZoom = true;
-    controls.minDistance = 3;
-    controls.maxDistance = 30;
-    controls.target.set(0, 0.8, 0);
-    finalControls = controls;
-
-    const resizeFinal = () => {
-      if (!finalContainer || !finalRenderer || !finalCamera) return;
-      const width = finalContainer.clientWidth;
-      const height = finalContainer.clientHeight;
-      if (width === 0 || height === 0) return;
-      finalRenderer.setSize(width, height);
-      finalCamera.aspect = width / height;
-      finalCamera.updateProjectionMatrix();
+    const viewPositions = {
+      principal: { position: [0, 6.5, 8.5], target: [0, 0.8, 0] },
+      side: { position: [8.5, 3.8, 4.8], target: [0, 1, 0] },
+      top: { position: [0, 11, 0.2], target: [0, 0, 0] },
+      opposite: { position: [-7, 3.8, 6.5], target: [0, 0.9, 0] }
     };
 
-    window.addEventListener('resize', resizeFinal);
+    const views = Array.from(finalContainer.querySelectorAll<HTMLElement>('.final-model-view'));
+    views.forEach((view) => {
+      const canvasHost = view.querySelector<HTMLElement>('.final-model-canvas');
+      const viewConfig = viewPositions[view.dataset.view] || viewPositions.principal;
+      if (!canvasHost) return;
 
-    const tick = () => {
-      controls.update();
-      renderer.render(scene, camera);
-      finalAnimationFrame = requestAnimationFrame(tick);
-    };
+      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 1000);
+      camera.position.set(...viewConfig.position);
+      camera.lookAt(...viewConfig.target);
 
-    tick();
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      canvasHost.appendChild(renderer.domElement);
+      finalCameras.push(camera);
+      finalRenderers.push({ renderer, camera, element: canvasHost });
+    });
+
+    const resizeObserver = new ResizeObserver(() => ensureFinalScene());
+    resizeObserver.observe(finalContainer);
 
     const fallback = finalContainer.querySelector('.final-model-fallback');
     const loader = new GLTFLoader();
@@ -1627,16 +1938,7 @@ const {
         applyFinalModelColors(finalModelRoot);
 
         if (fallback) fallback.remove();
-        resizeFinal();
-        controls.enabled = false;
-        controls.enableRotate = false;
-        controls.enableZoom = false;
-        controls.enablePan = false;
-        if (finalAnimationFrame !== null) {
-          cancelAnimationFrame(finalAnimationFrame);
-          finalAnimationFrame = null;
-        }
-        renderer.render(scene, camera);
+        ensureFinalScene();
       },
       undefined,
       (error) => {
@@ -1651,32 +1953,29 @@ const {
   const reloadFinalScene = () => {
     if (!finalContainer) return;
 
-    if (finalAnimationFrame !== null) {
-      cancelAnimationFrame(finalAnimationFrame);
-      finalAnimationFrame = null;
-    }
-
-    finalControls?.dispose();
     finalScene?.traverse((child) => {
       if (!child.isMesh) return;
       child.geometry?.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach((material) => material?.dispose());
     });
-    finalRenderer?.dispose();
-    finalRenderer?.domElement.remove();
+    finalRenderers.forEach(({ renderer }) => {
+      renderer.dispose();
+      renderer.domElement.remove();
+    });
 
     finalScene = null;
-    finalRenderer = null;
-    finalCamera = null;
-    finalControls = null;
+    finalRenderers = [];
+    finalCameras = [];
     finalModelRoot = null;
 
+    const views = finalContainer.querySelectorAll('.final-model-view');
+    views.forEach((view) => view.querySelector('.final-model-canvas')?.replaceChildren());
     if (!finalContainer.querySelector('.final-model-fallback')) {
       const fallback = document.createElement('div');
       fallback.className = 'final-model-fallback';
       fallback.textContent = 'Cargando resultado final...';
-      finalContainer.appendChild(fallback);
+      finalContainer.prepend(fallback);
     }
 
     ensureFinalScene();
