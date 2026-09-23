@@ -2,18 +2,6 @@
 @import "tailwindcss";
 
 :root {
-	--background: #f5f1e8;
-	--foreground: #17211f;
-	--surface: #fffdf8;
-	--line: #d7d4ca;
-	--muted: #66706d;
-	--accent: #147d72;
-	--square-light: #e9dfc8;
-	--square-dark: #7c9b89;
-	color-scheme: light;
-}
-
-:root[data-theme="dark"] {
 	--background: #121918;
 	--foreground: #edf3ed;
 	--surface: #1b2523;
@@ -93,15 +81,13 @@ body {
 	gap: 0.75rem;
 }
 
-.nav-divider a,
-#theme-switcher {
+.nav-divider a {
 	opacity: 0;
 	transform: translateY(1rem);
 	transition: opacity 700ms ease-out, transform 700ms ease-out;
 }
 
 .nav-divider.is-visible a,
-.nav-divider.is-visible #theme-switcher,
 .nav-divider.is-visible .nav-actions,
 .nav-divider.is-visible .color-menu,
 .nav-divider.is-visible .version-toggle {
@@ -170,12 +156,6 @@ body {
 .color-menu-options a:hover,
 .color-menu-options a.active { background: var(--background); color: var(--accent); }
 
-#theme-switcher {
-	justify-self: end;
-	display: inline-flex;
-	align-items: center;
-}
-
 .nav-line {
 	position: absolute;
 	bottom: 0;
@@ -189,35 +169,6 @@ body {
 
 .nav-line.is-visible {
 	width: 100%;
-}
-
-.switcher {
-	display: flex;
-	align-items: center;
-	gap: 0.55rem;
-	color: var(--muted);
-}
-
-.switcher-track {
-	width: 3rem;
-	height: 1.7rem;
-	padding: 0.18rem;
-	border: 1px solid var(--line);
-	border-radius: 999px;
-	background: var(--surface);
-}
-
-.switcher-thumb {
-	display: block;
-	width: 1.2rem;
-	height: 1.2rem;
-	border-radius: 50%;
-	background: var(--accent);
-	transition: transform 200ms ease;
-}
-
-[aria-checked="true"] .switcher-thumb {
-	transform: translateX(1.25rem);
 }
 
 .board-wrap {
@@ -359,35 +310,6 @@ body {
 	background: var(--surface);
 	white-space: nowrap;
 }
-
-.version-two-shell .switcher {
-	display: flex;
-	align-items: center;
-	gap: 0.55rem;
-	color: var(--muted);
-	justify-self: end;
-}
-
-.version-two-shell .switcher-track {
-	width: 3rem;
-	height: 1.7rem;
-	padding: 0.18rem;
-	border: 1px solid var(--line);
-	border-radius: 999px;
-	background: transparent;
-}
-
-.version-two-shell .switcher-thumb {
-	display: block;
-	width: 1.2rem;
-	height: 1.2rem;
-	border-radius: 50%;
-	background: linear-gradient(135deg, #fffdf0 0%, var(--gold-light) 48%, var(--gold-base) 100%);
-	box-shadow: 0 0.1rem 0.35rem rgb(73 43 5 / 35%);
-	transition: transform 200ms ease;
-}
-
-.version-two-shell [aria-checked="true"] .switcher-thumb { transform: translateX(1.25rem); }
 
 .version-two-shell .nav-line {
 	position: absolute;

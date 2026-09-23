@@ -7,8 +7,8 @@ const { showVersionToggle = false } = Astro.props;
 		<div class="version-two-brand">
 			<a class="flex items-center gap-3 font-semibold tracking-tight" href="#home">
 				<span class="navbar-logo-wrap">
-					<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="VAV Logo" class="pb-2 h-12 w-auto">
-					<img src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderBK_vhpnjo.png" alt="" aria-hidden="true" class="navbar-logo-gold pb-2 h-12 w-auto">
+					<img id="logo" src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png" alt="VAV Logo" class="pb-2 h-12 w-auto">
+					<img src="https://res.cloudinary.com/du83pwamg/image/upload/v1788372944/VAV_BorderWH_omznb8.png" alt="" aria-hidden="true" class="navbar-logo-gold pb-2 h-12 w-auto">
 				</span>
 				<span class="font-bold">Volver a Vertex</span>
 			</a>
@@ -21,10 +21,9 @@ const { showVersionToggle = false } = Astro.props;
 			{showVersionToggle && <a class="version-toggle" href="/">Volver al original</a>}
 			<span class="nav-active-indicator" aria-hidden="true"></span>
 		</div>
-		<button id="version2-theme-switcher" class="switcher" type="button" role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y oscuro">
-			<span class="text-sm" aria-hidden="true">☼</span>
-			<span class="switcher-track"><span class="switcher-thumb"></span></span>
-			<span class="text-sm" aria-hidden="true">☾</span>
+		<button class="navbar-game-link" type="button" aria-label="Jugar partida" aria-pressed="false">
+			<span>Jugar partida</span>
+			<img class="navbar-board-icon" src="https://res.cloudinary.com/lp0nhnzi/image/upload/v1790182193/tablero.png" alt="" aria-hidden="true">
 		</button>
 		<span class="nav-line" aria-hidden="true"></span>
 	</nav>
@@ -60,6 +59,57 @@ const { showVersionToggle = false } = Astro.props;
 	.version-two-brand a:focus-visible .navbar-logo-gold {
 		clip-path: inset(0 0 0);
 	}
+
+	.navbar-board-icon {
+		display: block;
+		width: 2.35rem;
+		height: 2.35rem;
+		object-fit: contain;
+	}
+
+	.navbar-game-link {
+		justify-self: end;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding: 0.35rem 0.55rem 0.35rem 0.8rem;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 0.65rem;
+		color: var(--foreground);
+		background: rgba(255, 255, 255, 0.06);
+		font-size: 0.72rem;
+		font-weight: 700;
+		font-family: inherit;
+		letter-spacing: 0.08em;
+		text-decoration: none;
+		text-transform: uppercase;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+	}
+
+	.navbar-game-link:hover,
+	.navbar-game-link:focus-visible {
+		border-color: var(--gold-base);
+		background: rgba(212, 167, 44, 0.14);
+		outline: none;
+		transform: translateY(-1px);
+	}
+
+	.navbar-game-link[aria-pressed="true"] {
+		border-color: var(--gold-base);
+		background: rgba(212, 167, 44, 0.12);
+		transform: translateY(-2px);
+	}
+
+	.navbar-game-link[aria-pressed="true"] .navbar-board-icon {
+		transform: translateY(-3px);
+		filter: drop-shadow(0 0.55rem 0.5rem rgba(242, 201, 76, 0.9));
+	}
+
+	.navbar-board-icon {
+		transition: transform 180ms ease, filter 180ms ease;
+	}
 </style>
 
 <script>
@@ -67,6 +117,12 @@ const { showVersionToggle = false } = Astro.props;
 	const sections = document.querySelectorAll<HTMLElement>('section[id]');
 	const navActions = document.querySelector<HTMLElement>('.nav-actions');
 	const activeIndicator = document.querySelector<HTMLElement>('.nav-active-indicator');
+	const gameButton = document.querySelector<HTMLButtonElement>('.navbar-game-link');
+
+	gameButton?.addEventListener('click', () => {
+		const isPressed = gameButton.getAttribute('aria-pressed') === 'true';
+		gameButton.setAttribute('aria-pressed', String(!isPressed));
+	});
 
 	let isManualScroll = false;
 	let manualScrollTimeout: number | undefined;

@@ -1,0 +1,440 @@
+---
+---
+
+<section id="play-mode" class="play-mode" aria-label="Modo de juego" hidden>
+	<div class="play-mode__panel">
+		<header class="play-mode__header">
+			<div>
+				<p class="play-mode__eyebrow">Modo de juego</p>
+				<h2>Jugar contra la PC</h2>
+				<p id="play-mode-status" class="play-mode__status" aria-live="polite">Tu turno. Elegí una pieza blanca.</p>
+			</div>
+			<button id="play-mode-close" class="play-mode__close" type="button" aria-label="Cerrar partida">&times;</button>
+		</header>
+
+		<div class="play-mode__body">
+			<div id="play-mode-board" class="play-mode__board" role="grid" aria-label="Tablero de ajedrez"></div>
+			<aside class="play-mode__side-panel">
+				<div class="play-mode__side-block">
+					<span class="play-mode__label">Tu color</span>
+					<div class="play-mode__color-actions">
+						<button class="play-mode__color is-active" type="button" data-player-color="w">Blancas</button>
+						<button class="play-mode__color" type="button" data-player-color="b">Negras</button>
+					</div>
+				</div>
+				<div class="play-mode__side-block">
+					<span class="play-mode__label">Dificultad</span>
+					<select id="play-mode-level" class="play-mode__select" aria-label="Dificultad">
+						<option value="8">Tranquila</option>
+						<option value="14" selected>Normal</option>
+						<option value="20">Exigente</option>
+					</select>
+				</div>
+				<button id="play-mode-reset" class="play-mode__reset" type="button">Nueva partida</button>
+				<p class="play-mode__hint">La PC piensa en tu navegador. El motor se carga únicamente al abrir este modo.</p>
+			</aside>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { Chess } from 'chess.js';
+
+	type PlayerColor = 'w' | 'b';
+	type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
+	type BoardSquare = Parameters<Chess['get']>[0];
+	type BoardPiece = { color: PlayerColor; type: PieceType };
+	type BoardAnimation = { from: BoardSquare; to: BoardSquare };
+
+	const playMode = document.querySelector<HTMLElement>('#play-mode');
+	const board = document.querySelector<HTMLElement>('#play-mode-board');
+	const status = document.querySelector<HTMLElement>('#play-mode-status');
+	const closeButton = document.querySelector<HTMLButtonElement>('#play-mode-close');
+	const resetButton = document.querySelector<HTMLButtonElement>('#play-mode-reset');
+	const levelSelect = document.querySelector<HTMLSelectElement>('#play-mode-level');
+	const colorButtons = document.querySelectorAll<HTMLButtonElement>('[data-player-color]');
+
+	if (playMode && board && status) {
+		if (playMode.parentElement !== document.body) {
+			document.body.append(playMode);
+		}
+
+		const pieceSymbols: Record<PieceType, [string, string]> = {
+			p: [String.fromCodePoint(9817), String.fromCodePoint(9823)],
+			n: [String.fromCodePoint(9816), String.fromCodePoint(9822)],
+			b: [String.fromCodePoint(9815), String.fromCodePoint(9821)],
+			r: [String.fromCodePoint(9814), String.fromCodePoint(9820)],
+			q: [String.fromCodePoint(9813), String.fromCodePoint(9819)],
+			k: [String.fromCodePoint(9812), String.fromCodePoint(9818)]
+		};
+		const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
+		const game = new Chess();
+		let playerColor: PlayerColor = 'w';
+		let selectedSquare: BoardSquare | null = null;
+		let engine: Worker | null = null;
+		let engineReady = false;
+		let engineThinking = false;
+		let pendingEngineMove: number | undefined;
+		const gameButton = document.querySelector<HTMLElement>('.navbar-game-link');
+
+		const positionPlayMode = () => {
+			if (!gameButton) return;
+			const buttonRect = gameButton.getBoundingClientRect();
+			playMode.style.top = `${buttonRect.bottom + 10}px`;
+			playMode.style.right = `${Math.max(0, document.documentElement.clientWidth - buttonRect.right)}px`;
+		};
+
+		const pieceLabel = (piece: BoardPiece) => {
+			const names: Record<PieceType, string> = { p: 'peon', n: 'caballo', b: 'alfil', r: 'torre', q: 'reina', k: 'rey' };
+			return `${piece.color === 'w' ? 'blanco' : 'negro'} ${names[piece.type]}`;
+		};
+
+		const setStatus = (message: string) => {
+			status.textContent = message;
+		};
+
+		const stopEngine = () => {
+			if (pendingEngineMove) window.clearTimeout(pendingEngineMove);
+			engine?.terminate();
+			engine = null;
+			engineReady = false;
+			engineThinking = false;
+		};
+
+		const startEngine = () => {
+			if (engine) return;
+			engine = new Worker('/stockfish-19-lite-single.js');
+			engine.addEventListener('message', (event) => {
+				const message = String(event.data || '');
+				if (message === 'uciok') {
+					engine?.postMessage('isready');
+				}
+				if (message === 'readyok') {
+					engineReady = true;
+					requestEngineMove();
+				}
+				if (message.startsWith('bestmove')) {
+					const move = message.split(' ')[1];
+					if (move && move !== '(none)' && game.turn() !== playerColor) {
+						const from = move.slice(0, 2) as BoardSquare;
+						const to = move.slice(2, 4) as BoardSquare;
+						setStatus('La PC está por mover...');
+						pendingEngineMove = window.setTimeout(() => {
+							pendingEngineMove = undefined;
+							try {
+								game.move({ from, to, promotion: move[4] || 'q' });
+								renderBoard({ from, to });
+							} catch {
+								setStatus('La PC no pudo completar la jugada. Reiniciá la partida.');
+							}
+							engineThinking = false;
+							updateStatus();
+						}, 500);
+					} else {
+						engineThinking = false;
+						renderBoard();
+						updateStatus();
+					}
+				}
+			});
+			engine.postMessage('uci');
+		};
+
+		const requestEngineMove = () => {
+			if (!engine || !engineReady || engineThinking || game.isGameOver() || game.turn() === playerColor) return;
+			engineThinking = true;
+			setStatus('La PC está pensando...');
+			engine.postMessage(`position fen ${game.fen()}`);
+			engine.postMessage(`go depth ${levelSelect?.value || 14}`);
+		};
+
+		const updateStatus = () => {
+			if (game.isCheckmate()) {
+				setStatus(game.turn() === playerColor ? 'Jaque mate. Ganó la PC.' : 'Jaque mate. Ganaste.');
+			} else if (game.isDraw()) {
+				setStatus('Tablas. La partida terminó empatada.');
+			} else if (game.inCheck()) {
+				setStatus(game.turn() === playerColor ? 'Estás en jaque.' : 'La PC está en jaque.');
+			} else if (game.turn() === playerColor) {
+				setStatus('Tu turno. Elegí una pieza.');
+			} else {
+				requestEngineMove();
+			}
+		};
+
+		const renderBoard = (animation?: BoardAnimation) => {
+			const origin = animation
+				? board.querySelector<HTMLElement>(`[data-square="${animation.from}"]`)?.getBoundingClientRect()
+				: undefined;
+			board.replaceChildren();
+			const ranks = playerColor === 'w' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
+			const orderedFiles = playerColor === 'w' ? files : [...files].reverse();
+			ranks.forEach((rank, rankIndex) => {
+				orderedFiles.forEach((file, fileIndex) => {
+					const square = `${file}${rank}` as BoardSquare;
+					const piece = game.get(square);
+					const tile = document.createElement('button');
+					let pieceElement: HTMLSpanElement | null = null;
+					tile.type = 'button';
+					tile.className = `play-mode__square ${(rankIndex + fileIndex) % 2 === 0 ? 'is-light' : 'is-dark'}`;
+					tile.dataset.square = square;
+					tile.setAttribute('role', 'gridcell');
+					tile.setAttribute('aria-label', piece ? `${square}, ${pieceLabel(piece)}` : square);
+					if (selectedSquare === square) tile.classList.add('is-selected');
+					if (piece) {
+						tile.classList.add(piece.color === 'w' ? 'piece-white' : 'piece-black');
+						pieceElement = document.createElement('span');
+						pieceElement.className = 'play-mode__piece';
+						pieceElement.textContent = pieceSymbols[piece.type][piece.color === 'w' ? 0 : 1];
+						tile.append(pieceElement);
+					}
+					tile.addEventListener('click', () => handleSquareClick(square));
+					board.append(tile);
+					if (animation?.to === square && origin && pieceElement) {
+						const destination = tile.getBoundingClientRect();
+						pieceElement.style.setProperty('--move-x', `${origin.left - destination.left}px`);
+						pieceElement.style.setProperty('--move-y', `${origin.top - destination.top}px`);
+						pieceElement.classList.add('is-moving');
+						window.setTimeout(() => pieceElement?.classList.remove('is-moving'), 560);
+					}
+				});
+			});
+		};
+
+		const handleSquareClick = (square: BoardSquare) => {
+			if (engineThinking || game.isGameOver() || game.turn() !== playerColor) return;
+			const piece = game.get(square);
+			if (selectedSquare) {
+				try {
+					const from = selectedSquare;
+					game.move({ from: selectedSquare, to: square, promotion: 'q' });
+					selectedSquare = null;
+					renderBoard({ from, to: square });
+					updateStatus();
+					return;
+				} catch {
+					selectedSquare = piece?.color === playerColor ? square : null;
+				}
+			} else if (piece?.color === playerColor) {
+				selectedSquare = square;
+			}
+			renderBoard();
+		};
+
+		const resetGame = () => {
+			if (pendingEngineMove) window.clearTimeout(pendingEngineMove);
+			pendingEngineMove = undefined;
+			game.reset();
+			selectedSquare = null;
+			engineThinking = false;
+			renderBoard();
+			updateStatus();
+		};
+
+		const openGame = () => {
+			playMode.hidden = false;
+			gameButton?.setAttribute('aria-pressed', 'true');
+			document.body.style.overflow = '';
+			positionPlayMode();
+			startEngine();
+		};
+
+		const closeGame = () => {
+			playMode.hidden = true;
+			gameButton?.setAttribute('aria-pressed', 'false');
+			document.body.style.overflow = '';
+		};
+
+		gameButton?.addEventListener('click', () => {
+			if (playMode.hidden) openGame();
+			else closeGame();
+		});
+		window.addEventListener('resize', positionPlayMode);
+		closeButton?.addEventListener('click', closeGame);
+		resetButton?.addEventListener('click', resetGame);
+		playMode.addEventListener('click', (event) => {
+			if (event.target === playMode) closeGame();
+		});
+		colorButtons.forEach((button) => {
+			button.addEventListener('click', () => {
+				const nextColor = button.dataset.playerColor;
+				if (nextColor !== 'w' && nextColor !== 'b') return;
+				playerColor = nextColor;
+				colorButtons.forEach((item) => item.classList.toggle('is-active', item === button));
+				resetGame();
+			});
+		});
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape' && !playMode.hidden) closeGame();
+		});
+
+		renderBoard();
+	}
+</script>
+
+<style>
+	.play-mode {
+		position: fixed;
+		top: 4.7rem;
+		right: 1rem;
+		z-index: 300;
+		display: grid;
+		align-items: start;
+		justify-items: end;
+		padding: 0;
+		pointer-events: none;
+	}
+
+	.play-mode[hidden] {
+		display: none;
+	}
+
+	.play-mode__panel {
+		width: min(100%, 430px);
+		max-height: calc(100dvh - 5.7rem);
+		overflow: auto;
+		padding: 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 0.9rem;
+		background: #0d191b;
+		box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.5);
+		pointer-events: auto;
+	}
+
+	.play-mode__header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.play-mode__eyebrow,
+	.play-mode__status,
+	.play-mode__header h2,
+	.play-mode__hint {
+		margin: 0;
+	}
+
+	.play-mode__eyebrow {
+		color: var(--gold-base);
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.play-mode__header h2 {
+		margin-top: 0.3rem;
+		color: #ffffff;
+		font-size: clamp(1.3rem, 3vw, 2rem);
+	}
+
+	.play-mode__status {
+		margin-top: 0.45rem;
+		color: var(--muted);
+		font-size: 0.9rem;
+	}
+
+	.play-mode__close {
+		display: grid;
+		place-items: center;
+		width: 2.4rem;
+		height: 2.4rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.06);
+		color: #ffffff;
+		font-size: 1.5rem;
+		cursor: pointer;
+	}
+
+	.play-mode__body {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.8rem;
+		align-items: start;
+	}
+
+	.play-mode__board {
+		display: grid;
+		grid-template-columns: repeat(8, 1fr);
+		grid-template-rows: repeat(8, minmax(0, 1fr));
+		width: min(100%, calc(100dvh - 245px));
+		aspect-ratio: 1;
+		justify-self: center;
+		overflow: hidden;
+		border: 4px solid #b98527;
+		border-radius: 0.55rem;
+		box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
+	}
+
+	:global(.play-mode__square) {
+		display: grid;
+		place-items: center;
+		min-width: 0;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		font-family: Georgia, serif;
+		font-size: clamp(1rem, 4.8vw, 2.8rem);
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	:global(.play-mode__square.is-light) { background: #d9c59a; }
+	:global(.play-mode__square.is-dark) { background: #a8832f; }
+	:global(.play-mode__square.is-selected) { box-shadow: inset 0 0 0 0.3rem #f2c94c; }
+	:global(.play-mode__square.piece-white) { color: #fffdf0; text-shadow: 0 0.12rem 0.15rem #1a1710; }
+	:global(.play-mode__square.piece-black) { color: #17211f; text-shadow: 0 0.08rem 0.1rem rgba(255, 255, 255, 0.2); }
+	:global(.play-mode__piece) {
+		display: block;
+		line-height: 1;
+	}
+
+	:global(.play-mode__piece.is-moving) {
+		position: relative;
+		z-index: 2;
+		filter: drop-shadow(0 0.35rem 0.3rem rgba(0, 0, 0, 0.35));
+		will-change: transform;
+		animation: play-mode-piece-move 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes play-mode-piece-move {
+		from { transform: translate(var(--move-x), var(--move-y)) scale(1.04); }
+		to { transform: translate(0, 0) scale(1); }
+	}
+
+	.play-mode__side-panel {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.65rem;
+		padding: 0.7rem;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 0.8rem;
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.play-mode__side-block { display: grid; gap: 0.55rem; }
+	.play-mode__label { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+	.play-mode__color-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+	.play-mode__color,
+	.play-mode__select,
+	.play-mode__reset { min-height: 2.4rem; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 0.45rem; background: rgba(0, 0, 0, 0.18); color: #ffffff; font: inherit; font-size: 0.75rem; cursor: pointer; }
+	.play-mode__color.is-active { border-color: var(--gold-base); color: var(--gold-light); }
+	.play-mode__select { padding: 0 0.5rem; }
+	.play-mode__reset { border-color: var(--gold-base); background: rgba(212, 167, 44, 0.12); font-weight: 700; }
+	.play-mode__hint { color: var(--muted); font-size: 0.72rem; line-height: 1.5; }
+
+	.play-mode__reset,
+	.play-mode__hint {
+		grid-column: 1 / -1;
+	}
+
+	@media (max-width: 720px) {
+		.play-mode { top: 4.6rem; right: 0.6rem; }
+		.play-mode__panel { width: min(calc(100vw - 1.2rem), 390px); max-height: calc(100dvh - 5.5rem); }
+		.play-mode__board { width: min(100%, calc(100dvh - 285px)); }
+	}
+</style>
