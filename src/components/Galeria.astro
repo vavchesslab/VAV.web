@@ -57,7 +57,6 @@ const categories = await getCloudinaryGallery();
     <div class="galeria__lightbox-toolbar">
       <div>
         <p id="galeria-lightbox-category" class="galeria__lightbox-category"></p>
-        <h2 id="galeria-lightbox-title" class="galeria__lightbox-title"></h2>
       </div>
       <button class="galeria__lightbox-close" type="button" aria-label="Cerrar imagen ampliada">&times;</button>
     </div>
@@ -84,7 +83,6 @@ const categories = await getCloudinaryGallery();
   const lightbox = document.querySelector<HTMLElement>('#galeria-lightbox');
   const lightboxImage = document.querySelector<HTMLImageElement>('#galeria-lightbox-image');
   const lightboxCategory = document.querySelector<HTMLElement>('#galeria-lightbox-category');
-  const lightboxTitle = document.querySelector<HTMLElement>('#galeria-lightbox-title');
   const lightboxPrev = document.querySelector<HTMLButtonElement>('#galeria-lightbox-prev');
   const lightboxNext = document.querySelector<HTMLButtonElement>('#galeria-lightbox-next');
   const lightboxThumbnails = document.querySelector<HTMLElement>('#galeria-lightbox-thumbnails');
@@ -119,7 +117,6 @@ const categories = await getCloudinaryGallery();
     lightboxImage.src = button.dataset.lightboxSrc || '';
     lightboxImage.alt = button.dataset.lightboxAlt || '';
     if (lightboxCategory) lightboxCategory.textContent = button.dataset.lightboxCategory || '';
-    if (lightboxTitle) lightboxTitle.textContent = button.dataset.lightboxTitle || '';
     if (lightboxPosition) lightboxPosition.textContent = `Imagen ${activeIndex + 1} de ${activeButtons.length}`;
     lightboxThumbnails?.querySelectorAll<HTMLButtonElement>('.galeria__lightbox-thumbnail').forEach((thumbnail, thumbnailIndex) => {
       thumbnail.classList.toggle('is-active', thumbnailIndex === activeIndex);
