@@ -35,10 +35,25 @@ const { showVersionToggle = false } = Astro.props;
 		top: 0;
 		z-index: 100;
 		width: 100%;
+		isolation: isolate;
+		background: transparent;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.sticky-nav-header::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
 		background: rgba(12, 14, 18, 0.52);
 		backdrop-filter: blur(30px) saturate(135%);
 		-webkit-backdrop-filter: blur(30px) saturate(135%);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.sticky-nav-header > nav {
+		position: relative;
+		z-index: 1;
 	}
 
 	.navbar-logo-wrap {
