@@ -3,7 +3,7 @@ import { getCloudinaryGallery } from '../lib/cloudinary';
 
 const {
   title = 'NUESTRAS PIEZAS Y TABLEROS',
-  subtitle = 'Explora la colección completa de nuestros diseños exclusivos'
+  subtitle = ''
 } = Astro.props;
 
 const categories = await getCloudinaryGallery();
@@ -19,12 +19,22 @@ const categories = await getCloudinaryGallery();
 
     {categories.length > 0 && (
       <div class="galeria__selector-wrap">
-        <label for="galeria-album">Elegí un álbum</label>
-        <select id="galeria-album" class="galeria__selector">
-          {categories.map((category, index) => (
-            <option value={`album-${index}`}>{category.name}</option>
-          ))}
-        </select>
+        <label id="galeria-album-label" for="galeria-album">Elegí un álbum</label>
+        <div class="galeria__select-shell">
+          <button id="galeria-album" class="galeria__selector" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="galeria-album-options" aria-labelledby="galeria-album-label galeria-album-current">
+            <span id="galeria-album-current">{categories[0].name}</span>
+            <svg class="galeria__selector-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div id="galeria-album-options" class="galeria__options" role="listbox" aria-labelledby="galeria-album-label" hidden>
+            {categories.map((category, index) => (
+              <button class="galeria__option" type="button" role="option" aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-album-value={`album-${index}`}>
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )}
 
@@ -71,13 +81,95 @@ const categories = await getCloudinaryGallery();
 </section>
 
 <script>
-  const albumSelector = document.querySelector<HTMLSelectElement>('#galeria-album');
+  const albumSelector = document.querySelector<HTMLButtonElement>('#galeria-album');
+  const albumSelectorLabel = document.querySelector<HTMLLabelElement>('#galeria-album-label');
+  const albumCurrent = document.querySelector<HTMLElement>('#galeria-album-current');
+  const albumOptions = document.querySelector<HTMLElement>('#galeria-album-options');
+  const albumOptionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.galeria__option'));
   const albums = document.querySelectorAll<HTMLElement>('[data-album]');
 
-  albumSelector?.addEventListener('change', () => {
+  const closeAlbumOptions = (restoreFocus = false) => {
+    if (!albumSelector || !albumOptions) return;
+    albumSelector.setAttribute('aria-expanded', 'false');
+    albumOptions.hidden = true;
+    if (restoreFocus) albumSelector.focus();
+  };
+
+  const openAlbumOptions = () => {
+    if (!albumSelector || !albumOptions) return;
+    albumSelector.setAttribute('aria-expanded', 'true');
+    albumOptions.hidden = false;
+    (albumOptionButtons.find((option) => option.getAttribute('aria-selected') === 'true') || albumOptionButtons[0])?.focus();
+  };
+
+  const selectAlbum = (option: HTMLButtonElement) => {
+    const value = option.dataset.albumValue;
+    if (!value || !albumSelector || !albumCurrent) return;
+
     albums.forEach((album) => {
-      album.hidden = album.dataset.album !== albumSelector.value;
+      album.hidden = album.dataset.album !== value;
     });
+    albumCurrent.textContent = option.textContent?.trim() || '';
+    albumOptionButtons.forEach((item) => {
+      const isSelected = item === option;
+      item.setAttribute('aria-selected', String(isSelected));
+      item.tabIndex = isSelected ? 0 : -1;
+    });
+    closeAlbumOptions(true);
+  };
+
+  albumSelector?.addEventListener('click', () => {
+    if (albumSelector.getAttribute('aria-expanded') === 'true') closeAlbumOptions();
+    else openAlbumOptions();
+  });
+
+  albumSelectorLabel?.addEventListener('click', (event) => {
+    event.preventDefault();
+    openAlbumOptions();
+  });
+
+  albumSelector?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      openAlbumOptions();
+    } else if (event.key === 'Escape') {
+      closeAlbumOptions();
+    }
+  });
+
+  albumOptions?.addEventListener('click', (event) => {
+    const option = (event.target as Element).closest<HTMLButtonElement>('.galeria__option');
+    if (option) selectAlbum(option);
+  });
+
+  albumOptions?.addEventListener('keydown', (event) => {
+    const currentIndex = albumOptionButtons.indexOf(document.activeElement as HTMLButtonElement);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % albumOptionButtons.length;
+    else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + albumOptionButtons.length) % albumOptionButtons.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = albumOptionButtons.length - 1;
+    else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeAlbumOptions(true);
+      return;
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      albumOptionButtons[currentIndex]?.click();
+      return;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    albumOptionButtons[nextIndex]?.focus();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Node && !document.querySelector('.galeria__selector-wrap')?.contains(event.target)) {
+      closeAlbumOptions();
+    }
   });
 
   const lightbox = document.querySelector<HTMLElement>('#galeria-lightbox');
@@ -190,31 +282,117 @@ const categories = await getCloudinaryGallery();
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.85rem;
     margin: 2rem auto 1.5rem;
   }
 
   .galeria__selector-wrap label {
-    color: var(--muted);
-    font-size: 0.85rem;
-    font-weight: 600;
+    color: var(--gold-light, #fff1a8);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .galeria__select-shell {
+    position: relative;
+    width: 13rem;
+    max-width: calc(100vw - 2rem);
   }
 
   .galeria__selector {
-    min-width: 13rem;
-    padding: 0.7rem 2.5rem 0.7rem 1rem;
-    border: 1px solid var(--line);
-    border-radius: 0.45rem;
-    color: var(--foreground);
-    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 2.8rem;
+    padding: 0.62rem 0.8rem 0.62rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--gold-base, #d4a72c) 48%, transparent);
+    border-radius: 0.7rem;
+    color: #f5f5f5;
+    background: rgba(12, 22, 26, 0.82);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
     font: inherit;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .galeria__selector:hover {
+    border-color: var(--gold-base, #d4a72c);
+    background: rgba(17, 31, 35, 0.94);
   }
 
   .galeria__selector:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    border-color: var(--gold-light, #fff1a8);
+    outline: 2px solid color-mix(in srgb, var(--gold-base, #d4a72c) 48%, transparent);
+    outline-offset: 3px;
+  }
+
+  .galeria__selector[aria-expanded="true"] .galeria__selector-icon {
+    color: var(--gold-light, #fff1a8);
+    transform: rotate(180deg);
+  }
+
+  .galeria__selector-icon {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    color: var(--gold-base, #d4a72c);
+    pointer-events: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .galeria__options {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    right: 0;
+    left: 0;
+    z-index: 20;
+    display: grid;
+    gap: 0.2rem;
+    max-height: min(18rem, 50vh);
+    padding: 0.35rem;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.7rem;
+    background: rgba(8, 17, 20, 0.98);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .galeria__options[hidden] {
+    display: none;
+  }
+
+  .galeria__option {
+    width: 100%;
+    padding: 0.6rem 0.65rem;
+    border: 0;
+    border-radius: 0.4rem;
+    color: rgba(245, 245, 245, 0.82);
+    background: transparent;
+    font: inherit;
+    font-size: 0.82rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease;
+  }
+
+  .galeria__option:hover,
+  .galeria__option:focus-visible {
+    outline: none;
+    color: #fff1a8;
+    background: rgba(212, 167, 44, 0.14);
+  }
+
+  .galeria__option[aria-selected="true"] {
+    color: #fff1a8;
+    background: rgba(212, 167, 44, 0.2);
   }
 
   .galeria__empty {
@@ -407,6 +585,15 @@ const categories = await getCloudinaryGallery();
   }
 
   @media (max-width: 640px) {
+    .galeria__selector-wrap {
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .galeria__select-shell {
+      width: min(13rem, calc(100vw - 2rem));
+    }
+
     .galeria__lightbox {
       padding: 1rem;
     }

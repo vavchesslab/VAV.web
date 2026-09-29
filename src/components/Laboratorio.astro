@@ -1,6 +1,6 @@
 ---
 const {
-  modelSrc = '/caballo.glb',
+  modelSrc = '/rey_regular.glb',
   title = 'OBJETOS 3D',
   subtitle = 'Vista interactiva del objeto'
 } = Astro.props;
@@ -62,7 +62,7 @@ const {
               <div class="board-color-palette" data-target="Blancas" role="group" aria-label="Elegir color 1"></div>
             </div>
           </div>
-          <div class="match-pieces-actions">
+          <div class="match-pieces-actions" role="group" aria-label="Acciones de colores del tablero">
             <button type="button" class="match-pieces-btn" id="match-pieces-btn">
               Emparejar<br />color de piezas
             </button>
@@ -103,58 +103,44 @@ const {
               <div class="color-palette__column" aria-label="Grises">
                 <button type="button" class="color-swatch" style="--swatch: #ffffff" data-color="#ffffff" aria-label="Blanco"></button>
                 <button type="button" class="color-swatch" style="--swatch: #d9d9d9" data-color="#d9d9d9" aria-label="Gris claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #aaaaaa" data-color="#aaaaaa" aria-label="Gris medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #777777" data-color="#777777" aria-label="Gris medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #444444" data-color="#444444" aria-label="Gris oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #111111" data-color="#111111" aria-label="Negro"></button>
               </div>
               <div class="color-palette__column" aria-label="Azules">
                 <button type="button" class="color-swatch" style="--swatch: #dbeafe" data-color="#dbeafe" aria-label="Azul muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #93c5fd" data-color="#93c5fd" aria-label="Azul claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #60a5fa" data-color="#60a5fa" aria-label="Azul medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #2563eb" data-color="#2563eb" aria-label="Azul medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #1d4ed8" data-color="#1d4ed8" aria-label="Azul oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #172554" data-color="#172554" aria-label="Azul muy oscuro"></button>
               </div>
               <div class="color-palette__column" aria-label="Rojos">
                 <button type="button" class="color-swatch" style="--swatch: #fee2e2" data-color="#fee2e2" aria-label="Rojo muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #fca5a5" data-color="#fca5a5" aria-label="Rojo claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #f87171" data-color="#f87171" aria-label="Rojo medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #dc2626" data-color="#dc2626" aria-label="Rojo medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #b91c1c" data-color="#b91c1c" aria-label="Rojo oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #450a0a" data-color="#450a0a" aria-label="Rojo muy oscuro"></button>
               </div>
               <div class="color-palette__column" aria-label="Verdes">
                 <button type="button" class="color-swatch" style="--swatch: #dcfce7" data-color="#dcfce7" aria-label="Verde muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #86efac" data-color="#86efac" aria-label="Verde claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #4ade80" data-color="#4ade80" aria-label="Verde medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #16a34a" data-color="#16a34a" aria-label="Verde medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #15803d" data-color="#15803d" aria-label="Verde oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #052e16" data-color="#052e16" aria-label="Verde muy oscuro"></button>
               </div>
               <div class="color-palette__column" aria-label="Amarillos">
                 <button type="button" class="color-swatch" style="--swatch: #fef9c3" data-color="#fef9c3" aria-label="Amarillo muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #fde68a" data-color="#fde68a" aria-label="Amarillo claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #facc15" data-color="#facc15" aria-label="Amarillo medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #eab308" data-color="#eab308" aria-label="Amarillo medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #a16207" data-color="#a16207" aria-label="Amarillo oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #422006" data-color="#422006" aria-label="Amarillo muy oscuro"></button>
               </div>
               <div class="color-palette__column" aria-label="Violetas y rosas">
                 <button type="button" class="color-swatch" style="--swatch: #fce7f3" data-color="#fce7f3" aria-label="Rosa muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #f9a8d4" data-color="#f9a8d4" aria-label="Rosa claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #e879f9" data-color="#e879f9" aria-label="Fucsia claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #c026d3" data-color="#c026d3" aria-label="Violeta rosado"></button>
                 <button type="button" class="color-swatch" style="--swatch: #7e22ce" data-color="#7e22ce" aria-label="Violeta oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #3b0764" data-color="#3b0764" aria-label="Violeta muy oscuro"></button>
               </div>
               <div class="color-palette__column" aria-label="Naranjas">
                 <button type="button" class="color-swatch" style="--swatch: #ffedd5" data-color="#ffedd5" aria-label="Naranja muy claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #fdba74" data-color="#fdba74" aria-label="Naranja claro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #fb923c" data-color="#fb923c" aria-label="Naranja medio claro"></button>
                 <button type="button" class="color-swatch" style="--swatch: #ea580c" data-color="#ea580c" aria-label="Naranja medio"></button>
                 <button type="button" class="color-swatch" style="--swatch: #c2410c" data-color="#c2410c" aria-label="Naranja oscuro"></button>
-                <button type="button" class="color-swatch" style="--swatch: #431407" data-color="#431407" aria-label="Naranja muy oscuro"></button>
               </div>
             </div>
           </div>
@@ -173,6 +159,12 @@ const {
             <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           Volver
+        </button>
+        <button class="model-reload-button" type="button" aria-label="Recargar resultado final" hidden>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 7v5h-5M4 17v-5h5m-4.2-3A8 8 0 0 1 18.5 7L20 12M4 12l1.5 5A8 8 0 0 0 19.2 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span>Recargar</span>
         </button>
       </div>
 
@@ -210,9 +202,13 @@ const {
               <div class="final-model-canvas"></div>
               <figcaption>Vista superior</figcaption>
             </figure>
-            <figure class="final-model-view" data-view="opposite" tabindex="0" role="button" aria-label="Ampliar perspectiva diagonal">
+            <figure class="final-model-view" data-view="whitePerspective" tabindex="0" role="button" aria-label="Ampliar Frente (blancas)">
               <div class="final-model-canvas"></div>
-              <figcaption>Perspectiva diagonal</figcaption>
+              <figcaption>Frente (blancas)</figcaption>
+            </figure>
+            <figure class="final-model-view" data-view="blackPerspective" tabindex="0" role="button" aria-label="Ampliar Frente (negras)">
+              <div class="final-model-canvas"></div>
+              <figcaption>Frente (negras)</figcaption>
             </figure>
           </div>
         </div>
@@ -483,7 +479,7 @@ const {
   .final-model-views {
     display: grid;
     grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
-    grid-template-rows: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
     gap: 0.65rem;
     width: 100%;
     height: 100%;
@@ -547,6 +543,54 @@ const {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     pointer-events: none;
+  }
+
+  .model-reload-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(12, 18, 22, 0.72);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    color: #f5f5f5;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .model-reload-button[hidden] {
+    display: none;
+  }
+
+  .model-reload-button:hover:not(:disabled) {
+    box-shadow: 0 0 0 0.12rem color-mix(in srgb, var(--gold-base) 22%, transparent), 0 0.6rem 1.2rem color-mix(in srgb, var(--gold-base) 55%, transparent);
+  }
+
+  .model-reload-button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+
+  .model-reload-button:disabled {
+    cursor: progress;
+    opacity: 0.75;
+  }
+
+  .model-reload-button svg {
+    width: 1rem;
+    height: 1rem;
   }
 
   .final-model-lightbox {
@@ -852,37 +896,12 @@ const {
     justify-content: flex-end;
   }
 
-  .model-reload-button {
-    padding: 0.48rem 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 999px;
-    background: rgba(12, 18, 22, 0.72);
-    color: #f5f5f5;
-    cursor: pointer;
-    font: inherit;
-    font-size: 0.68rem;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-  }
-
-  .model-reload-button:hover {
-    border-color: rgba(255, 255, 255, 0.42);
-    background: rgba(12, 18, 22, 0.92);
-    transform: translateY(-1px);
-  }
-
-  .model-reload-button:disabled {
-    cursor: wait;
-    opacity: 0.6;
-  }
-
   .model-color-picker {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 0.55rem;
-    width: 11.5rem;
+    width: 13rem;
     box-sizing: border-box;
     overflow: hidden;
     padding: 0.55rem 0.9rem;
@@ -913,8 +932,9 @@ const {
   }
 
   .model-color-toggle {
-    display: inline-grid;
-    place-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
     padding: 0;
@@ -931,6 +951,7 @@ const {
   }
 
   .model-color-toggle svg {
+    display: block;
     width: 0.9rem;
     height: 0.9rem;
     transition: transform 0.2s ease;
@@ -960,8 +981,8 @@ const {
 
   .color-palette {
     display: grid;
-    grid-template-columns: repeat(7, 1.05rem);
-    gap: 0.28rem;
+    grid-template-columns: repeat(7, 1.25rem);
+    column-gap: 0.2rem;
     padding: 0.35rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 0.55rem;
@@ -986,6 +1007,11 @@ const {
     background: var(--swatch);
     cursor: pointer;
     transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .model-color-picker .color-swatch {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .color-swatch:hover,
@@ -1151,9 +1177,9 @@ const {
   .match-pieces-btn {
     pointer-events: auto;
     padding: 0.55rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 0.9rem;
-    background: rgba(12, 18, 22, 0.75);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     color: #f5f5f5;
     font-family: inherit;
     font-size: 0.72rem;
@@ -1163,36 +1189,39 @@ const {
     text-align: center;
     line-height: 1.35;
     cursor: pointer;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease;
   }
 
   .match-pieces-actions {
     display: inline-flex;
     align-items: stretch;
-    gap: 0.25rem;
+    gap: 0;
     pointer-events: auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.9rem;
+    background: rgba(12, 18, 22, 0.75);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .swap-board-colors-btn {
     display: inline-grid;
     place-items: center;
-    width: 2.25rem;
+    flex: 0 0 2.75rem;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 0.9rem;
+    border: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0;
     color: #f5f5f5;
-    background: rgba(12, 18, 22, 0.75);
+    background: transparent;
     cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease;
   }
 
   .swap-board-colors-btn:hover {
-    border-color: var(--gold-base);
     background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-1px);
   }
 
   .swap-board-colors-btn svg {
@@ -1201,10 +1230,16 @@ const {
   }
 
   .match-pieces-btn:hover {
-    border-color: rgba(255, 255, 255, 0.45);
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    transform: translateY(-1px);
+  }
+
+  .match-pieces-btn:focus-visible,
+  .swap-board-colors-btn:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 2px solid var(--gold-base);
+    outline-offset: -3px;
   }
 
   .group-color-picker {
@@ -1244,6 +1279,7 @@ const {
   }
 
   .group-color-picker__content {
+    align-self: center;
     max-height: 12rem;
     opacity: 1;
     overflow: hidden;
@@ -1603,7 +1639,7 @@ const {
       column.className = 'color-palette__column';
       column.setAttribute('aria-label', `Familia de color ${columnIndex + 1}`);
 
-      paletteColors.slice(columnIndex * 6, columnIndex * 6 + 6).forEach((color) => {
+      paletteColors.slice(columnIndex * 4, columnIndex * 4 + 4).forEach((color) => {
         const swatch = document.createElement('button');
         swatch.type = 'button';
         swatch.className = 'color-swatch';
@@ -1627,7 +1663,7 @@ const {
     });
   };
 
-  const pieceModels = ['/caballo.glb', '/alfil.glb', '/reina_regular.glb', '/torre.glb', '/peon.glb', '/rey_regular.glb'];
+  const pieceModels = ['/rey_regular.glb', '/reina_regular.glb', '/alfil_regular.glb', '/Caballo_Regular.glb', '/torre_regular.glb', '/Peon_Regular.glb'];
   let currentPieceIndex = 0;
   let modelRoot = null;
   let currentScene = null;
@@ -1642,6 +1678,16 @@ const {
   let finalRenderers = [];
   let finalCameras = [];
   let finalModelRoot = null;
+  let finalResizeObserver = null;
+  let finalResultDirty = false;
+  let finalModelLoadPending = false;
+
+  const markFinalResultDirty = () => {
+    finalResultDirty = true;
+    if (reloadButton) {
+      reloadButton.hidden = !finalModelRoot || !showcaseLayout?.classList.contains('is-revealed');
+    }
+  };
 
   const ensureScene = () => {
     if (!mount || currentScene) return;
@@ -1722,7 +1768,33 @@ const {
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach((mat) => {
         if (mat.color) {
-          mat.color.set(targetColor);
+          if (mat.map) {
+            mat.color.set('#ffffff');
+            mat.userData.marbleTint ??= new THREE.Color();
+            mat.userData.marbleTint.set(targetColor);
+
+            if (!mat.userData.hasMarbleTintShader) {
+              mat.onBeforeCompile = (shader) => {
+                shader.uniforms.marbleTint = { value: mat.userData.marbleTint };
+                shader.fragmentShader = shader.fragmentShader.replace(
+                  '#include <common>',
+                  `uniform vec3 marbleTint;
+                  #include <common>`
+                );
+                shader.fragmentShader = shader.fragmentShader.replace(
+                  '#include <map_fragment>',
+                  `#include <map_fragment>
+                  float marbleLuminance = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+                  vec3 marbleDark = marbleTint * 0.18;
+                  vec3 marbleLight = marbleTint * 0.78;
+                  diffuseColor.rgb = mix(marbleDark, marbleLight, marbleLuminance);`
+                );
+              };
+              mat.userData.hasMarbleTintShader = true;
+            }
+          } else {
+            mat.color.set(targetColor);
+          }
         }
         mat.needsUpdate = true;
       });
@@ -1761,9 +1833,6 @@ const {
     }
 
     updateSummaryDots();
-    if (finalModelRoot) {
-      applyFinalModelColors(finalModelRoot);
-    }
   };
 
   const applyFinalModelColors = (model) => {
@@ -1849,9 +1918,6 @@ const {
   const ensureFinalScene = () => {
     if (!finalContainer) return;
     if (finalScene) {
-      if (finalModelRoot) {
-        applyFinalModelColors(finalModelRoot);
-      }
       finalRenderers.forEach(({ renderer, camera, element }) => {
         const width = element.clientWidth;
         const height = element.clientHeight;
@@ -1883,7 +1949,8 @@ const {
       principal: { position: [0, 6.5, 8.5], target: [0, 0.8, 0] },
       side: { position: [8.5, 3.8, 4.8], target: [0, 1, 0] },
       top: { position: [0, 11, 0.2], target: [0, 0, 0] },
-      opposite: { position: [-7, 3.8, 6.5], target: [0, 0.9, 0] }
+      blackPerspective: { position: [3.45, 2.4, -6.32], target: [0, 1.1, 0] },
+      whitePerspective: { position: [-3.45, 2.4, 6.32], target: [0, 1.1, 0] }
     };
 
     const views = Array.from(finalContainer.querySelectorAll<HTMLElement>('.final-model-view'));
@@ -1905,11 +1972,12 @@ const {
       finalRenderers.push({ renderer, camera, element: canvasHost });
     });
 
-    const resizeObserver = new ResizeObserver(() => ensureFinalScene());
-    resizeObserver.observe(finalContainer);
+    finalResizeObserver = new ResizeObserver(() => ensureFinalScene());
+    finalResizeObserver.observe(finalContainer);
 
     const fallback = finalContainer.querySelector('.final-model-fallback');
     const loader = new GLTFLoader();
+    finalModelLoadPending = true;
 
     loader.load(
       '/resultadofinal.glb',
@@ -1938,11 +2006,25 @@ const {
         applyFinalModelColors(finalModelRoot);
 
         if (fallback) fallback.remove();
+        finalModelLoadPending = false;
+        finalResultDirty = false;
+        if (reloadButton) {
+          reloadButton.hidden = true;
+          reloadButton.disabled = false;
+          reloadButton.removeAttribute('aria-busy');
+        }
         ensureFinalScene();
       },
       undefined,
       (error) => {
         console.warn('resultadofinal.glb no se pudo cargar:', error);
+        finalModelLoadPending = false;
+        finalResultDirty = true;
+        if (reloadButton) {
+          reloadButton.hidden = !showcaseLayout?.classList.contains('is-revealed');
+          reloadButton.disabled = false;
+          reloadButton.removeAttribute('aria-busy');
+        }
         if (fallback) {
           fallback.innerHTML = 'Coloca <strong>resultadofinal.glb</strong> en la carpeta <code>public/</code> para visualizar el tablero completo aquí.';
         }
@@ -1953,6 +2035,9 @@ const {
   const reloadFinalScene = () => {
     if (!finalContainer) return;
 
+    finalResizeObserver?.disconnect();
+    finalResizeObserver = null;
+
     finalScene?.traverse((child) => {
       if (!child.isMesh) return;
       child.geometry?.dispose();
@@ -1961,6 +2046,7 @@ const {
     });
     finalRenderers.forEach(({ renderer }) => {
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     });
 
@@ -1968,6 +2054,7 @@ const {
     finalRenderers = [];
     finalCameras = [];
     finalModelRoot = null;
+    finalModelLoadPending = false;
 
     const views = finalContainer.querySelectorAll('.final-model-view');
     views.forEach((view) => view.querySelector('.final-model-canvas')?.replaceChildren());
@@ -1982,9 +2069,9 @@ const {
   };
 
   reloadButton?.addEventListener('click', () => {
-    reloadButton.setAttribute('disabled', 'true');
+    reloadButton.disabled = true;
+    reloadButton.setAttribute('aria-busy', 'true');
     reloadFinalScene();
-    window.setTimeout(() => reloadButton.removeAttribute('disabled'), 1200);
   });
 
   continueButton?.addEventListener('click', () => {
@@ -1996,9 +2083,10 @@ const {
     editor?.setAttribute('aria-hidden', 'false');
 
     setTimeout(() => {
-      ensureFinalScene();
-      if (finalModelRoot) {
-        applyFinalModelColors(finalModelRoot);
+      if (finalResultDirty && !finalModelLoadPending) {
+        reloadFinalScene();
+      } else {
+        ensureFinalScene();
       }
     }, 250);
   });
@@ -2014,6 +2102,7 @@ const {
     continueButton?.setAttribute('aria-expanded', 'false');
     backButton?.setAttribute('aria-hidden', 'true');
     editor?.setAttribute('aria-hidden', 'true');
+    if (reloadButton) reloadButton.hidden = true;
 
     requestAnimationFrame(() => {
       showcaseLayout.style.transition = layoutTransition;
@@ -2035,7 +2124,7 @@ const {
     }
 
     updateSummaryDots();
-    if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+    markFinalResultDirty();
   });
 
   swapBoardColorsBtn?.addEventListener('click', () => {
@@ -2052,7 +2141,7 @@ const {
     }
 
     updateSummaryDots();
-    if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+    markFinalResultDirty();
   });
 
   // Team Selector (Blancas / Negras)
@@ -2081,7 +2170,7 @@ const {
         }
 
         updateSummaryDots();
-        if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+        markFinalResultDirty();
       });
     });
   });
@@ -2103,7 +2192,7 @@ const {
       }
 
       updateSummaryDots();
-      if (finalModelRoot) applyFinalModelColors(finalModelRoot);
+      markFinalResultDirty();
       syncBoardSwatches();
     });
   });
@@ -2202,13 +2291,13 @@ const {
     if (modelName) {
       modelName.textContent = modelUrl.includes('rey_regular.glb')
         ? 'Rey'
-        : modelUrl.includes('alfil.glb')
+        : modelUrl.includes('alfil_regular.glb')
           ? 'Alfil'
           : modelUrl.includes('reina_regular.glb')
             ? 'Reina'
-            : modelUrl.includes('torre.glb')
+            : modelUrl.includes('torre_regular.glb')
               ? 'Torre'
-              : modelUrl.includes('peon.glb')
+              : modelUrl.includes('Peon_Regular.glb')
                 ? 'Peón'
                 : 'Caballo';
       modelName.hidden = activeModelMode !== 'piece';
@@ -2303,6 +2392,7 @@ const {
       const nextColor = event.target.value;
       chessConfig.pieces[activePieceTeam] = nextColor;
       saveState();
+      markFinalResultDirty();
       updateCurrentPieceColor();
     });
   });
@@ -2314,6 +2404,7 @@ const {
       colorPicker.value = nextColor;
       chessConfig.pieces[activePieceTeam] = nextColor;
       saveState();
+      markFinalResultDirty();
       updateCurrentPieceColor();
     });
   });
