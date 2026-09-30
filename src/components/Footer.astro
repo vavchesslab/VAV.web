@@ -29,6 +29,9 @@
 		</div>
 
 	</div>
+	<div class="footer__credit-band">
+		<p>Coded &amp; Designed by <strong>sinccsdgn</strong></p>
+	</div>
 </footer>
 
 <style>
@@ -55,6 +58,26 @@
 		backdrop-filter: blur(16px);
 		-webkit-backdrop-filter: blur(16px);
 		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.footer__credit-band {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 1.75rem;
+		background: color-mix(in srgb, var(--background) 92%, white 8%);
+		color: var(--muted);
+		font-size: 0.64rem;
+	}
+
+	.footer__credit-band p {
+		margin: 0;
+	}
+
+	.footer__credit-band strong {
+		color: var(--gold-light);
+		font-weight: 700;
 	}
 
 	@media (max-width: 640px) {

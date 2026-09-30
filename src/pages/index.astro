@@ -1,21 +1,20 @@
 ---
-import Navbar from './Navbar.astro';
-import Laboratorio from './Laboratorio.astro';
-import Galeria from './Galeria.astro';
-import Contacto from './Contacto.astro';
-import Footer from './Footer.astro';
-import GoUp from './GoUp.astro';
-import PlayMode from './PlayMode.astro';
+import Navbar from '../components/Navbar.astro';
+import Laboratorio from '../components/Laboratorio.astro';
+import Galeria from '../components/Galeria.astro';
+import Contacto from '../components/Contacto.astro';
+import Footer from '../components/Footer.astro';
+import GoUp from '../components/GoUp.astro';
+import PlayMode from '../components/PlayMode.astro';
+import '../styles/global.css';
 
-const props = Astro.props;
-const accent = props.accent || '#147d72';
-const buttonText = props.buttonText || '#ffffff';
-const goldDeep = props.goldDeep || '#8f5b16';
-const goldBase = props.goldBase || '#d4a72c';
-const goldLight = props.goldLight || '#fff1a8';
-const goldBright = props.goldBright || '#f2c94c';
-const goldShadow = props.goldShadow || '#9b681c';
-const showVersionToggle = props.showVersionToggle ?? true;
+const accent = '#e8c031';
+const buttonText = '#ffffff';
+const goldDeep = '#8f5b16';
+const goldBase = '#e8c031';
+const goldLight = '#fff1a8';
+const goldBright = '#f2c94c';
+const goldShadow = '#9b681c';
 ---
 
 <html lang="es">
@@ -29,7 +28,7 @@ const showVersionToggle = props.showVersionToggle ?? true;
 		</div>
 
 		<div class="version-two-shell" style={`--accent: ${accent}; --button-text: ${buttonText}; --gold-deep: ${goldDeep}; --gold-base: ${goldBase}; --gold-light: ${goldLight}; --gold-bright: ${goldBright}; --gold-shadow: ${goldShadow};`}>
-			<Navbar showVersionToggle={showVersionToggle} />
+			<Navbar showVersionToggle={false} />
 
 			<main class="page-content min-h-screen py-0">
 				<PlayMode />
