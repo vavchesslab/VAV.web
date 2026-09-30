@@ -9,7 +9,10 @@ export default defineConfig({
   integrations: [react()],
 
   redirects: {
-    '/': '/Index'
+    '/': '/home',
+    '/LandingPage': '/home',
+    '/Parametros': '/home',
+    '/Index': '/home'
   },
 
   vite: {

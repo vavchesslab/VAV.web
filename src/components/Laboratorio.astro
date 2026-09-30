@@ -148,7 +148,7 @@ const {
 
         <div class="model-fallback">Cargando modelo...</div>
         <p class="model-showcase__model-name" aria-live="polite">Caballo</p>
-        <button type="button" class="model-showcase__continue" aria-controls="model-showcase-editor" aria-expanded="false">
+        <button type="button" class="model-showcase__action-button model-showcase__continue" aria-controls="model-showcase-editor" aria-expanded="false">
           Continuar
           <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
             <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -214,7 +214,12 @@ const {
         </div>
         <div class="model-showcase__editor-summary">
           <span>Vista Completa 3D</span>
-          <small class="final-hint"></small>
+          <a class="model-showcase__action-button model-showcase__finish" href="#partidas">
+            FINALIZAR
+            <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
         </div>
       </aside>
     </div>
@@ -224,11 +229,23 @@ const {
     <div class="final-model-lightbox__panel">
       <div class="final-model-lightbox__header">
         <h2 id="final-model-lightbox-title">Vista principal</h2>
-        <button class="final-model-lightbox__close" type="button" aria-label="Cerrar vista ampliada">&times;</button>
+        <button class="final-model-lightbox__close" type="button" aria-label="Cerrar vista ampliada">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
       </div>
-      <button id="final-model-lightbox-prev" class="final-model-lightbox__arrow final-model-lightbox__arrow--prev" type="button" aria-label="Perspectiva anterior">&#8592;</button>
+      <button id="final-model-lightbox-prev" class="final-model-lightbox__arrow final-model-lightbox__arrow--prev" type="button" aria-label="Perspectiva anterior">
+        <svg class="piece-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
       <img id="final-model-lightbox-image" class="final-model-lightbox__image" alt="" />
-      <button id="final-model-lightbox-next" class="final-model-lightbox__arrow final-model-lightbox__arrow--next" type="button" aria-label="Perspectiva siguiente">&#8594;</button>
+      <button id="final-model-lightbox-next" class="final-model-lightbox__arrow final-model-lightbox__arrow--next" type="button" aria-label="Perspectiva siguiente">
+        <svg class="piece-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
     </div>
   </div>
 </section>
@@ -656,6 +673,12 @@ const {
     cursor: pointer;
   }
 
+  .final-model-lightbox__close svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+  }
+
   .final-model-lightbox__arrow {
     position: absolute;
     top: 50%;
@@ -665,9 +688,9 @@ const {
     width: 2.75rem;
     height: 2.75rem;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.42);
+    background: rgba(0, 0, 0, 0.35);
     color: #ffffff;
     font-size: 1.5rem;
     line-height: 1;
@@ -678,9 +701,7 @@ const {
 
   .final-model-lightbox__arrow:hover,
   .final-model-lightbox__arrow:focus-visible {
-    border-color: rgba(255, 255, 255, 0.65);
-    background: rgba(255, 255, 255, 0.16);
-    outline: none;
+    background: rgba(255, 255, 255, 0.18);
   }
 
   .final-model-lightbox__arrow--prev {
@@ -707,8 +728,8 @@ const {
     }
 
     .final-model-lightbox__arrow {
-      width: 2.35rem;
-      height: 2.35rem;
+      width: 2.25rem;
+      height: 2.25rem;
     }
 
     .final-model-lightbox__arrow--prev {
@@ -748,8 +769,6 @@ const {
     justify-content: space-between;
     gap: 0.75rem;
     margin-top: auto;
-    padding-top: 0.8rem;
-    border-top: 1px solid rgba(255,255,255,0.12);
     font-size: 0.75rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -798,11 +817,7 @@ const {
     border-radius: 1.3rem !important;
   }
 
-  .model-showcase__continue {
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 4;
+  .model-showcase__action-button {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
@@ -822,13 +837,28 @@ const {
     transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   }
 
-  .model-showcase__continue:hover {
+  .model-showcase__continue {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 4;
+  }
+
+  .model-showcase__finish {
+    flex: 0 0 auto;
+    margin-left: auto;
+    text-decoration: none;
+  }
+
+  .model-showcase__continue:hover,
+  .model-showcase__finish:hover {
     border-color: var(--gold-light);
     background: linear-gradient(115deg, var(--gold-shadow) 0%, var(--gold-bright) 35%, var(--gold-light) 60%, var(--gold-base) 100%);
     transform: translateY(-2px);
   }
 
-  .model-showcase__continue:focus-visible {
+  .model-showcase__continue:focus-visible,
+  .model-showcase__finish:focus-visible {
     outline: 2px solid #d9f3ff;
     outline-offset: 3px;
   }
@@ -1532,8 +1562,8 @@ const {
         finalLightboxRenderer.toneMapping = THREE.ACESFilmicToneMapping;
         finalLightboxRenderer.toneMappingExposure = 1.1;
       }
-      const renderWidth = Math.min(1800, Math.max(1000, window.innerWidth * 2));
-      const renderHeight = Math.min(1400, Math.max(700, window.innerHeight * 2));
+      const renderWidth = Math.min(1600, Math.max(700, Math.round(window.innerWidth * 1.5)));
+      const renderHeight = Math.min(1100, Math.max(550, Math.round(window.innerHeight * 1.5)));
       const highResolutionCamera = selectedView.camera.clone();
       highResolutionCamera.aspect = renderWidth / renderHeight;
       highResolutionCamera.updateProjectionMatrix();
@@ -1963,8 +1993,8 @@ const {
       camera.position.set(...viewConfig.position);
       camera.lookAt(...viewConfig.target);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.1;
       canvasHost.appendChild(renderer.domElement);

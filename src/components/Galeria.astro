@@ -68,12 +68,24 @@ const categories = await getCloudinaryGallery();
       <div>
         <p id="galeria-lightbox-category" class="galeria__lightbox-category"></p>
       </div>
-      <button class="galeria__lightbox-close" type="button" aria-label="Cerrar imagen ampliada">&times;</button>
+      <button class="galeria__lightbox-close" type="button" aria-label="Cerrar imagen ampliada">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
     </div>
     <div class="galeria__lightbox-viewer">
-      <button id="galeria-lightbox-prev" class="galeria__lightbox-arrow" type="button" aria-label="Imagen anterior">&#8592;</button>
-      <img id="galeria-lightbox-image" class="galeria__lightbox-image" alt="" />
-      <button id="galeria-lightbox-next" class="galeria__lightbox-arrow" type="button" aria-label="Imagen siguiente">&#8594;</button>
+      <button id="galeria-lightbox-prev" class="galeria__lightbox-arrow" type="button" aria-label="Imagen anterior">
+        <svg class="galeria__lightbox-arrow-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <img id="galeria-lightbox-image" class="galeria__lightbox-image" alt="" role="button" tabindex="0" aria-label="Ampliar imagen" aria-pressed="false" draggable="false" />
+      <button id="galeria-lightbox-next" class="galeria__lightbox-arrow" type="button" aria-label="Imagen siguiente">
+        <svg class="galeria__lightbox-arrow-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
     </div>
     <div id="galeria-lightbox-thumbnails" class="galeria__lightbox-thumbnails" aria-label="Miniaturas del álbum"></div>
     <p id="galeria-lightbox-position" class="galeria__lightbox-position" aria-live="polite"></p>
@@ -183,8 +195,56 @@ const categories = await getCloudinaryGallery();
   const imageButtons = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]');
   let activeButtons: HTMLButtonElement[] = [];
   let activeIndex = 0;
+  let imageZoomed = false;
+  let imageDragging = false;
+  let imageWasDragged = false;
+  let imagePointerId: number | null = null;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let imageStartX = 0;
+  let imageStartY = 0;
+  let imageOffsetX = 0;
+  let imageOffsetY = 0;
+  const imageZoomScale = 2;
 
   if (lightbox) document.body.append(lightbox);
+
+  const applyImageZoom = () => {
+    if (!lightboxImage) return;
+    lightboxImage.classList.toggle('is-zoomed', imageZoomed);
+    lightboxImage.setAttribute('aria-pressed', String(imageZoomed));
+    lightboxImage.setAttribute('aria-label', imageZoomed ? 'Reducir imagen' : 'Ampliar imagen');
+    if (imageZoomed) {
+      lightboxImage.style.transform = `translate3d(${imageOffsetX}px, ${imageOffsetY}px, 0) scale(${imageZoomScale})`;
+    } else {
+      lightboxImage.style.removeProperty('transform');
+    }
+  };
+
+  const setImageZoomed = (zoomed: boolean) => {
+    imageZoomed = zoomed;
+    imageOffsetX = 0;
+    imageOffsetY = 0;
+    applyImageZoom();
+  };
+
+  const resetImageZoom = () => {
+    imageDragging = false;
+    imageWasDragged = false;
+    imagePointerId = null;
+    lightboxImage?.classList.remove('is-dragging');
+    setImageZoomed(false);
+  };
+
+  const clampImagePan = () => {
+    if (!lightboxImage) return;
+    const viewer = lightboxImage.closest<HTMLElement>('.galeria__lightbox-viewer');
+    if (!viewer) return;
+    const maxX = Math.max(0, (lightboxImage.offsetWidth * imageZoomScale - viewer.clientWidth) / 2);
+    const maxY = Math.max(0, (lightboxImage.offsetHeight * imageZoomScale - viewer.clientHeight) / 2);
+    imageOffsetX = Math.max(-maxX, Math.min(maxX, imageOffsetX));
+    imageOffsetY = Math.max(-maxY, Math.min(maxY, imageOffsetY));
+  };
 
   const renderThumbnails = () => {
     if (!lightboxThumbnails) return;
@@ -204,6 +264,7 @@ const categories = await getCloudinaryGallery();
 
   const showImage = (index: number) => {
     if (!lightboxImage || activeButtons.length === 0) return;
+    resetImageZoom();
     activeIndex = (index + activeButtons.length) % activeButtons.length;
     const button = activeButtons[activeIndex];
     lightboxImage.src = button.dataset.lightboxSrc || '';
@@ -219,6 +280,7 @@ const categories = await getCloudinaryGallery();
 
   const closeLightbox = () => {
     if (!lightbox || !lightboxImage) return;
+    resetImageZoom();
     lightbox.hidden = true;
     lightboxImage.removeAttribute('src');
     document.body.style.overflow = '';
@@ -239,6 +301,52 @@ const categories = await getCloudinaryGallery();
 
   lightboxPrev?.addEventListener('click', () => showImage(activeIndex - 1));
   lightboxNext?.addEventListener('click', () => showImage(activeIndex + 1));
+
+  lightboxImage?.addEventListener('click', () => {
+    if (imageWasDragged) {
+      imageWasDragged = false;
+      return;
+    }
+    setImageZoomed(!imageZoomed);
+  });
+  lightboxImage?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    setImageZoomed(!imageZoomed);
+  });
+  lightboxImage?.addEventListener('pointerdown', (event) => {
+    if (!imageZoomed || event.button !== 0 || !lightboxImage) return;
+    event.preventDefault();
+    imageDragging = true;
+    imageWasDragged = false;
+    imagePointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    imageStartX = imageOffsetX;
+    imageStartY = imageOffsetY;
+    lightboxImage.classList.add('is-dragging');
+    lightboxImage.setPointerCapture(event.pointerId);
+  });
+  lightboxImage?.addEventListener('pointermove', (event) => {
+    if (!imageDragging || imagePointerId !== event.pointerId) return;
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    if (Math.hypot(deltaX, deltaY) > 3) imageWasDragged = true;
+    imageOffsetX = imageStartX + deltaX;
+    imageOffsetY = imageStartY + deltaY;
+    clampImagePan();
+    applyImageZoom();
+  });
+  const finishImageDrag = (event: PointerEvent) => {
+    if (!imageDragging || imagePointerId !== event.pointerId || !lightboxImage) return;
+    imageDragging = false;
+    imagePointerId = null;
+    lightboxImage.classList.remove('is-dragging');
+    if (lightboxImage.hasPointerCapture(event.pointerId)) lightboxImage.releasePointerCapture(event.pointerId);
+    if (imageWasDragged) window.setTimeout(() => { imageWasDragged = false; }, 0);
+  };
+  lightboxImage?.addEventListener('pointerup', finishImageDrag);
+  lightboxImage?.addEventListener('pointercancel', finishImageDrag);
 
   lightboxClose?.addEventListener('click', closeLightbox);
   lightbox?.addEventListener('click', (event) => {
@@ -461,6 +569,8 @@ const categories = await getCloudinaryGallery();
   }
 
   .galeria__lightbox-image {
+    position: relative;
+    z-index: 0;
     max-width: min(82vw, 1100px);
     max-height: min(68vh, 720px);
     width: auto;
@@ -468,6 +578,19 @@ const categories = await getCloudinaryGallery();
     object-fit: contain;
     border-radius: 0.35rem;
     box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.55);
+    cursor: zoom-in;
+    touch-action: none;
+    user-select: none;
+    transition: transform 180ms ease;
+  }
+
+  .galeria__lightbox-image.is-dragging {
+    transition: none;
+  }
+
+  .galeria__lightbox-image:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 4px;
   }
 
   .galeria__lightbox-toolbar {
@@ -496,6 +619,7 @@ const categories = await getCloudinaryGallery();
   }
 
   .galeria__lightbox-viewer {
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,15 +630,26 @@ const categories = await getCloudinaryGallery();
   }
 
   .galeria__lightbox-arrow {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
     flex: 0 0 auto;
     width: 2.75rem;
     height: 2.75rem;
+    padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
     color: #fff;
     background: rgba(0, 0, 0, 0.35);
     font-size: 1.5rem;
     cursor: pointer;
+  }
+
+  .galeria__lightbox-arrow-icon {
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
   }
 
   .galeria__lightbox-arrow:hover,
@@ -569,8 +704,11 @@ const categories = await getCloudinaryGallery();
     position: absolute;
     top: 1rem;
     right: 1.25rem;
+    display: grid;
+    place-items: center;
     width: 2.75rem;
     height: 2.75rem;
+    padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
     color: #fff;
@@ -578,6 +716,12 @@ const categories = await getCloudinaryGallery();
     font-size: 2rem;
     line-height: 1;
     cursor: pointer;
+  }
+
+  .galeria__lightbox-close svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .galeria__lightbox-close:hover {
