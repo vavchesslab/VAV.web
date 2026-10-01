@@ -47,8 +47,18 @@ const { showVersionToggle = false } = Astro.props;
 		z-index: 0;
 		pointer-events: none;
 		background: rgba(12, 14, 18, 0.52);
-		backdrop-filter: blur(30px) saturate(135%);
-		-webkit-backdrop-filter: blur(30px) saturate(135%);
+	}
+
+	@supports (-webkit-backdrop-filter: blur(1px)) {
+		.sticky-nav-header::before {
+			-webkit-backdrop-filter: blur(30px) saturate(135%);
+		}
+	}
+
+	@supports (backdrop-filter: blur(1px)) {
+		.sticky-nav-header::before {
+			backdrop-filter: blur(30px) saturate(135%);
+		}
 	}
 
 	.sticky-nav-header > nav {

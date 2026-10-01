@@ -222,6 +222,30 @@ const {
           </a>
         </div>
       </aside>
+
+      <div id="model-showcase-exit-lottie" class="model-showcase__exit-lottie" aria-hidden="true">
+        <div class="model-showcase__exit-lottie-item" data-lottie-src="/loading_ciencia.json"></div>
+        <div class="model-showcase__exit-progress">
+          <span id="model-showcase-exit-progress-fill" class="model-showcase__exit-progress-fill"></span>
+        </div>
+        <p class="model-showcase__exit-title">
+          Fabricando<span class="model-showcase__exit-dots"><span>.</span><span>.</span><span>.</span></span>
+        </p>
+      </div>
+      <div id="model-showcase-final-message" class="model-showcase__final-message" aria-hidden="true">
+        <div class="model-showcase__final-column model-showcase__final-column--left">
+          <p class="model-showcase__final-subtitle">SET CREADO CON ÉXITO</p>
+          <h3 class="model-showcase__final-title">¡Buena creatividad!</h3>
+        </div>
+        <div class="model-showcase__final-divider" aria-hidden="true"></div>
+        <div class="model-showcase__final-column model-showcase__final-column--right">
+          <p><span class="model-showcase__final-dot" id="final-message-dot-white-piece"></span>Piezas Blancas</p>
+          <p><span class="model-showcase__final-dot" id="final-message-dot-black-piece"></span>Piezas Negras</p>
+          <p>
+            <span class="model-showcase__final-dot" id="final-message-dot-board-c1"></span><span class="model-showcase__final-dot" id="final-message-dot-board-c2"></span>Tablero (C1 / C2)
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -269,6 +293,7 @@ const {
   }
 
   .model-showcase__layout {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
@@ -882,6 +907,186 @@ const {
     pointer-events: none;
   }
 
+  .model-showcase__exit-lottie {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -62%);
+    transition: opacity 0.55s ease 0.55s;
+  }
+
+  .model-showcase__exit-title {
+    margin: 0;
+    display: inline-flex;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .model-showcase__exit-dots span {
+    opacity: 0;
+    animation: exit-dot-appear 1.4s ease-in-out infinite;
+  }
+
+  .model-showcase__exit-dots span:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .model-showcase__exit-dots span:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  .model-showcase__exit-dots span:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes exit-dot-appear {
+    0%, 100% {
+      opacity: 0;
+    }
+    20%, 80% {
+      opacity: 1;
+    }
+  }
+
+  .model-showcase__exit-progress {
+    width: min(180px, 36%);
+    height: 0.4rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .model-showcase__exit-progress-fill {
+    display: block;
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--gold-bright, #f2c94c);
+  }
+
+  .model-showcase__exit-lottie-item {
+    width: min(180px, 36%);
+    height: min(180px, 36%);
+  }
+
+  .model-showcase__layout.is-exiting .model-showcase__exit-lottie-item {
+    animation: exit-lottie-blop 1.1s ease-in-out 0.55s infinite;
+  }
+
+  @keyframes exit-lottie-blop {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.12);
+    }
+  }
+
+  .model-showcase__layout.is-exiting .model-showcase__exit-lottie {
+    opacity: 1;
+  }
+
+  .model-showcase__exit-lottie.is-fading-out {
+    opacity: 0 !important;
+    transition: opacity 0.9s ease;
+  }
+
+  .model-showcase__final-message {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: auto;
+    padding: 0 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .model-showcase__final-message.is-visible {
+    opacity: 1;
+  }
+
+  .model-showcase__final-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+  }
+
+  .model-showcase__final-column--left {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .model-showcase__final-column--right {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .model-showcase__final-column--right p {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .model-showcase__final-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: inline-block;
+  }
+
+  .model-showcase__final-divider {
+    align-self: center;
+    width: 1px;
+    height: 6.5rem;
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .model-showcase__final-subtitle {
+    margin: 0;
+    color: var(--gold-bright, #f2c94c);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .model-showcase__final-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+  }
+
+  .model-showcase__final-text {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+
   @media (max-width: 900px) {
     .model-showcase__layout.is-revealed {
       grid-template-columns: minmax(0, 1fr);
@@ -1443,6 +1648,7 @@ const {
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import lottie from 'lottie-web';
 
   const STORAGE_KEY = 'chess_custom_color_config';
 
@@ -1498,6 +1704,9 @@ const {
   const continueButton = document.querySelector('.model-showcase__continue');
   const backButton = document.querySelector('.model-showcase__back');
   const editor = document.querySelector('.model-showcase__editor');
+  const exitLottieContainer = document.querySelector('#model-showcase-exit-lottie');
+  const exitProgressFill = document.querySelector('#model-showcase-exit-progress-fill');
+  const finalMessage = document.querySelector('#model-showcase-final-message');
   const colorPicker = document.querySelector('#piece-color-picker');
   const colorPickerPanel = document.querySelector('.model-color-picker');
   const colorPickerToggle = document.querySelector('.model-color-toggle');
@@ -1653,6 +1862,16 @@ const {
     if (dotPieceBlack) dotPieceBlack.style.backgroundColor = chessConfig.pieces.Negras;
     if (dotBoardWhite) dotBoardWhite.style.backgroundColor = chessConfig.board.Blancas;
     if (dotBoardBlack) dotBoardBlack.style.backgroundColor = chessConfig.board.Negras;
+
+    const messageDotPieceWhite = document.querySelector('#final-message-dot-white-piece');
+    const messageDotPieceBlack = document.querySelector('#final-message-dot-black-piece');
+    const messageDotBoardC1 = document.querySelector('#final-message-dot-board-c1');
+    const messageDotBoardC2 = document.querySelector('#final-message-dot-board-c2');
+
+    if (messageDotPieceWhite) messageDotPieceWhite.style.backgroundColor = chessConfig.pieces.Blancas;
+    if (messageDotPieceBlack) messageDotPieceBlack.style.backgroundColor = chessConfig.pieces.Negras;
+    if (messageDotBoardC1) messageDotBoardC1.style.backgroundColor = chessConfig.board.Blancas;
+    if (messageDotBoardC2) messageDotBoardC2.style.backgroundColor = chessConfig.board.Negras;
   };
 
   updateSummaryDots();
@@ -2118,14 +2337,35 @@ const {
     event.preventDefault();
     showcaseLayout.classList.add('is-exiting');
 
-    setTimeout(() => {
-      const targetId = finishButton.getAttribute('href');
-      const targetSection = targetId ? document.querySelector(targetId) : null;
-      targetSection?.scrollIntoView({ behavior: 'smooth' });
+    const displayDuration = 3000;
 
+    const exitAnims = Array.from(exitLottieContainer?.querySelectorAll('.model-showcase__exit-lottie-item') || [])
+      .map((item) => lottie.loadAnimation({
+        container: item,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: `${item.dataset.lottieSrc}?v=${Date.now()}`
+      }));
+
+    if (exitProgressFill) {
+      exitProgressFill.style.transition = `width ${displayDuration}ms linear`;
+      requestAnimationFrame(() => {
+        exitProgressFill.style.width = '100%';
+      });
+    }
+
+    setTimeout(() => {
       setTimeout(() => {
-        showcaseLayout.classList.remove('is-exiting');
-      }, 800);
+        exitLottieContainer?.classList.add('is-fading-out');
+
+        setTimeout(() => {
+          exitAnims.forEach((anim) => anim.destroy());
+          exitLottieContainer?.querySelectorAll('.model-showcase__exit-lottie-item').forEach((item) => { item.innerHTML = ''; });
+          finalMessage?.classList.add('is-visible');
+          finalMessage?.setAttribute('aria-hidden', 'false');
+        }, 900);
+      }, displayDuration);
     }, 600);
   });
 
