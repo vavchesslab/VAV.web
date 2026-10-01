@@ -690,7 +690,7 @@ const {
     padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(18, 18, 18, 0.85);
     color: #ffffff;
     font-size: 1.5rem;
     line-height: 1;
@@ -701,7 +701,7 @@ const {
 
   .final-model-lightbox__arrow:hover,
   .final-model-lightbox__arrow:focus-visible {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(32, 32, 32, 0.92);
   }
 
   .final-model-lightbox__arrow--prev {
@@ -872,6 +872,14 @@ const {
 
   .model-showcase__layout.is-revealed .model-showcase__back {
     transition: opacity 0.35s ease 0.2s, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .model-showcase__layout.is-exiting .model-showcase__viewer,
+  .model-showcase__layout.is-exiting .model-showcase__editor {
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+    transform: translateX(-4.5rem);
+    opacity: 0;
+    pointer-events: none;
   }
 
   @media (max-width: 900px) {
@@ -1517,6 +1525,7 @@ const {
   const finalLightboxClose = document.querySelector<HTMLButtonElement>('.final-model-lightbox__close');
   const finalLightboxPrev = document.querySelector<HTMLButtonElement>('#final-model-lightbox-prev');
   const finalLightboxNext = document.querySelector<HTMLButtonElement>('#final-model-lightbox-next');
+  const finishButton = document.querySelector<HTMLAnchorElement>('.model-showcase__finish');
   const viewerModeLabel = document.querySelector('#viewer-mode-label');
   let finalLightboxRenderer = null;
   let activeFinalViewIndex = 0;
@@ -2010,7 +2019,7 @@ const {
     finalModelLoadPending = true;
 
     loader.load(
-      '/resultadofinal.glb',
+      '/ResultadoFinal_Regular.glb',
       (gltf) => {
         finalModelRoot = cloneModelWithMaterials(gltf.scene);
 
@@ -2047,7 +2056,7 @@ const {
       },
       undefined,
       (error) => {
-        console.warn('resultadofinal.glb no se pudo cargar:', error);
+        console.warn('ResultadoFinal_Regular.glb no se pudo cargar:', error);
         finalModelLoadPending = false;
         finalResultDirty = true;
         if (reloadButton) {
@@ -2056,7 +2065,7 @@ const {
           reloadButton.removeAttribute('aria-busy');
         }
         if (fallback) {
-          fallback.innerHTML = 'Coloca <strong>resultadofinal.glb</strong> en la carpeta <code>public/</code> para visualizar el tablero completo aquí.';
+          fallback.innerHTML = 'Coloca <strong>ResultadoFinal_Regular.glb</strong> en la carpeta <code>public/</code> para visualizar el tablero completo aquí.';
         }
       }
     );
@@ -2102,6 +2111,22 @@ const {
     reloadButton.disabled = true;
     reloadButton.setAttribute('aria-busy', 'true');
     reloadFinalScene();
+  });
+
+  finishButton?.addEventListener('click', (event) => {
+    if (!showcaseLayout || showcaseLayout.classList.contains('is-exiting')) return;
+    event.preventDefault();
+    showcaseLayout.classList.add('is-exiting');
+
+    setTimeout(() => {
+      const targetId = finishButton.getAttribute('href');
+      const targetSection = targetId ? document.querySelector(targetId) : null;
+      targetSection?.scrollIntoView({ behavior: 'smooth' });
+
+      setTimeout(() => {
+        showcaseLayout.classList.remove('is-exiting');
+      }, 800);
+    }, 600);
   });
 
   continueButton?.addEventListener('click', () => {

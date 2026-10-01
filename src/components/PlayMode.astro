@@ -12,7 +12,10 @@
 		</header>
 
 		<div class="play-mode__body">
-			<div id="play-mode-board" class="play-mode__board" role="grid" aria-label="Tablero de ajedrez"></div>
+			<div class="play-mode__board-wrap">
+				<div id="play-mode-board" class="play-mode__board" role="grid" aria-label="Tablero de ajedrez"></div>
+				<div id="play-mode-result" class="play-mode__result" hidden role="status" aria-live="assertive">¡Ganaste!</div>
+			</div>
 			<aside class="play-mode__side-panel">
 				<div class="play-mode__side-block">
 					<span class="play-mode__label">Tu color</span>
@@ -57,6 +60,7 @@
 	const playMode = document.querySelector<HTMLElement>('#play-mode');
 	const board = document.querySelector<HTMLElement>('#play-mode-board');
 	const status = document.querySelector<HTMLElement>('#play-mode-status');
+	const resultBanner = document.querySelector<HTMLElement>('#play-mode-result');
 	const closeButton = document.querySelector<HTMLButtonElement>('#play-mode-close');
 	const resetButton = document.querySelector<HTMLButtonElement>('#play-mode-reset');
 		const levelSelect = document.querySelector<HTMLInputElement>('#play-mode-level');
@@ -162,18 +166,43 @@
 			engine.postMessage(`go depth ${activeEngineDepth}`);
 		};
 
+		const showResultBanner = (message: string) => {
+			if (!resultBanner) return;
+			resultBanner.textContent = message;
+			resultBanner.hidden = false;
+		};
+
+		const hideResultBanner = () => {
+			if (!resultBanner) return;
+			resultBanner.hidden = true;
+		};
+
 		const updateStatus = () => {
 			if (game.isCheckmate()) {
-				setStatus(game.turn() === playerColor ? 'Jaque mate. Ganó la PC.' : 'Jaque mate. Ganaste.');
+				const playerWon = game.turn() !== playerColor;
+				setStatus(playerWon ? 'Jaque mate. Ganaste.' : 'Jaque mate. Ganó la PC.');
+				if (playerWon) showResultBanner('¡Ganaste!');
 			} else if (game.isDraw()) {
 				setStatus('Tablas. La partida terminó empatada.');
 			} else if (game.inCheck()) {
 				setStatus(game.turn() === playerColor ? 'Estás en jaque.' : 'La PC está en jaque.');
+				if (game.turn() !== playerColor) requestEngineMove();
 			} else if (game.turn() === playerColor) {
 				setStatus('Tu turno. Elegí una pieza.');
 			} else {
 				requestEngineMove();
 			}
+		};
+
+		const findKingSquare = (color: PlayerColor): BoardSquare | null => {
+			for (const file of files) {
+				for (let rank = 1; rank <= 8; rank += 1) {
+					const square = `${file}${rank}` as BoardSquare;
+					const piece = game.get(square);
+					if (piece?.type === 'k' && piece.color === color) return square;
+				}
+			}
+			return null;
 		};
 
 		const renderBoard = (animation?: BoardAnimation) => {
@@ -183,6 +212,7 @@
 			board.replaceChildren();
 			const ranks = playerColor === 'w' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
 			const orderedFiles = playerColor === 'w' ? files : [...files].reverse();
+			const checkedKingSquare = game.inCheck() ? findKingSquare(game.turn()) : null;
 			ranks.forEach((rank, rankIndex) => {
 				orderedFiles.forEach((file, fileIndex) => {
 					const square = `${file}${rank}` as BoardSquare;
@@ -195,6 +225,7 @@
 					tile.setAttribute('role', 'gridcell');
 					tile.setAttribute('aria-label', piece ? `${square}, ${pieceLabel(piece)}` : square);
 					if (selectedSquare === square) tile.classList.add('is-selected');
+					if (checkedKingSquare === square) tile.classList.add('is-check');
 					if (piece) {
 						tile.classList.add(piece.color === 'w' ? 'piece-white' : 'piece-black');
 						pieceElement = document.createElement('span');
@@ -243,6 +274,7 @@
 			game.reset();
 			selectedSquare = null;
 			engineThinking = false;
+			hideResultBanner();
 			renderBoard();
 			updateStatus();
 		};
@@ -458,6 +490,27 @@
 		box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
 	}
 
+	.play-mode__board-wrap {
+		position: relative;
+		display: grid;
+		justify-items: center;
+	}
+
+	.play-mode__result {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		background: rgba(10, 20, 15, 0.55);
+		border-radius: 0.55rem;
+		font-size: clamp(1.8rem, 6vw, 2.6rem);
+		font-weight: 800;
+		color: #f2c94c;
+		text-shadow: 0 0.15rem 0.3rem rgba(0, 0, 0, 0.6);
+		letter-spacing: 0.02em;
+		pointer-events: none;
+	}
+
 	:global(.play-mode__square) {
 		display: grid;
 		place-items: center;
@@ -475,6 +528,7 @@
 	:global(.play-mode__square.is-light) { background: #d9c59a; }
 	:global(.play-mode__square.is-dark) { background: #a8832f; }
 	:global(.play-mode__square.is-selected) { box-shadow: inset 0 0 0 0.3rem #f2c94c; }
+	:global(.play-mode__square.is-check) { box-shadow: inset 0 0 0 100vmax rgba(220, 38, 38, 0.4); }
 	:global(.play-mode__square.piece-white) { color: #fffdf0; text-shadow: 0 0.12rem 0.15rem #1a1710; }
 	:global(.play-mode__square.piece-black) { color: #17211f; text-shadow: 0 0.08rem 0.1rem rgba(255, 255, 255, 0.2); }
 	:global(.play-mode__piece) {

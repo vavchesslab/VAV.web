@@ -59,28 +59,46 @@ const searchFolder = async (folder: string): Promise<GalleryImage[]> => {
   const images: GalleryImage[] = [];
   let nextCursor: string | undefined;
 
-  do {
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/resources/search`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${authorization}`,
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store',
-      signal: AbortSignal.timeout(8000),
-      body: JSON.stringify({
-        expression,
-        sort_by: [{ created_at: 'desc' }],
-        max_results: 100,
-        ...(nextCursor ? { next_cursor: nextCursor } : {})
-      })
-    });
+  const fetchPage = async (cursor?: string): Promise<CloudinarySearchResponse> => {
+    const maxAttempts = 3;
+    let lastError: unknown;
 
-    if (!response.ok) {
-      throw new Error(`Cloudinary respondió ${response.status} al consultar ${folder}`);
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/resources/search`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${authorization}`,
+            'Content-Type': 'application/json'
+          },
+          cache: 'no-store',
+          signal: AbortSignal.timeout(20000),
+          body: JSON.stringify({
+            expression,
+            sort_by: [{ created_at: 'desc' }],
+            max_results: 100,
+            ...(cursor ? { next_cursor: cursor } : {})
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Cloudinary respondió ${response.status} al consultar ${folder}`);
+        }
+
+        return await response.json() as CloudinarySearchResponse;
+      } catch (error) {
+        lastError = error;
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+        }
+      }
     }
 
-    const data = await response.json() as CloudinarySearchResponse;
+    throw lastError;
+  };
+
+  do {
+    const data = await fetchPage(nextCursor);
     for (const resource of data.resources || []) {
       images.push({
         url: getDeliveryUrl(resource.public_id, resource.format),
@@ -102,8 +120,7 @@ export const getCloudinaryGallery = async (): Promise<GalleryCategory[]> => {
     try {
       return { name, images: await searchFolder(`${galleryFolder}/${name}`) };
     } catch (error) {
-      console.error(`No se pudo cargar el álbum ${name}:`, error);
-      return { name, images: [] };
+      throw new Error(`No se pudo cargar el álbum "${name}" desde Cloudinary tras varios intentos: ${error instanceof Error ? error.message : error}`);
     }
   }));
 };
