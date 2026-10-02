@@ -283,6 +283,7 @@ const categories = await getCloudinaryGallery();
   let activeIndex = 0;
   let touchStartX = 0;
   let touchStartY = 0;
+  let multiTouchGesture = false;
 
   if (lightbox) document.body.append(lightbox);
 
@@ -359,18 +360,35 @@ const categories = await getCloudinaryGallery();
 
   lightboxViewer?.addEventListener('touchstart', (event) => {
     if (!window.matchMedia('(max-width: 640px)').matches) return;
+    if (event.touches.length > 1) {
+      multiTouchGesture = true;
+      return;
+    }
+    if (multiTouchGesture) return;
     const touch = event.changedTouches[0];
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
   }, { passive: true });
 
+  lightboxViewer?.addEventListener('touchmove', (event) => {
+    if (event.touches.length > 1) multiTouchGesture = true;
+  }, { passive: true });
+
   lightboxViewer?.addEventListener('touchend', (event) => {
     if (!window.matchMedia('(max-width: 640px)').matches) return;
+    if (event.touches.length > 0 || multiTouchGesture) {
+      if (event.touches.length === 0) multiTouchGesture = false;
+      return;
+    }
     const touch = event.changedTouches[0];
     const deltaX = touch.clientX - touchStartX;
     const deltaY = touch.clientY - touchStartY;
-    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
     showImage(activeIndex + (deltaX < 0 ? 1 : -1));
+  }, { passive: true });
+
+  lightboxViewer?.addEventListener('touchcancel', () => {
+    multiTouchGesture = false;
   }, { passive: true });
 
   lightboxClose?.addEventListener('click', closeLightbox);
@@ -799,8 +817,9 @@ const categories = await getCloudinaryGallery();
 
     .galeria__lightbox-position {
       position: absolute;
-      top: calc(env(safe-area-inset-top, 0px) + 4rem);
-      right: 1rem;
+      top: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+      right: auto;
+      left: 0.5rem;
       z-index: 2;
       min-height: 0;
       margin: 0;
