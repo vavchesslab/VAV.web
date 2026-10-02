@@ -299,6 +299,12 @@ const categories = await getCloudinaryGallery();
   let panStartY = 0;
   let panBaseX = 0;
   let panBaseY = 0;
+  let panLastX = 0;
+  let panLastY = 0;
+  let panLastTime = 0;
+  let panVelocityX = 0;
+  let panVelocityY = 0;
+  let panMomentumFrame = 0;
 
   if (lightbox) document.body.append(lightbox);
 
@@ -322,7 +328,52 @@ const categories = await getCloudinaryGallery();
     lightboxImage.classList.toggle('is-zoomed', zoomScale > 1.01);
   };
 
+  const stopPanMomentum = () => {
+    if (panMomentumFrame) cancelAnimationFrame(panMomentumFrame);
+    panMomentumFrame = 0;
+    panVelocityX = 0;
+    panVelocityY = 0;
+  };
+
+  const startPanMomentum = () => {
+    if (panMomentumFrame) cancelAnimationFrame(panMomentumFrame);
+    panMomentumFrame = 0;
+    if (zoomScale <= 1.01 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let previousTime = performance.now();
+    const animate = (time: number) => {
+      const elapsed = Math.min(32, Math.max(0, time - previousTime));
+      previousTime = time;
+      if (elapsed === 0) {
+        panMomentumFrame = requestAnimationFrame(animate);
+        return;
+      }
+
+      const nextX = zoomPanX + panVelocityX * elapsed;
+      const nextY = zoomPanY + panVelocityY * elapsed;
+      zoomPanX = nextX;
+      zoomPanY = nextY;
+      clampZoomPan();
+      if (zoomPanX !== nextX) panVelocityX = 0;
+      if (zoomPanY !== nextY) panVelocityY = 0;
+
+      const friction = Math.exp(-0.0055 * elapsed);
+      panVelocityX *= friction;
+      panVelocityY *= friction;
+      updateImageZoom();
+
+      if (Math.abs(panVelocityX) > 0.015 || Math.abs(panVelocityY) > 0.015) {
+        panMomentumFrame = requestAnimationFrame(animate);
+      } else {
+        panMomentumFrame = 0;
+      }
+    };
+
+    panMomentumFrame = requestAnimationFrame(animate);
+  };
+
   const resetImageZoom = () => {
+    stopPanMomentum();
     zoomScale = 1;
     zoomPanX = 0;
     zoomPanY = 0;
@@ -435,6 +486,7 @@ const categories = await getCloudinaryGallery();
 
     if (activePointers.size === 1) {
       gestureHadPinch = false;
+      stopPanMomentum();
       gestureStartX = event.clientX;
       gestureStartY = event.clientY;
       gestureMode = zoomScale > 1.01 ? 'pan' : 'swipe';
@@ -442,6 +494,9 @@ const categories = await getCloudinaryGallery();
       panStartY = event.clientY;
       panBaseX = zoomPanX;
       panBaseY = zoomPanY;
+      panLastX = event.clientX;
+      panLastY = event.clientY;
+      panLastTime = event.timeStamp;
     } else if (activePointers.size === 2) {
       startPinchGesture();
     } else {
@@ -461,13 +516,23 @@ const categories = await getCloudinaryGallery();
       zoomScale = Math.min(4, Math.max(1, pinchStartScale * getPointerDistance(points[0], points[1]) / pinchStartDistance));
       zoomPanX = pinchStartPanX + midpointX - pinchStartMidX;
       zoomPanY = pinchStartPanY + midpointY - pinchStartMidY;
+      panVelocityX = 0;
+      panVelocityY = 0;
       updateImageZoom();
       return;
     }
 
     if (gestureMode === 'pan' && activePointers.size === 1 && zoomScale > 1.01) {
+      const deltaX = event.clientX - panLastX;
+      const deltaY = event.clientY - panLastY;
+      const elapsed = Math.max(1, event.timeStamp - panLastTime);
       zoomPanX = panBaseX + event.clientX - panStartX;
       zoomPanY = panBaseY + event.clientY - panStartY;
+      panVelocityX = panVelocityX * 0.35 + deltaX / elapsed * 0.65;
+      panVelocityY = panVelocityY * 0.35 + deltaY / elapsed * 0.65;
+      panLastX = event.clientX;
+      panLastY = event.clientY;
+      panLastTime = event.timeStamp;
       updateImageZoom();
     }
   });
@@ -492,6 +557,7 @@ const categories = await getCloudinaryGallery();
     }
 
     if (activePointers.size > 0) return;
+    if (gestureMode === 'pan') startPanMomentum();
     if (gestureMode === 'swipe' && zoomScale <= 1.01) {
       const deltaX = event.clientX - gestureStartX;
       const deltaY = event.clientY - gestureStartY;

@@ -40,12 +40,7 @@ const goldShadow = '#9b681c';
 					<div class="version-two-copy">
 						<p class="version-two-eyebrow mb-5 text-sm font-semibold uppercase tracking-[0.22em]">Piezas únicas y personalizables</p>
 						<h1 class="text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza ya.</h1>
-						<p class="version-two-copy__description max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas y tableros de ajedrez originales en resina, elaborados artesanalmente en dos líneas: <b>Estándar y Premium.</b><span id="hero-copy-more" class="version-two-copy__more"> La línea Premium suma piezas imantadas con imanes de neodimio, y ambas cuentan con un packaging de calidad que completa la experiencia VAV.</span></p>
-						<button id="hero-copy-toggle" class="version-two-copy__toggle" type="button" aria-label="Mostrar más información" aria-expanded="false" aria-controls="hero-copy-more">
-							<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-								<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
+						<p class="version-two-copy__description max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas y tableros de ajedrez originales en resina, elaborados artesanalmente en dos líneas: <b>Estándar y Premium.</b> La línea Premium suma piezas imantadas con imanes de neodimio, y ambas cuentan con un packaging de calidad que completa la experiencia VAV.</p>
 						<div class="mt-9 flex flex-wrap justify-center gap-3">
 							<a class="contact-button rounded-full px-6 py-3 font-semibold transition" href="https://ig.me/m/vavchesslab">Contactar</a>
 							<a class="work-button rounded-full border px-6 py-3 font-semibold transition" href="#galeria">Nuestros trabajos</a>
@@ -116,15 +111,6 @@ const goldShadow = '#9b681c';
 				window.setTimeout(revealPage, 3500);
 			})();
 
-			const heroCopyToggle = document.querySelector<HTMLButtonElement>('#hero-copy-toggle');
-			const heroCopyMore = document.querySelector<HTMLElement>('#hero-copy-more');
-			heroCopyToggle?.addEventListener('click', () => {
-				if (!heroCopyMore) return;
-				const isExpanded = heroCopyToggle.getAttribute('aria-expanded') !== 'true';
-				heroCopyMore.classList.toggle('is-expanded', isExpanded);
-				heroCopyToggle.setAttribute('aria-expanded', String(isExpanded));
-				heroCopyToggle.setAttribute('aria-label', isExpanded ? 'Mostrar menos información' : 'Mostrar más información');
-			});
 		</script>
 	</body>
 </html>

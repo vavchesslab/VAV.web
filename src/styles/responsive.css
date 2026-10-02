@@ -43,10 +43,6 @@ body.navbar-menu-open .sticky-nav-header::before {
 	-webkit-backdrop-filter: none;
 }
 
-.version-two-shell .version-two-copy__toggle {
-	display: none;
-}
-
 .version-two-shell .laboratorio-desktop-only { display: block; }
 .version-two-shell .laboratorio-mobile-only { display: none; }
 
@@ -87,41 +83,6 @@ body.navbar-menu-open .sticky-nav-header::before {
 		line-height: 1.05;
 	}
 
-	.version-two-shell .version-two-copy__more {
-		display: none;
-	}
-
-	.version-two-shell .version-two-copy__more.is-expanded {
-		display: inline;
-	}
-
-	.version-two-shell .version-two-copy__toggle {
-		display: grid;
-		place-items: center;
-		width: 2.75rem;
-		height: 2.75rem;
-		margin: 0.25rem auto 0;
-		padding: 0;
-		border: 0;
-		color: #ffffff;
-		background: transparent;
-		cursor: pointer;
-	}
-
-	.version-two-shell .version-two-copy__toggle svg {
-		width: 1.2rem;
-		height: 1.2rem;
-		transition: transform 180ms ease;
-	}
-
-	.version-two-shell .version-two-copy__toggle[aria-expanded="true"] svg {
-		transform: rotate(180deg);
-	}
-
-	.version-two-shell .version-two-copy__toggle:focus-visible {
-		outline: 1px solid #ffffff;
-		outline-offset: -0.35rem;
-	}
 }
 
 @media (max-width: 379px) {
