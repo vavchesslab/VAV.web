@@ -1,0 +1,75 @@
+/* MOBILE MINI: estilos base desde 320px CSS. */
+
+.version-two-shell .sticky-nav-header .nav-divider {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+html.navbar-menu-open {
+	overflow: hidden;
+	scrollbar-gutter: auto;
+}
+
+body.navbar-menu-open {
+	position: fixed;
+	top: calc(0px - var(--navbar-menu-scroll-y, 0px));
+	left: 0;
+	width: 100vw;
+	overflow: hidden;
+}
+
+body.navbar-menu-open .sticky-nav-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+}
+
+@media (min-width: 1280px) {
+	.version-two-shell .sticky-nav-header .nav-divider {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: 0;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu-toggle {
+		display: none;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu,
+	.version-two-shell .sticky-nav-header .navbar-menu[hidden] {
+		position: static;
+		display: contents;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu .nav-actions {
+		display: flex;
+		position: relative;
+		align-items: center;
+		justify-self: center;
+		gap: clamp(1.5rem, 4vw, 5rem);
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu .version-two-nav-link {
+		padding: 0 0 0.25rem;
+		border-bottom: 0;
+		font-size: 0.72rem;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu .version-toggle {
+		justify-self: auto;
+		margin: 0;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu .navbar-game-link {
+		justify-self: end;
+		justify-content: center;
+		width: auto;
+	}
+
+	.version-two-shell .sticky-nav-header .navbar-menu .nav-active-indicator {
+		display: block;
+	}
+}
