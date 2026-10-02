@@ -3,12 +3,26 @@
 
 <section id="play-mode" class="play-mode" aria-label="Jugar contra la PC" hidden>
 	<div class="play-mode__panel">
+		<button id="play-mode-close" class="play-mode__close" type="button" aria-label="Cerrar partida">
+			<span class="play-mode__close-x" aria-hidden="true">&times;</span>
+			<svg class="play-mode__close-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</button>
+		<div class="play-mode__content">
 		<header class="play-mode__header">
 			<div>
 				<h2>Jugar contra la PC</h2>
 				<p id="play-mode-status" class="play-mode__status" aria-live="polite">Tu turno. Elegí una pieza blanca.</p>
 			</div>
-			<button id="play-mode-close" class="play-mode__close" type="button" aria-label="Cerrar partida">&times;</button>
+			<div class="play-mode__header-actions">
+				<button id="play-mode-settings-toggle" class="play-mode__settings-toggle" type="button" aria-label="Abrir configuración" aria-controls="play-mode-settings" aria-expanded="false" title="Configuración" hidden>
+					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path d="M12.22 2h-.44a2 2 0 0 0-2 1.72l-.13.96a2 2 0 0 1-1 1.73l-.87.5a2 2 0 0 1-1.99-.02l-.83-.48a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.83.48a2 2 0 0 1 1 1.72v1a2 2 0 0 1-1 1.73l-.83.48a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.83-.48a2 2 0 0 1 1.99-.02l.87.5a2 2 0 0 1 1 1.73l.13.96a2 2 0 0 0 2 1.72h.44a2 2 0 0 0 2-1.72l.13-.96a2 2 0 0 1 1-1.73l.87-.5a2 2 0 0 1 1.99.02l.83.48a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.83-.48a2 2 0 0 1-1-1.72v-1a2 2 0 0 1 1-1.73l.83-.48a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.83.48a2 2 0 0 1-1.99-.02l-.87-.5a2 2 0 0 1-1-1.73l-.13-.96a2 2 0 0 0-2-1.72Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+						<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+					</svg>
+				</button>
+			</div>
 		</header>
 
 		<div class="play-mode__body">
@@ -16,7 +30,7 @@
 				<div id="play-mode-board" class="play-mode__board" role="grid" aria-label="Tablero de ajedrez"></div>
 				<div id="play-mode-result" class="play-mode__result" hidden role="status" aria-live="assertive">¡Ganaste!</div>
 			</div>
-			<aside class="play-mode__side-panel">
+			<aside id="play-mode-settings" class="play-mode__side-panel">
 				<div class="play-mode__side-block">
 					<span class="play-mode__label">Tu color</span>
 					<div class="play-mode__color-actions">
@@ -45,6 +59,7 @@
 			</aside>
 			<p class="play-mode__hint"><em>Powered by <strong>sinccsdgn</strong></em></p>
 		</div>
+		</div>
 	</div>
 </section>
 
@@ -63,6 +78,9 @@
 	const resultBanner = document.querySelector<HTMLElement>('#play-mode-result');
 	const closeButton = document.querySelector<HTMLButtonElement>('#play-mode-close');
 	const resetButton = document.querySelector<HTMLButtonElement>('#play-mode-reset');
+	const settingsToggle = document.querySelector<HTMLButtonElement>('#play-mode-settings-toggle');
+	const settingsPanel = document.querySelector<HTMLElement>('#play-mode-settings');
+	const playBody = document.querySelector<HTMLElement>('.play-mode__body');
 		const levelSelect = document.querySelector<HTMLInputElement>('#play-mode-level');
 		const levelSelector = document.querySelector<HTMLButtonElement>('#play-mode-level-selector');
 		const levelCurrent = document.querySelector<HTMLElement>('#play-mode-level-current');
@@ -74,6 +92,25 @@
 		if (playMode.parentElement !== document.body) {
 			document.body.append(playMode);
 		}
+		const mobileSettings = window.matchMedia('(max-width: 720px)');
+		let isMobileSettingsOpen = false;
+		const syncSettingsVisibility = () => {
+			if (!settingsToggle || !settingsPanel) return;
+			settingsToggle.hidden = !mobileSettings.matches;
+			settingsPanel.hidden = mobileSettings.matches && !isMobileSettingsOpen;
+			settingsToggle.setAttribute('aria-expanded', String(mobileSettings.matches && isMobileSettingsOpen));
+			settingsToggle.setAttribute('aria-label', isMobileSettingsOpen ? 'Cerrar configuración' : 'Abrir configuración');
+			playBody?.classList.toggle('is-settings-open', mobileSettings.matches && isMobileSettingsOpen);
+		};
+		settingsToggle?.addEventListener('click', () => {
+			isMobileSettingsOpen = !isMobileSettingsOpen;
+			syncSettingsVisibility();
+		});
+		mobileSettings.addEventListener('change', () => {
+			isMobileSettingsOpen = false;
+			syncSettingsVisibility();
+		});
+		syncSettingsVisibility();
 
 		const pieceSymbols: Record<PieceType, [string, string]> = {
 			p: [String.fromCodePoint(9817), String.fromCodePoint(9823)],
@@ -94,8 +131,25 @@
 		let engineThinking = false;
 		let pendingEngineMove: number | undefined;
 		const gameButton = document.querySelector<HTMLElement>('.navbar-game-link');
+		const mobileNavActions = document.querySelector<HTMLElement>('#navbar-menu .nav-actions');
+		const playPanel = playMode.querySelector<HTMLElement>('.play-mode__panel');
+		const desktopGameLayout = window.matchMedia('(min-width: 1280px)');
 
 		const positionPlayMode = () => {
+			if (!desktopGameLayout.matches) {
+				const actionsRect = mobileNavActions?.getBoundingClientRect();
+				const headerBottom = document.querySelector('.sticky-nav-header')?.getBoundingClientRect().bottom || 0;
+				const panelTop = (actionsRect?.height ? actionsRect.bottom : headerBottom) + 12;
+				playMode.style.top = `${panelTop}px`;
+				playMode.style.left = '0.6rem';
+				playMode.style.right = '0.6rem';
+				playPanel?.style.setProperty('max-height', `${Math.max(180, window.innerHeight - panelTop - 12)}px`);
+				return;
+			}
+			playMode.style.removeProperty('left');
+			playMode.style.removeProperty('top');
+			playMode.style.removeProperty('right');
+			playPanel?.style.removeProperty('max-height');
 			if (!gameButton) return;
 			const buttonRect = gameButton.getBoundingClientRect();
 			playMode.style.top = `${buttonRect.bottom + 10}px`;
@@ -281,6 +335,8 @@
 
 		const openGame = () => {
 			playMode.hidden = false;
+			isMobileSettingsOpen = false;
+			syncSettingsVisibility();
 			gameButton?.setAttribute('aria-pressed', 'true');
 			document.body.style.overflow = '';
 			positionPlayMode();
@@ -289,6 +345,8 @@
 
 		const closeGame = () => {
 			playMode.hidden = true;
+			isMobileSettingsOpen = false;
+			syncSettingsVisibility();
 			gameButton?.setAttribute('aria-pressed', 'false');
 			document.body.style.overflow = '';
 		};
@@ -411,15 +469,23 @@
 	}
 
 	.play-mode__panel {
+		position: relative;
 		width: min(100%, 430px);
 		max-height: calc(100dvh - 5.7rem);
-		overflow: auto;
-		padding: 1rem;
+		overflow: visible;
+		padding: 0;
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		border-radius: 0.9rem;
 		background: #0d191b;
 		box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.5);
 		pointer-events: auto;
+	}
+
+	.play-mode__content {
+		max-height: inherit;
+		overflow: auto;
+		padding: 1rem;
+		border-radius: inherit;
 	}
 
 	.play-mode__header {
@@ -458,6 +524,10 @@
 	}
 
 	.play-mode__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 1;
 		display: grid;
 		place-items: center;
 		width: 2.4rem;
@@ -468,6 +538,49 @@
 		color: #ffffff;
 		font-size: 1.5rem;
 		cursor: pointer;
+		pointer-events: auto;
+	}
+
+	.play-mode__close-arrow {
+		display: none;
+	}
+
+	.play-mode__header-actions {
+		display: grid;
+		justify-items: center;
+		gap: 0.4rem;
+		flex: 0 0 auto;
+	}
+
+	.play-mode__settings-toggle {
+		display: grid;
+		place-items: center;
+		width: 2.4rem;
+		height: 2.4rem;
+		padding: 0;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 50%;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.06);
+		cursor: pointer;
+	}
+
+	.play-mode__settings-toggle svg {
+		width: 1.15rem;
+		height: 1.15rem;
+	}
+
+	.play-mode__settings-toggle:hover,
+	.play-mode__settings-toggle:focus-visible,
+	.play-mode__settings-toggle[aria-expanded="true"] {
+		border-color: var(--gold-base);
+		color: var(--gold-light);
+		outline: none;
+	}
+
+	.play-mode__settings-toggle[hidden],
+	.play-mode__side-panel[hidden] {
+		display: none;
 	}
 
 	.play-mode__body {
@@ -523,6 +636,12 @@
 		font-size: clamp(1rem, 4.8vw, 2.8rem);
 		line-height: 1;
 		cursor: pointer;
+	}
+
+	@media (max-width: 1279.98px) {
+		:global(.play-mode__square) {
+			font-size: clamp(1.5rem, 8vw, 2.8rem);
+		}
 	}
 
 	:global(.play-mode__square.is-light) { background: #d9c59a; }
@@ -637,6 +756,29 @@
 	@media (max-width: 720px) {
 		.play-mode { top: 4.6rem; right: 0.6rem; }
 		.play-mode__panel { width: min(calc(100vw - 1.2rem), 390px); max-height: calc(100dvh - 5.5rem); }
+		.play-mode__content { max-height: inherit; }
 		.play-mode__board { width: min(100%, calc(100dvh - 285px)); }
+		.play-mode__status { margin-top: 0.35rem; }
+		.play-mode__header-actions { padding-top: 2.8rem; }
+		.play-mode__close {
+			position: absolute;
+			top: -1.05rem;
+			right: 0.65rem;
+			left: auto;
+			width: 2.1rem;
+			height: 2.1rem;
+			margin: 0;
+			transform: none;
+			z-index: 2;
+			font-size: 0.9rem;
+			border-color: rgba(255, 255, 255, 0.3);
+			background: #0d191b;
+			color: #ffffff;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+			pointer-events: auto;
+		}
+		.play-mode__close-x { display: block; }
+		.play-mode__close-arrow { display: none; }
+		.play-mode__body.is-settings-open .play-mode__side-panel { order: -1; }
 	}
 </style>
