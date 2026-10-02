@@ -339,7 +339,8 @@ const { showVersionToggle = false } = Astro.props;
 	syncMenuVisibility();
 
 	document.addEventListener('click', (event) => {
-		const clickedGame = event.target instanceof Node && document.querySelector('#play-mode')?.contains(event.target);
+		const playMode = document.querySelector('#play-mode');
+		const clickedGame = Boolean(playMode && event.composedPath().includes(playMode));
 		if (clickedGame && isMenuOpen && !desktopMenu.matches) return;
 		if (!(event.target instanceof Element) || (!menu?.contains(event.target) && !menuToggle?.contains(event.target))) {
 			closeMenu();
