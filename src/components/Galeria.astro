@@ -281,11 +281,72 @@ const categories = await getCloudinaryGallery();
   const imageButtons = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]');
   let activeButtons: HTMLButtonElement[] = [];
   let activeIndex = 0;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let multiTouchGesture = false;
+  const activePointers = new Map<number, { x: number; y: number }>();
+  let zoomScale = 1;
+  let zoomPanX = 0;
+  let zoomPanY = 0;
+  let gestureMode: 'idle' | 'swipe' | 'pan' | 'pinch' = 'idle';
+  let gestureHadPinch = false;
+  let gestureStartX = 0;
+  let gestureStartY = 0;
+  let pinchStartDistance = 0;
+  let pinchStartScale = 1;
+  let pinchStartMidX = 0;
+  let pinchStartMidY = 0;
+  let pinchStartPanX = 0;
+  let pinchStartPanY = 0;
+  let panStartX = 0;
+  let panStartY = 0;
+  let panBaseX = 0;
+  let panBaseY = 0;
 
   if (lightbox) document.body.append(lightbox);
+
+  const isMobileLightbox = () => window.matchMedia('(max-width: 640px)').matches;
+  const clampZoomPan = () => {
+    if (!lightboxImage || zoomScale <= 1) {
+      zoomPanX = 0;
+      zoomPanY = 0;
+      return;
+    }
+    const maxX = lightboxImage.clientWidth * (zoomScale - 1) / 2;
+    const maxY = lightboxImage.clientHeight * (zoomScale - 1) / 2;
+    zoomPanX = Math.max(-maxX, Math.min(maxX, zoomPanX));
+    zoomPanY = Math.max(-maxY, Math.min(maxY, zoomPanY));
+  };
+
+  const updateImageZoom = () => {
+    if (!lightboxImage) return;
+    clampZoomPan();
+    lightboxImage.style.transform = `translate3d(${zoomPanX}px, ${zoomPanY}px, 0) scale(${zoomScale})`;
+    lightboxImage.classList.toggle('is-zoomed', zoomScale > 1.01);
+  };
+
+  const resetImageZoom = () => {
+    zoomScale = 1;
+    zoomPanX = 0;
+    zoomPanY = 0;
+    gestureMode = 'idle';
+    gestureHadPinch = false;
+    activePointers.clear();
+    updateImageZoom();
+  };
+
+  const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) =>
+    Math.hypot(second.x - first.x, second.y - first.y);
+
+  const startPinchGesture = () => {
+    const points = Array.from(activePointers.values());
+    if (points.length < 2) return;
+    gestureMode = 'pinch';
+    gestureHadPinch = true;
+    pinchStartDistance = Math.max(1, getPointerDistance(points[0], points[1]));
+    pinchStartScale = zoomScale;
+    pinchStartMidX = (points[0].x + points[1].x) / 2;
+    pinchStartMidY = (points[0].y + points[1].y) / 2;
+    pinchStartPanX = zoomPanX;
+    pinchStartPanY = zoomPanY;
+  };
 
   const renderThumbnails = () => {
     if (!lightboxThumbnails) return;
@@ -318,6 +379,7 @@ const categories = await getCloudinaryGallery();
 
   const showImage = (index: number) => {
     if (!lightboxImage || activeButtons.length === 0) return;
+    resetImageZoom();
     activeIndex = (index + activeButtons.length) % activeButtons.length;
     const button = activeButtons[activeIndex];
     lightboxImage.src = button.dataset.lightboxSrc || '';
@@ -336,6 +398,7 @@ const categories = await getCloudinaryGallery();
 
   const closeLightbox = () => {
     if (!lightbox || !lightboxImage) return;
+    resetImageZoom();
     lightbox.hidden = true;
     lightboxImage.removeAttribute('src');
     document.body.style.overflow = '';
@@ -358,38 +421,89 @@ const categories = await getCloudinaryGallery();
   lightboxPrev?.addEventListener('click', () => showImage(activeIndex - 1));
   lightboxNext?.addEventListener('click', () => showImage(activeIndex + 1));
 
-  lightboxViewer?.addEventListener('touchstart', (event) => {
-    if (!window.matchMedia('(max-width: 640px)').matches) return;
-    if (event.touches.length > 1) {
-      multiTouchGesture = true;
+  lightboxViewer?.addEventListener('pointerdown', (event) => {
+    if (!isMobileLightbox() || !lightboxImage) return;
+    event.preventDefault();
+    activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (event.isTrusted) {
+      try {
+        lightboxViewer.setPointerCapture(event.pointerId);
+      } catch {
+        // Pointer capture is unavailable in synthetic or cancelled events.
+      }
+    }
+
+    if (activePointers.size === 1) {
+      gestureHadPinch = false;
+      gestureStartX = event.clientX;
+      gestureStartY = event.clientY;
+      gestureMode = zoomScale > 1.01 ? 'pan' : 'swipe';
+      panStartX = event.clientX;
+      panStartY = event.clientY;
+      panBaseX = zoomPanX;
+      panBaseY = zoomPanY;
+    } else if (activePointers.size === 2) {
+      startPinchGesture();
+    } else {
+      gestureHadPinch = true;
+      gestureMode = 'pinch';
+    }
+  });
+
+  lightboxViewer?.addEventListener('pointermove', (event) => {
+    if (!isMobileLightbox() || !activePointers.has(event.pointerId)) return;
+    activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (gestureMode === 'pinch' && activePointers.size >= 2) {
+      const points = Array.from(activePointers.values()).slice(0, 2);
+      const midpointX = (points[0].x + points[1].x) / 2;
+      const midpointY = (points[0].y + points[1].y) / 2;
+      zoomScale = Math.min(4, Math.max(1, pinchStartScale * getPointerDistance(points[0], points[1]) / pinchStartDistance));
+      zoomPanX = pinchStartPanX + midpointX - pinchStartMidX;
+      zoomPanY = pinchStartPanY + midpointY - pinchStartMidY;
+      updateImageZoom();
       return;
     }
-    if (multiTouchGesture) return;
-    const touch = event.changedTouches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-  }, { passive: true });
 
-  lightboxViewer?.addEventListener('touchmove', (event) => {
-    if (event.touches.length > 1) multiTouchGesture = true;
-  }, { passive: true });
+    if (gestureMode === 'pan' && activePointers.size === 1 && zoomScale > 1.01) {
+      zoomPanX = panBaseX + event.clientX - panStartX;
+      zoomPanY = panBaseY + event.clientY - panStartY;
+      updateImageZoom();
+    }
+  });
 
-  lightboxViewer?.addEventListener('touchend', (event) => {
-    if (!window.matchMedia('(max-width: 640px)').matches) return;
-    if (event.touches.length > 0 || multiTouchGesture) {
-      if (event.touches.length === 0) multiTouchGesture = false;
+  const finishPointerGesture = (event: PointerEvent) => {
+    if (!activePointers.has(event.pointerId)) return;
+    activePointers.delete(event.pointerId);
+
+    if (gestureHadPinch) {
+      if (activePointers.size === 1) {
+        const remainingPointer = Array.from(activePointers.values())[0];
+        gestureMode = 'pan';
+        panStartX = remainingPointer.x;
+        panStartY = remainingPointer.y;
+        panBaseX = zoomPanX;
+        panBaseY = zoomPanY;
+      } else if (activePointers.size === 0) {
+        gestureMode = 'idle';
+        gestureHadPinch = false;
+      }
       return;
     }
-    const touch = event.changedTouches[0];
-    const deltaX = touch.clientX - touchStartX;
-    const deltaY = touch.clientY - touchStartY;
-    if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-    showImage(activeIndex + (deltaX < 0 ? 1 : -1));
-  }, { passive: true });
 
-  lightboxViewer?.addEventListener('touchcancel', () => {
-    multiTouchGesture = false;
-  }, { passive: true });
+    if (activePointers.size > 0) return;
+    if (gestureMode === 'swipe' && zoomScale <= 1.01) {
+      const deltaX = event.clientX - gestureStartX;
+      const deltaY = event.clientY - gestureStartY;
+      if (Math.abs(deltaX) >= 55 && Math.abs(deltaX) >= Math.abs(deltaY) * 1.25) {
+        showImage(activeIndex + (deltaX < 0 ? 1 : -1));
+      }
+    }
+    gestureMode = 'idle';
+  };
+
+  lightboxViewer?.addEventListener('pointerup', finishPointerGesture);
+  lightboxViewer?.addEventListener('pointercancel', finishPointerGesture);
 
   lightboxClose?.addEventListener('click', closeLightbox);
   lightbox?.addEventListener('click', (event) => {
@@ -771,7 +885,7 @@ const categories = await getCloudinaryGallery();
 
     .galeria__lightbox-viewer {
       gap: 0;
-      touch-action: pan-y pinch-zoom;
+      touch-action: none;
     }
 
     .galeria__lightbox-arrow,
@@ -783,6 +897,10 @@ const categories = await getCloudinaryGallery();
       max-width: 100%;
       max-height: 68dvh;
       border-radius: 0.25rem;
+      transform-origin: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .galeria__lightbox-dots {
