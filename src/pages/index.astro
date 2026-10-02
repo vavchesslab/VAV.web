@@ -40,7 +40,12 @@ const goldShadow = '#9b681c';
 					<div class="version-two-copy">
 						<p class="version-two-eyebrow mb-5 text-sm font-semibold uppercase tracking-[0.22em]">Piezas únicas y personalizables</p>
 						<h1 class="text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza ya.</h1>
-						<p class="max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas y tableros de ajedrez originales en resina, elaborados artesanalmente en dos líneas: <b>Estándar y Premium.</b> La línea Premium suma piezas imantadas con imanes de neodimio, y ambas cuentan con un packaging de calidad que completa la experiencia VAV.</p>
+						<p class="version-two-copy__description max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas y tableros de ajedrez originales en resina, elaborados artesanalmente en dos líneas: <b>Estándar y Premium.</b><span id="hero-copy-more" class="version-two-copy__more"> La línea Premium suma piezas imantadas con imanes de neodimio, y ambas cuentan con un packaging de calidad que completa la experiencia VAV.</span></p>
+						<button id="hero-copy-toggle" class="version-two-copy__toggle" type="button" aria-label="Mostrar más información" aria-expanded="false" aria-controls="hero-copy-more">
+							<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+								<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
 						<div class="mt-9 flex flex-wrap justify-center gap-3">
 							<a class="contact-button rounded-full px-6 py-3 font-semibold transition" href="https://ig.me/m/vavchesslab">Contactar</a>
 							<a class="work-button rounded-full border px-6 py-3 font-semibold transition" href="#galeria">Nuestros trabajos</a>
@@ -48,11 +53,26 @@ const goldShadow = '#9b681c';
 					</div>
 				</section>
 
-				<Laboratorio
-					modelSrc="/rey_regular.glb"
-					title="Tu pieza 3D"
-					subtitle=""
-				/>
+				<div id="laboratorio" class="laboratorio-home-entry">
+					<div class="laboratorio-desktop-only">
+						<Laboratorio
+							modelSrc="/rey_regular.glb"
+							title="Tu pieza 3D"
+							subtitle=""
+							desktopOnly={true}
+							sectionId="laboratorio-desktop"
+						/>
+					</div>
+					<section class="laboratorio-mobile-only text-center py-16">
+						<p class="mb-4 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent)">Laboratorio</p>
+						<a class="contact-button mt-2 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold transition" href="/laboratorio">
+							Abrir laboratorio
+							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+								<path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</a>
+					</section>
+				</div>
 
 				<Galeria />
 
@@ -95,6 +115,16 @@ const goldShadow = '#9b681c';
 
 				window.setTimeout(revealPage, 3500);
 			})();
+
+			const heroCopyToggle = document.querySelector<HTMLButtonElement>('#hero-copy-toggle');
+			const heroCopyMore = document.querySelector<HTMLElement>('#hero-copy-more');
+			heroCopyToggle?.addEventListener('click', () => {
+				if (!heroCopyMore) return;
+				const isExpanded = heroCopyToggle.getAttribute('aria-expanded') !== 'true';
+				heroCopyMore.classList.toggle('is-expanded', isExpanded);
+				heroCopyToggle.setAttribute('aria-expanded', String(isExpanded));
+				heroCopyToggle.setAttribute('aria-label', isExpanded ? 'Mostrar menos información' : 'Mostrar más información');
+			});
 		</script>
 	</body>
 </html>

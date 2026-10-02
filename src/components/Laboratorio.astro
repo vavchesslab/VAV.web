@@ -2,11 +2,13 @@
 const {
   modelSrc = '/rey_regular.glb',
   title = 'OBJETOS 3D',
-  subtitle = 'Vista interactiva del objeto'
+  subtitle = 'Vista interactiva del objeto',
+  desktopOnly = false,
+  sectionId = 'laboratorio'
 } = Astro.props;
 ---
 
-<section id="laboratorio" class="model-showcase" aria-labelledby="model-showcase-title">
+<section id={sectionId} class="model-showcase" aria-labelledby="model-showcase-title" data-desktop-only={desktopOnly}>
   <div class="model-showcase__inner">
     <div class="text-center mb-6">
       <p class="mt-6 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent)">Laboratorio</p>
@@ -1645,10 +1647,21 @@ const {
 </style>
 
 <script type="module">
-  import * as THREE from 'three';
-  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-  import lottie from 'lottie-web';
+  const showcaseRoot = document.querySelector('.model-showcase');
+  const desktopOnly = showcaseRoot?.getAttribute('data-desktop-only') === 'true';
+  const desktopQuery = window.matchMedia('(min-width: 1280px)');
+  let initialized = false;
+
+  const initializeLaboratorio = async () => {
+    if (initialized) return;
+    initialized = true;
+
+    const [THREE, { OrbitControls }, { GLTFLoader }] = await Promise.all([
+      import('three'),
+      import('three/examples/jsm/controls/OrbitControls.js'),
+      import('three/examples/jsm/loaders/GLTFLoader.js')
+    ]);
+    const lottiePromise = import('lottie-web');
 
   const STORAGE_KEY = 'chess_custom_color_config';
 
@@ -2332,11 +2345,12 @@ const {
     reloadFinalScene();
   });
 
-  finishButton?.addEventListener('click', (event) => {
+  finishButton?.addEventListener('click', async (event) => {
     if (!showcaseLayout || showcaseLayout.classList.contains('is-exiting')) return;
     event.preventDefault();
     showcaseLayout.classList.add('is-exiting');
 
+    const { default: lottie } = await lottiePromise;
     const displayDuration = 3000;
 
     const exitAnims = Array.from(exitLottieContainer?.querySelectorAll('.model-showcase__exit-lottie-item') || [])
@@ -2705,4 +2719,20 @@ const {
   });
 
   syncColorSwatches();
+  };
+
+  const startLaboratorio = () => {
+    void initializeLaboratorio().catch((error) => {
+      initialized = false;
+      console.error('No se pudo iniciar el laboratorio 3D:', error);
+    });
+  };
+
+  if (!desktopOnly || desktopQuery.matches) {
+    startLaboratorio();
+  } else {
+    desktopQuery.addEventListener('change', (event) => {
+      if (event.matches) startLaboratorio();
+    }, { once: true });
+  }
 </script>

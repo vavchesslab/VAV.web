@@ -1,0 +1,88 @@
+---
+import Laboratorio from '../components/Laboratorio.astro';
+import '../styles/global.css';
+import '../styles/responsive.css';
+
+const accent = '#e8c031';
+const buttonText = '#ffffff';
+const goldDeep = '#8f5b16';
+const goldBase = '#e8c031';
+const goldLight = '#fff1a8';
+const goldBright = '#f2c94c';
+const goldShadow = '#9b681c';
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Laboratorio 3D | VAV Chess Lab</title>
+	</head>
+	<body>
+		<div class="version-two-shell laboratorio-page-shell" style={`--accent: ${accent}; --button-text: ${buttonText}; --gold-deep: ${goldDeep}; --gold-base: ${goldBase}; --gold-light: ${goldLight}; --gold-bright: ${goldBright}; --gold-shadow: ${goldShadow};`}>
+			<header class="laboratorio-page-header">
+				<a class="laboratorio-page-back" href="/" aria-label="Volver a la página principal">
+					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path d="m15 18-6-6 6-6M9 12h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+					Volver
+				</a>
+			</header>
+			<main>
+				<Laboratorio
+					modelSrc="/rey_regular.glb"
+					title="Tu pieza 3D"
+					subtitle="Personaliza y explora las piezas y tableros"
+				/>
+			</main>
+		</div>
+	</body>
+</html>
+
+<style>
+	.laboratorio-page-shell {
+		min-height: 100vh;
+	}
+
+	.laboratorio-page-header {
+		position: relative;
+		z-index: 10;
+		width: min(100%, 1600px);
+		margin-inline: auto;
+		padding: 1rem 1.5rem 0;
+	}
+
+	.laboratorio-page-back {
+		display: inline-flex;
+		min-height: 2.75rem;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.45rem 0.9rem;
+		border: 1px solid rgba(255, 255, 255, 0.24);
+		border-radius: 999px;
+		color: var(--foreground);
+		background: rgba(255, 255, 255, 0.06);
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-decoration: none;
+		transition: border-color 180ms ease, background 180ms ease;
+	}
+
+	.laboratorio-page-back:hover,
+	.laboratorio-page-back:focus-visible {
+		border-color: var(--gold-base);
+		background: rgba(232, 192, 49, 0.12);
+		outline: none;
+	}
+
+	.laboratorio-page-back svg {
+		width: 1.1rem;
+		height: 1.1rem;
+	}
+
+	@media (max-width: 720px) {
+		.laboratorio-page-header {
+			padding: 0.75rem 1rem 0;
+		}
+	}
+</style>

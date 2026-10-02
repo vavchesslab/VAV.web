@@ -116,11 +116,14 @@ const searchFolder = async (folder: string): Promise<GalleryImage[]> => {
 export const getCloudinaryGallery = async (): Promise<GalleryCategory[]> => {
   if (!cloudName || !apiKey || !apiSecret) return [];
 
-  return Promise.all(categoryNames.map(async (name) => {
+  const categories = await Promise.all(categoryNames.map(async (name) => {
     try {
       return { name, images: await searchFolder(`${galleryFolder}/${name}`) };
     } catch (error) {
-      throw new Error(`No se pudo cargar el álbum "${name}" desde Cloudinary tras varios intentos: ${error instanceof Error ? error.message : error}`);
+      console.warn(`No se pudo cargar el álbum "${name}" desde Cloudinary:`, error);
+      return null;
     }
   }));
+
+  return categories.filter((category): category is GalleryCategory => category !== null);
 };
