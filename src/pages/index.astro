@@ -42,7 +42,7 @@ const goldShadow = '#9b681c';
 						<h1 class="text-5xl font-semibold leading-[.98] tracking-[-0.04em] sm:text-7xl">Tu próxima jugada empieza ya.</h1>
 						<p class="version-two-copy__description max-w-2xl mt-7 text-lg leading-8 text-(--muted)">Creamos piezas y tableros de ajedrez originales en resina, elaborados artesanalmente en dos líneas: <b>Estándar y Premium.</b> La línea Premium suma piezas imantadas con imanes de neodimio, y ambas cuentan con un packaging de calidad que completa la experiencia VAV.</p>
 						<div class="mt-9 flex flex-wrap justify-center gap-3">
-							<a class="contact-button rounded-full px-6 py-3 font-semibold transition" href="https://ig.me/m/vavchesslab" data-instagram-desktop-href="https://ig.me/m/vavchesslab" data-instagram-mobile-href="https://www.instagram.com/m/vavchesslab">Contactar</a>
+							<a class="contact-button rounded-full px-6 py-3 font-semibold transition" href="https://ig.me/m/vavchesslab">Contactar</a>
 							<a class="work-button rounded-full border px-6 py-3 font-semibold transition" href="#galeria">Nuestros trabajos</a>
 						</div>
 					</div>
@@ -110,17 +110,6 @@ const goldShadow = '#9b681c';
 
 				window.setTimeout(revealPage, 3500);
 			})();
-
-			const instagramMobileQuery = window.matchMedia('(max-width: 1279.98px)');
-			const syncInstagramLinks = () => {
-				document.querySelectorAll<HTMLAnchorElement>('[data-instagram-desktop-href][data-instagram-mobile-href]').forEach((link) => {
-					link.href = instagramMobileQuery.matches
-						? link.dataset.instagramMobileHref || ''
-						: link.dataset.instagramDesktopHref || '';
-				});
-			};
-			syncInstagramLinks();
-			instagramMobileQuery.addEventListener('change', syncInstagramLinks);
 
 		</script>
 	</body>

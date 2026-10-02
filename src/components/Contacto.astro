@@ -26,8 +26,6 @@ const {
       <a
         href="https://ig.me/m/vavchesslab"
         class="contacto__button"
-        data-instagram-desktop-href="https://ig.me/m/vavchesslab"
-        data-instagram-mobile-href="https://www.instagram.com/m/vavchesslab"
       >
         <span>Contactar</span>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -180,18 +178,11 @@ const {
 
   @media (max-width: 768px) {
     .contacto-section {
-      min-height: 100vh;
-      min-height: 100svh;
+      min-height: 0;
     }
 
     .contacto-section::after {
-      background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.04) 0%,
-        rgba(0, 0, 0, 0.28) 38%,
-        rgba(0, 0, 0, 0.94) 72%,
-        rgba(0, 0, 0, 0.98) 100%
-      );
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .contacto-section::before {
@@ -200,18 +191,64 @@ const {
 
     .contacto__inner {
       display: flex;
-      align-items: flex-end;
-      padding: 3rem 1.5rem;
+      align-items: flex-start;
+      padding: 1.5rem 1.5rem 3rem;
     }
 
     .contacto__content {
       width: 100%;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
 
     .contacto__header h2 {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      white-space: normal;
+    }
+
+    .contacto__header p,
+    .contacto__details p {
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    .contacto__divider {
+      margin: 1.5rem auto;
+    }
+
+    .contacto__button {
+      display: flex;
+      width: calc(100% - 1.25rem);
+      box-sizing: border-box;
+      margin: 0.5rem auto 0;
+      justify-content: center;
+    }
+  }
+
+  @media (max-aspect-ratio: 3 / 2) {
+    .contacto-section::before {
+      background-size: cover;
+      background-position: left center;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1100px) {
+    .contacto-section {
+      min-height: 0;
+    }
+
+    .contacto__inner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 1.5rem 3rem 3rem;
+    }
+
+    .contacto__content {
+      margin: 0;
+      padding: 0;
     }
   }
 </style>
