@@ -20,6 +20,7 @@ const categories = await getCloudinaryGallery();
     {categories.length > 0 && (
       <div class="galeria__selector-wrap">
         <label id="galeria-album-label" for="galeria-album">Elegí un álbum</label>
+          <button class="galeria__sheet-scrim" type="button" aria-label="Cerrar selector de álbumes" hidden></button>
         <div class="galeria__select-shell">
           <button id="galeria-album" class="galeria__selector" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="galeria-album-options" aria-labelledby="galeria-album-label galeria-album-current">
             <span id="galeria-album-current">{categories[0].name}</span>
@@ -54,6 +55,17 @@ const categories = await getCloudinaryGallery();
               </article>
             ))}
           </div>
+            <div class="galeria__pagination" role="group" aria-label={`Imágenes de ${category.name}`} hidden={category.images.length < 2}>
+              {category.images.map((image, slideIndex) => (
+                <button
+                  class="galeria__pagination-dot"
+                  type="button"
+                  data-slide-to={slideIndex}
+                  aria-label={`Ver imagen ${slideIndex + 1} de ${category.images.length}`}
+                  aria-current={slideIndex === 0 ? 'true' : 'false'}
+                />
+              ))}
+            </div>
         </section>
       ))}
     </div>
@@ -87,6 +99,7 @@ const categories = await getCloudinaryGallery();
         </svg>
       </button>
     </div>
+    <div id="galeria-lightbox-dots" class="galeria__lightbox-dots" role="group" aria-label="Navegación de imágenes"></div>
     <div id="galeria-lightbox-thumbnails" class="galeria__lightbox-thumbnails" aria-label="Miniaturas del álbum"></div>
     <p id="galeria-lightbox-position" class="galeria__lightbox-position" aria-live="polite"></p>
   </div>
@@ -97,6 +110,45 @@ const categories = await getCloudinaryGallery();
   const albumSelectorLabel = document.querySelector<HTMLLabelElement>('#galeria-album-label');
   const albumCurrent = document.querySelector<HTMLElement>('#galeria-album-current');
   const albumOptions = document.querySelector<HTMLElement>('#galeria-album-options');
+  const albumSelectorWrap = document.querySelector<HTMLElement>('.galeria__selector-wrap');
+  const albumSheetScrim = document.querySelector<HTMLButtonElement>('.galeria__sheet-scrim');
+  const albumOptionsParent = albumOptions?.parentElement;
+  const albumOptionsNextSibling = albumOptions?.nextSibling || null;
+  const albumSheetScrimParent = albumSheetScrim?.parentElement;
+  const albumSheetScrimNextSibling = albumSheetScrim?.nextSibling || null;
+  const mobileAlbumSheet = window.matchMedia('(max-width: 640px)');
+  let previousBodyOverflow = '';
+  const carouselGrids = Array.from(document.querySelectorAll<HTMLElement>('.galeria__grid'));
+
+  const updateCarouselPagination = (grid: HTMLElement, selectedIndex?: number) => {
+    const dots = Array.from(grid.nextElementSibling?.querySelectorAll<HTMLButtonElement>('.galeria__pagination-dot') || []);
+    if (dots.length < 2) return;
+    const activeIndex = selectedIndex ?? Math.round(grid.scrollLeft / Math.max(1, grid.clientWidth));
+    dots.forEach((dot, index) => dot.setAttribute('aria-current', String(index === activeIndex)));
+  };
+
+  carouselGrids.forEach((grid) => {
+    let scrollFrame = 0;
+    grid.addEventListener('scroll', () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        updateCarouselPagination(grid);
+        scrollFrame = 0;
+      });
+    }, { passive: true });
+
+    grid.nextElementSibling?.querySelectorAll<HTMLButtonElement>('.galeria__pagination-dot').forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const index = Number(dot.dataset.slideTo || 0);
+        grid.scrollTo({ left: index * grid.clientWidth, behavior: 'smooth' });
+      });
+    });
+  });
+
+  const restoreAlbumSheetNodes = () => {
+    if (albumOptions && albumOptionsParent) albumOptionsParent.insertBefore(albumOptions, albumOptionsNextSibling);
+    if (albumSheetScrim && albumSheetScrimParent) albumSheetScrimParent.insertBefore(albumSheetScrim, albumSheetScrimNextSibling);
+  };
   const albumOptionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.galeria__option'));
   const albums = document.querySelectorAll<HTMLElement>('[data-album]');
 
@@ -104,15 +156,36 @@ const categories = await getCloudinaryGallery();
     if (!albumSelector || !albumOptions) return;
     albumSelector.setAttribute('aria-expanded', 'false');
     albumOptions.hidden = true;
+    if (albumSelectorWrap?.classList.contains('is-sheet-open')) {
+      albumSelectorWrap.classList.remove('is-sheet-open');
+      if (albumSheetScrim) albumSheetScrim.hidden = true;
+      document.body.style.overflow = previousBodyOverflow;
+      restoreAlbumSheetNodes();
+    }
     if (restoreFocus) albumSelector.focus();
   };
 
   const openAlbumOptions = () => {
     if (!albumSelector || !albumOptions) return;
+    if (mobileAlbumSheet.matches && albumSelectorWrap && albumSheetScrim) {
+      previousBodyOverflow = document.body.style.overflow;
+      albumSelectorWrap.classList.add('is-sheet-open');
+      albumSheetScrim.hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.body.append(albumSheetScrim, albumOptions);
+    }
     albumSelector.setAttribute('aria-expanded', 'true');
     albumOptions.hidden = false;
     (albumOptionButtons.find((option) => option.getAttribute('aria-selected') === 'true') || albumOptionButtons[0])?.focus();
   };
+
+  albumSheetScrim?.addEventListener('click', () => closeAlbumOptions(true));
+  mobileAlbumSheet.addEventListener('change', () => {
+    if (!mobileAlbumSheet.matches) closeAlbumOptions();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (mobileAlbumSheet.matches && event.key === 'Escape' && albumOptions && !albumOptions.hidden) closeAlbumOptions(true);
+  });
 
   const selectAlbum = (option: HTMLButtonElement) => {
     const value = option.dataset.albumValue;
@@ -121,6 +194,12 @@ const categories = await getCloudinaryGallery();
     albums.forEach((album) => {
       album.hidden = album.dataset.album !== value;
     });
+    const selectedAlbum = Array.from(albums).find((album) => album.dataset.album === value);
+    const selectedGrid = selectedAlbum?.querySelector<HTMLElement>('.galeria__grid');
+    if (selectedGrid) {
+      selectedGrid.scrollLeft = 0;
+      updateCarouselPagination(selectedGrid, 0);
+    }
     albumCurrent.textContent = option.textContent?.trim() || '';
     albumOptionButtons.forEach((item) => {
       const isSelected = item === option;
@@ -179,7 +258,12 @@ const categories = await getCloudinaryGallery();
   });
 
   document.addEventListener('click', (event) => {
-    if (event.target instanceof Node && !document.querySelector('.galeria__selector-wrap')?.contains(event.target)) {
+    const clickedInsideSelector = event.target instanceof Node && (
+      albumSelectorWrap?.contains(event.target)
+      || albumOptions?.contains(event.target)
+      || albumSheetScrim?.contains(event.target)
+    );
+    if (event.target instanceof Node && !clickedInsideSelector) {
       closeAlbumOptions();
     }
   });
@@ -189,12 +273,16 @@ const categories = await getCloudinaryGallery();
   const lightboxCategory = document.querySelector<HTMLElement>('#galeria-lightbox-category');
   const lightboxPrev = document.querySelector<HTMLButtonElement>('#galeria-lightbox-prev');
   const lightboxNext = document.querySelector<HTMLButtonElement>('#galeria-lightbox-next');
+  const lightboxViewer = document.querySelector<HTMLElement>('.galeria__lightbox-viewer');
+  const lightboxDots = document.querySelector<HTMLElement>('#galeria-lightbox-dots');
   const lightboxThumbnails = document.querySelector<HTMLElement>('#galeria-lightbox-thumbnails');
   const lightboxPosition = document.querySelector<HTMLElement>('#galeria-lightbox-position');
   const lightboxClose = document.querySelector<HTMLButtonElement>('.galeria__lightbox-close');
   const imageButtons = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]');
   let activeButtons: HTMLButtonElement[] = [];
   let activeIndex = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
 
   if (lightbox) document.body.append(lightbox);
 
@@ -214,6 +302,19 @@ const categories = await getCloudinaryGallery();
     }));
   };
 
+  const renderLightboxDots = () => {
+    if (!lightboxDots) return;
+    lightboxDots.replaceChildren(...activeButtons.map((button, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'galeria__lightbox-dot';
+      dot.setAttribute('aria-label', `Ver imagen ${index + 1} de ${activeButtons.length}`);
+      dot.setAttribute('aria-current', String(index === activeIndex));
+      dot.addEventListener('click', () => showImage(index));
+      return dot;
+    }));
+  };
+
   const showImage = (index: number) => {
     if (!lightboxImage || activeButtons.length === 0) return;
     activeIndex = (index + activeButtons.length) % activeButtons.length;
@@ -222,6 +323,9 @@ const categories = await getCloudinaryGallery();
     lightboxImage.alt = button.dataset.lightboxAlt || '';
     if (lightboxCategory) lightboxCategory.textContent = button.dataset.lightboxCategory || '';
     if (lightboxPosition) lightboxPosition.textContent = `Imagen ${activeIndex + 1} de ${activeButtons.length}`;
+    lightboxDots?.querySelectorAll<HTMLButtonElement>('.galeria__lightbox-dot').forEach((dot, dotIndex) => {
+      dot.setAttribute('aria-current', String(dotIndex === activeIndex));
+    });
     lightboxThumbnails?.querySelectorAll<HTMLButtonElement>('.galeria__lightbox-thumbnail').forEach((thumbnail, thumbnailIndex) => {
       thumbnail.classList.toggle('is-active', thumbnailIndex === activeIndex);
       if (thumbnailIndex === activeIndex) thumbnail.setAttribute('aria-current', 'true');
@@ -243,6 +347,7 @@ const categories = await getCloudinaryGallery();
       activeButtons = Array.from(album?.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]') || []);
       activeIndex = activeButtons.indexOf(button);
       renderThumbnails();
+      renderLightboxDots();
       showImage(activeIndex);
       lightbox.hidden = false;
       document.body.style.overflow = 'hidden';
@@ -252,10 +357,26 @@ const categories = await getCloudinaryGallery();
   lightboxPrev?.addEventListener('click', () => showImage(activeIndex - 1));
   lightboxNext?.addEventListener('click', () => showImage(activeIndex + 1));
 
+  lightboxViewer?.addEventListener('touchstart', (event) => {
+    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    const touch = event.changedTouches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  lightboxViewer?.addEventListener('touchend', (event) => {
+    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    showImage(activeIndex + (deltaX < 0 ? 1 : -1));
+  }, { passive: true });
+
   lightboxClose?.addEventListener('click', closeLightbox);
   lightbox?.addEventListener('click', (event) => {
     const target = event.target;
-    if (target instanceof Element && !target.closest('.galeria__lightbox-image, .galeria__lightbox-arrow, .galeria__lightbox-thumbnail, .galeria__lightbox-close')) {
+    if (target instanceof Element && !target.closest('.galeria__lightbox-image, .galeria__lightbox-arrow, .galeria__lightbox-thumbnail, .galeria__lightbox-dot, .galeria__lightbox-close')) {
       closeLightbox();
     }
   });
@@ -380,6 +501,8 @@ const categories = await getCloudinaryGallery();
   .galeria__options[hidden] {
     display: none;
   }
+
+  .galeria__pagination { display: none; }
 
   .galeria__option {
     width: 100%;
@@ -561,6 +684,8 @@ const categories = await getCloudinaryGallery();
     padding: 0.25rem;
   }
 
+  .galeria__lightbox-dots { display: none; }
+
   .galeria__lightbox-position {
     min-height: 1.25rem;
     margin: 0.25rem 0 0;
@@ -622,6 +747,182 @@ const categories = await getCloudinaryGallery();
   }
 
   @media (max-width: 640px) {
+    .galeria__lightbox {
+      padding: 0.75rem;
+    }
+
+    .galeria__lightbox-viewer {
+      gap: 0;
+      touch-action: pan-y pinch-zoom;
+    }
+
+    .galeria__lightbox-arrow,
+    .galeria__lightbox-thumbnails {
+      display: none;
+    }
+
+    .galeria__lightbox-image {
+      max-width: 100%;
+      max-height: 68dvh;
+      border-radius: 0.25rem;
+    }
+
+    .galeria__lightbox-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-height: 1.75rem;
+      padding-top: 0.5rem;
+    }
+
+    :global(.galeria__lightbox-dot) {
+      width: 0.4rem;
+      height: 0.4rem;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.42);
+      cursor: pointer;
+    }
+
+    :global(.galeria__lightbox-dot[aria-current="true"]) {
+      background: #ffffff;
+      transform: scale(1.25);
+    }
+
+    :global(.galeria__lightbox-dot:focus-visible) {
+      outline: 2px solid var(--gold-base);
+      outline-offset: 3px;
+    }
+
+    .galeria__lightbox-position {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 4rem);
+      right: 1rem;
+      z-index: 2;
+      min-height: 0;
+      margin: 0;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.58);
+      font-size: 0.72rem;
+    }
+
+    .galeria__grid {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .galeria__grid::-webkit-scrollbar { display: none; }
+
+    .galeria__item {
+      flex: 0 0 100%;
+      min-width: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    .galeria__pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      min-height: 1.75rem;
+      padding-top: 0.55rem;
+    }
+
+    .galeria__pagination[hidden] { display: none; }
+
+    .galeria__pagination-dot {
+      width: 0.4rem;
+      height: 0.4rem;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.38);
+      cursor: pointer;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .galeria__pagination-dot[aria-current="true"] {
+      background: #ffffff;
+      transform: scale(1.25);
+    }
+
+    .galeria__pagination-dot:focus-visible {
+      outline: 2px solid var(--gold-base);
+      outline-offset: 3px;
+    }
+
+    .galeria__sheet-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: rgba(0, 0, 0, 0.56);
+      cursor: default;
+      animation: galeria-scrim-in 180ms ease-out both;
+    }
+
+    .galeria__sheet-scrim[hidden] { display: none; }
+
+    .galeria__options,
+    .galeria__options[hidden] {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 1000;
+      display: grid;
+      gap: 0.3rem;
+      width: 100%;
+      max-height: min(65dvh, 32rem);
+      padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-bottom: 0;
+      border-radius: 1rem 1rem 0 0;
+      background: #0d191b;
+      box-shadow: 0 -1rem 2.5rem rgba(0, 0, 0, 0.3);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      animation: galeria-sheet-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .galeria__options[hidden] { display: none; }
+
+    .galeria__options::before {
+      content: '';
+      display: block;
+      width: 2.5rem;
+      height: 0.25rem;
+      margin: 0 auto 0.55rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .galeria__option { min-height: 3rem; padding: 0.85rem 0.75rem; }
+
+    @keyframes galeria-sheet-in {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    @keyframes galeria-scrim-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .galeria__selector-wrap {
       flex-direction: column;
       gap: 0.55rem;

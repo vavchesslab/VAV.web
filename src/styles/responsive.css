@@ -56,6 +56,14 @@ body.navbar-menu-open .sticky-nav-header::before {
 }
 
 @media (max-width: 720px) {
+	#laboratorio .laboratorio-mobile-only {
+		padding-block: 1.5rem;
+	}
+
+	#galeria.galeria-section {
+		margin-top: 1rem;
+	}
+
 	.version-two-shell .version-two-copy .mt-9 {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
