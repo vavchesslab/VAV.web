@@ -154,4 +154,9 @@ body.navbar-menu-open .sticky-nav-header::before {
 	.version-two-shell .footer__nav {
 		display: none;
 	}
+}/* Laboratorio (movil): ocultar el resumen de colores (Piezas / Tablero) del resultado final. */
+@media (max-width: 900px) {
+	.version-two-shell .model-showcase__editor .final-colors-summary {
+		display: none;
+	}
 }

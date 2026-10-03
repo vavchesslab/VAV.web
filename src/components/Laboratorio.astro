@@ -10,13 +10,13 @@ const {
 
 <section id={sectionId} class="model-showcase" aria-labelledby="model-showcase-title" data-desktop-only={desktopOnly}>
   <div class="model-showcase__inner">
-    <div class="text-center mb-6">
+    <div class="text-center mb-6 model-showcase__heading">
       <div class="mx-auto mb-4 h-px w-14 bg-white/30" aria-hidden="true"></div>
       <p class="mt-6 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent)">Laboratorio</p>
       <p class="text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
     </div>
     <div class="model-showcase__layout">
-      <div id="model-showcase-viewer" class="model-showcase__viewer" data-model-src={modelSrc}>
+              <div id="model-showcase-viewer" class="model-showcase__viewer" data-model-src={modelSrc}>
         <div class="model-showcase__top-bar">
           <div class="piece-team-controls" role="group" aria-label="Elegir bando de piezas">
             <button type="button" class="piece-team-btn is-active" data-team="Blancas" aria-label="Personalizar Piezas Blancas">
@@ -1263,7 +1263,76 @@ const {
     }
   }
 
-  @media (min-width: 901px) and (max-width: 1400px) {
+  @media (max-width: 900px) {
+    /* Mobile: el Lottie tambien arranca arriba (en escritorio queda centrado). */
+    .model-showcase__exit-lottie {
+      top: 0.5rem;
+      transform: translate(-50%, 0);
+    }
+
+    /* Mobile: el Lottie se agranda (el color se mantiene el original). */
+    .model-showcase__exit-lottie-item {
+      width: min(260px, 62%);
+      height: min(260px, 62%);
+    }
+
+    .model-showcase__exit-progress {
+      width: min(260px, 62%);
+    }
+
+    /* Mobile: el bloque final pasa a columna para que nada se estire. */
+    .model-showcase__final-message {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      /* Sin padding-top y con padding-bottom: el bloque deja de estar centrado
+         verticalmente y sube hasta quedar pegado a la parte alta del visor. */
+      padding: 0 1.25rem 7rem;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+    }
+
+    .model-showcase__final-column {
+      flex: 0 0 auto;
+      align-items: center;
+      text-align: center;
+      gap: 0.4rem;
+    }
+
+    .model-showcase__final-column--right p {
+      justify-content: center;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .model-showcase__final-divider {
+      width: 5rem;
+      height: 1px;
+    }
+
+    .model-showcase__final-title {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+    }
+
+    /* El boton deja de flotar y se integra al final de la columna. */
+    .model-showcase__return {
+      position: static;
+      transform: none;
+      margin-top: 0.5rem;
+      width: 100%;
+      max-width: 22rem;
+      justify-content: center;
+          }
+
+          /* En mobile no queremos el boton "Volver" de la esquina del bloque final. */
+          .model-showcase__final-message .model-showcase__back--final {
+            display: none;
+          }
+        }
+
+        @media (min-width: 901px) and (max-width: 1400px) {
     .model-showcase__layout.is-revealed {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
@@ -1800,6 +1869,28 @@ const {
     text-align: center;
     text-transform: uppercase;
     transform: translateX(-50%);
+  }
+</style>
+
+<style is:global>
+  /* Ajustes exclusivos de mobile (se aplican en responsive.css para no afectar escritorio). */
+  @media (max-width: 900px) {
+    /* Mobile: el titulo "Laboratorio" se muestra arriba (junto al boton Volver),
+       asi que aqui se oculta el bloque completo y su linea divisoria. */
+    .model-showcase__heading {
+      display: none;
+    }
+
+    /* Ambos contenedores (visor y resultado final) seanze lo mas arriba posible. */
+    .model-showcase {
+      padding-top: 0.75rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .model-showcase__inner {
+      gap: 0.5rem;
+      padding: 0 0.75rem;
+    }
   }
 </style>
 
