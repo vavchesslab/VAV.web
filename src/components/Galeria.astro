@@ -161,16 +161,32 @@ const categories = await getCloudinaryGallery();
   const closeAlbumOptions = (restoreFocus = false) => {
     if (!albumSelector || !albumOptions) return;
     albumSelector.setAttribute('aria-expanded', 'false');
+    // En mobile el panel se retira con una animacion antes de ocultarse.
+    if (mobileAlbumSheet.matches && !albumOptions.hidden) {
+      albumOptions.classList.add('is-closing');
+      albumSheetScrim?.classList.add('is-closing');
+      window.setTimeout(() => {
+        albumOptions?.classList.remove('is-closing');
+        albumSheetScrim?.classList.remove('is-closing');
+        if (albumOptions) albumOptions.hidden = true;
+        finishAlbumSheetClose(restoreFocus);
+      }, 220);
+      return;
+    }
     albumOptions.hidden = true;
     albumOptions.style.transition = '';
     albumOptions.style.transform = '';
+    finishAlbumSheetClose(restoreFocus);
+  };
+
+  const finishAlbumSheetClose = (restoreFocus = false) => {
     if (albumSelectorWrap?.classList.contains('is-sheet-open')) {
       albumSelectorWrap.classList.remove('is-sheet-open');
       if (albumSheetScrim) albumSheetScrim.hidden = true;
       document.body.style.overflow = previousBodyOverflow;
       restoreAlbumSheetNodes();
     }
-    if (restoreFocus) albumSelector.focus();
+    if (restoreFocus) albumSelector?.focus();
   };
 
   const openAlbumOptions = () => {
@@ -190,80 +206,12 @@ const categories = await getCloudinaryGallery();
   albumSheetScrim?.addEventListener('click', () => closeAlbumOptions(true));
 
   const albumSheetHandle = document.querySelector<HTMLButtonElement>('.galeria__sheet-handle');
-  const sheetHeight = () => albumOptions?.offsetHeight || window.innerHeight;
-  let sheetDragging = false;
-  let sheetDragStartY = 0;
-  let sheetDragDistance = 0;
-  let sheetDragOffset = 0;
-  let sheetDragLastY = 0;
-  let sheetDragLastTime = 0;
-  let sheetDragVelocity = 0;
-
-  albumSheetHandle?.addEventListener('pointerdown', (event) => {
-    if (!mobileAlbumSheet.matches || !albumOptions) return;
-    sheetDragging = true;
-    sheetDragStartY = event.clientY;
-    sheetDragLastY = event.clientY;
-    sheetDragLastTime = event.timeStamp;
-    sheetDragDistance = 0;
-    sheetDragOffset = 0;
-    sheetDragVelocity = 0;
-    albumSheetHandle.setPointerCapture(event.pointerId);
-    albumSheetHandle.classList.add('is-dragging');
+  // En mobile el handle no arrastra: un simple toque cierra el menu,
+  // y el cierre ya esta animado en closeAlbumOptions().
+  albumSheetHandle?.addEventListener('click', () => {
+    if (!mobileAlbumSheet.matches) return;
+    closeAlbumOptions(true);
   });
-
-  albumSheetHandle?.addEventListener('pointermove', (event) => {
-    if (!sheetDragging || !albumOptions) return;
-    // moveThreshold ignora el temblor del dedo: recien despues de este umbral
-    // se considera que hay un arrastre real.
-    const moveThreshold = 4;
-    const total = event.clientY - sheetDragStartY;
-    if (sheetDragDistance === 0 && Math.abs(total) <= moveThreshold) return;
-    sheetDragDistance = Math.max(0, total);
-
-    const dt = Math.max(event.timeStamp - sheetDragLastTime, 1);
-    sheetDragVelocity = (event.clientY - sheetDragLastY) / dt;
-    sheetDragLastY = event.clientY;
-    sheetDragLastTime = event.timeStamp;
-
-    // Rubber band: hacia arriba no se mueve, hacia abajo resiste.
-    const overscroll = sheetDragDistance < 0 ? sheetDragDistance / 4 : 0;
-    sheetDragOffset = sheetDragDistance + overscroll;
-
-    albumOptions.style.transition = 'none';
-    albumOptions.style.willChange = 'transform';
-    albumOptions.style.transform = `translate3d(0, ${sheetDragOffset}px, 0)`;
-  });
-
-  const finishSheetDrag = (event: PointerEvent) => {
-    if (!sheetDragging || !albumOptions) return;
-    sheetDragging = false;
-    albumSheetHandle?.classList.remove('is-dragging');
-    if (albumSheetHandle?.hasPointerCapture(event.pointerId)) {
-      albumSheetHandle.releasePointerCapture(event.pointerId);
-    }
-    const height = sheetHeight();
-    const velocity = event.type === 'pointercancel' ? 0 : sheetDragVelocity;
-
-    // Cierra solo si el gesto fue un arrastre real hacia abajo.
-    // Un toque corto (sin movimiento) mantiene el panel abierto.
-    const projected = sheetDragOffset + velocity * 120;
-    const shouldClose = sheetDragDistance > 0 && (sheetDragDistance > height * 0.32 || velocity > 0.5 || projected > height * 0.55);
-
-    albumOptions.style.transition = 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)';
-    albumOptions.style.transform = shouldClose ? 'translate3d(0, 100%, 0)' : 'translate3d(0, 0px, 0)';
-
-    window.setTimeout(() => {
-      if (!albumOptions) return;
-      albumOptions.style.transition = '';
-      albumOptions.style.transform = '';
-      albumOptions.style.willChange = '';
-      if (shouldClose) closeAlbumOptions();
-    }, shouldClose ? 300 : 320);
-  };
-
-  albumSheetHandle?.addEventListener('pointerup', finishSheetDrag);
-  albumSheetHandle?.addEventListener('pointercancel', finishSheetDrag);
 
   mobileAlbumSheet.addEventListener('change', () => {
     if (!mobileAlbumSheet.matches) closeAlbumOptions();
@@ -1203,6 +1151,15 @@ const categories = await getCloudinaryGallery();
       animation: galeria-sheet-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
+    /* Cierre animado: el panel vuelve a deslizarse hacia abajo y el scrim se desvanece. */
+    .galeria__options.is-closing {
+      animation: galeria-sheet-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
+    }
+
+    .galeria__sheet-scrim.is-closing {
+      animation: galeria-scrim-out 220ms ease-in both;
+    }
+
     .galeria__options[hidden] { display: none; }
 
     .galeria__sheet-handle {
@@ -1214,15 +1171,21 @@ const categories = await getCloudinaryGallery();
       padding: 0;
       border: 0;
       background: transparent;
-      cursor: grab;
-      touch-action: none;
-      /* El handle es de arrastre: no debe disparar scroll ni zooms del viewport. */
-      -webkit-user-select: none;
-      user-select: none;
+      cursor: default;
+      touch-action: auto;
     }
 
-    .galeria__sheet-handle.is-dragging {
-      cursor: grabbing;
+    .galeria__sheet-handle {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 1.6rem;
+      margin: -0.3rem 0 0.2rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .galeria__sheet-handle::before {
@@ -1248,6 +1211,16 @@ const categories = await getCloudinaryGallery();
     @keyframes galeria-sheet-in {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
+    }
+
+    @keyframes galeria-sheet-out {
+      from { transform: translateY(0); }
+      to { transform: translateY(100%); }
+    }
+
+    @keyframes galeria-scrim-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
 
     @keyframes galeria-scrim-in {
