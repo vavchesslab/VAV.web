@@ -9,14 +9,14 @@ const {
 <section id="partidas" class="contacto-section" style={`--contact-image: url("${imageSrc}")`} aria-label="Sección de contacto">
   <div class="contacto__inner">
     <div class="contacto__content">
+      <div class="contacto__divider" aria-hidden="true"></div>
+
       <p class="contacto__eyebrow">Contacto</p>
 
       <div class="contacto__header">
         <h2>{title}</h2>
         <p>{subtitle}</p>
       </div>
-
-      <div class="contacto__divider" aria-hidden="true"></div>
 
       <div class="contacto__details">
         <h3>Consultá por tu juego</h3>
@@ -134,7 +134,7 @@ const {
   .contacto__divider {
     width: 3.5rem;
     height: 1px;
-    margin: 2.8rem 0 2.45rem;
+    margin: 0 0 1.75rem;
     background: rgba(255, 255, 255, 0.3);
   }
 
@@ -178,7 +178,8 @@ const {
 
   @media (max-width: 768px) {
     .contacto-section {
-      min-height: 0;
+      min-height: 75vh;
+      min-height: 48svh;
     }
 
     .contacto-section::after {
@@ -198,7 +199,7 @@ const {
     .contacto__content {
       width: 100%;
       margin: 0;
-      padding: 0;
+      padding: 2rem 0 0;
       text-align: center;
     }
 
@@ -221,18 +222,18 @@ const {
     }
 
     .contacto__divider {
-      margin: 1.5rem auto;
+      margin: 0 auto 1.5rem;
     }
 
     .contacto__details {
-      visibility: hidden;
+      display: none;
     }
 
     .contacto__button {
       display: flex;
       width: min(60%, 14rem);
       box-sizing: border-box;
-      margin: 0.5rem auto 0;
+      margin: 1.75rem auto 0;
       justify-content: center;
     }
   }

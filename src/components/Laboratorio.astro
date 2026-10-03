@@ -11,6 +11,7 @@ const {
 <section id={sectionId} class="model-showcase" aria-labelledby="model-showcase-title" data-desktop-only={desktopOnly}>
   <div class="model-showcase__inner">
     <div class="text-center mb-6">
+      <div class="mx-auto mb-4 h-px w-14 bg-white/30" aria-hidden="true"></div>
       <p class="mt-6 mb-2 text-lg font-semibold uppercase tracking-[0.22em] text-(--accent)">Laboratorio</p>
       <p class="text-base text-(--muted) max-w-xl mx-auto">{subtitle}</p>
     </div>
@@ -171,6 +172,12 @@ const {
       </div>
 
       <aside id="model-showcase-editor" class="model-showcase__editor" aria-label="Visor del resultado final" aria-hidden="true">
+        <button type="button" class="model-showcase__back model-showcase__back--mobile" aria-controls="model-showcase-viewer" aria-hidden="true">
+          <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Volver
+        </button>
         <div class="model-showcase__editor-header">
           <div class="model-showcase__editor-title">
             <p>Resultado final</p>
@@ -235,6 +242,12 @@ const {
         </p>
       </div>
       <div id="model-showcase-final-message" class="model-showcase__final-message" aria-hidden="true">
+        <button type="button" class="model-showcase__back model-showcase__back--final" aria-label="Volver al laboratorio">
+          <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Volver
+        </button>
         <div class="model-showcase__final-column model-showcase__final-column--left">
           <p class="model-showcase__final-subtitle">SET FABRICADO CON ÉXITO</p>
           <h3 class="model-showcase__final-title">¡Buena creatividad!</h3>
@@ -417,6 +430,17 @@ const {
   .model-showcase__layout.is-revealed .model-showcase__back {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* El botón "Volver" propio del editor solo se usa en mobile
+     (en desktop se sigue usando el del visor). */
+  .model-showcase__back--mobile {
+    display: none;
+  }
+
+  /* "Volver" del resultado final: oculto por defecto, se muestra en mobile. */
+  .model-showcase__back--final {
+    display: none;
   }
 
   .model-showcase__button-icon {
@@ -767,6 +791,38 @@ const {
   }
 
   @media (max-width: 640px) {
+    .model-showcase {
+      padding-bottom: 10rem;
+    }
+
+    /* En pantallas chicas el resultado final respira más y las vistas se achican. */
+    .model-showcase__layout.is-revealed .final-model-container,
+    .model-showcase__layout.is-revealed .final-model-views {
+      min-height: 360px;
+    }
+
+    .model-showcase__layout.is-revealed .final-model-views {
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+
+    .model-showcase__layout.is-revealed .final-model-view figcaption {
+      right: 0.4rem;
+      bottom: 0.35rem;
+      padding: 0.2rem 0.35rem;
+      font-size: 0.55rem;
+    }
+
+    .model-showcase__layout.is-revealed .model-showcase__editor-summary {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .model-showcase__layout.is-revealed .model-showcase__editor-summary .model-showcase__finish {
+      margin-left: 0;
+      justify-content: center;
+    }
+
     .final-model-lightbox__panel {
       width: calc(100% - 2.5rem);
       padding: 0.7rem;
@@ -1122,17 +1178,88 @@ const {
   @media (max-width: 900px) {
     .model-showcase__layout.is-revealed {
       grid-template-columns: minmax(0, 1fr);
-      gap: 1rem;
+      gap: 0;
     }
 
+    /* El visor y el resultado final comparten la misma celda del grid. */
+    .model-showcase__layout.is-revealed .model-showcase__viewer,
+    .model-showcase__layout.is-revealed .model-showcase__editor {
+      grid-area: 1 / 1;
+    }
+
+    /* Apagamos el primer contenedor (visor) sin sacarlo del layout:
+       así el canvas 3D conserva su tamaño y sus controles no estorban. */
+    .model-showcase__layout.is-revealed .model-showcase__viewer {
+      width: min(var(--viewer-width), 100%);
+      transform: none;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* El segundo contenedor (resultado final) aparece en su lugar. */
     .model-showcase__layout.is-revealed .model-showcase__editor {
       width: min(var(--editor-width), 100%);
-      height: var(--editor-height);
-      transform: translateY(1rem) scale(0.98);
+      height: auto;
+      min-height: 0;
+      gap: 0.85rem;
+      padding: 0.95rem 0.85rem 1rem;
+      transform: none;
     }
 
-    .model-showcase__layout.is-revealed .model-showcase__editor {
-      transform: translateY(0) scale(1);
+    /* El header del resultado pasa a columna: título arriba y colores debajo. */
+    .model-showcase__layout.is-revealed .model-showcase__editor-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding-bottom: 0;
+    }
+
+    /* Los chips de color bajan de línea si no entran en el ancho. */
+    .model-showcase__layout.is-revealed .final-colors-summary {
+      width: 100%;
+      flex-wrap: wrap;
+      row-gap: 0.45rem;
+    }
+
+    /* El divisor vertical se ve mal al envolver, lo ocultamos en mobile. */
+    .model-showcase__layout.is-revealed .final-colors-divider {
+      display: none;
+    }
+
+    /* El contenedor de vistas no depende de una altura fija en mobile. */
+    .model-showcase__layout.is-revealed .final-model-container {
+      height: auto;
+      min-height: 420px;
+    }
+
+    /* El resumen inferior (Vista Completa + DESCARGAR) se acomoda sin romperse. */
+    .model-showcase__layout.is-revealed .model-showcase__editor-summary {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Botón "Volver" del resultado final, en flujo normal (mobile). */
+    .model-showcase__back--mobile {
+      display: inline-flex;
+      position: static;
+      right: auto;
+      bottom: auto;
+      justify-self: start;
+      margin: 0;
+      transform: none;
+    }
+
+    /* "Volver" en la pantalla de resultado final (mobile), arriba a la izquierda.
+       Tras realizar la descarga, reinicia el laboratorio. */
+    .model-showcase__back--final {
+      display: inline-flex;
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      right: auto;
+      bottom: auto;
+      opacity: 1;
+      pointer-events: auto;
     }
   }
 
@@ -1745,7 +1872,8 @@ const {
   const mount = document.querySelector('.model-showcase__viewer');
   const showcaseLayout = document.querySelector('.model-showcase__layout');
   const continueButton = document.querySelector('.model-showcase__continue');
-  const backButton = document.querySelector('.model-showcase__back');
+  const backButtons = Array.from(document.querySelectorAll('.model-showcase__back:not(.model-showcase__back--final)'));
+  const finalBackButton = document.querySelector('.model-showcase__back--final');
   const editor = document.querySelector('.model-showcase__editor');
   const exitLottieContainer = document.querySelector('#model-showcase-exit-lottie');
   const exitProgressFill = document.querySelector('#model-showcase-exit-progress-fill');
@@ -2608,19 +2736,22 @@ const {
     }, 600);
   });
 
-  returnButton?.addEventListener('click', () => {
-    // Forzamos una recarga completa de la página (en vez de solo resetear el estado del showcase)
-    // para que el usuario vuelva a un Laboratorio "limpio", pero manteniendo el foco en la sección.
+  // Vuelve a un Laboratorio "limpio" recargando la página (en vez de solo resetear el estado
+  // del showcase), manteniendo el foco en la sección.
+  const goToLaboratorio = () => {
     window.location.hash = 'laboratorio';
     window.location.reload();
-  });
+  };
+
+  returnButton?.addEventListener('click', goToLaboratorio);
+  finalBackButton?.addEventListener('click', goToLaboratorio);
 
   continueButton?.addEventListener('click', () => {
     if (!mount || !showcaseLayout || showcaseLayout.classList.contains('is-revealed')) return;
 
     showcaseLayout.classList.add('is-revealed');
     continueButton.setAttribute('aria-expanded', 'true');
-    backButton?.setAttribute('aria-hidden', 'false');
+    backButtons.forEach((button) => button.setAttribute('aria-hidden', 'false'));
     editor?.setAttribute('aria-hidden', 'false');
 
     setTimeout(() => {
@@ -2632,7 +2763,7 @@ const {
     }, 250);
   });
 
-  backButton?.addEventListener('click', () => {
+  const handleBackToViewer = () => {
     if (!mount || !showcaseLayout || !showcaseLayout.classList.contains('is-revealed')) return;
 
     const layoutTransition = showcaseLayout.style.transition;
@@ -2641,7 +2772,7 @@ const {
     mount.style.transition = 'none';
     showcaseLayout.classList.remove('is-revealed');
     continueButton?.setAttribute('aria-expanded', 'false');
-    backButton?.setAttribute('aria-hidden', 'true');
+    backButtons.forEach((button) => button.setAttribute('aria-hidden', 'true'));
     editor?.setAttribute('aria-hidden', 'true');
     if (reloadButton) reloadButton.hidden = true;
 
@@ -2649,7 +2780,9 @@ const {
       showcaseLayout.style.transition = layoutTransition;
       mount.style.transition = viewerTransition;
     });
-  });
+  };
+
+  backButtons.forEach((button) => button.addEventListener('click', handleBackToViewer));
 
   matchPiecesBtn?.addEventListener('click', () => {
     chessConfig.board.Blancas = chessConfig.pieces.Blancas;

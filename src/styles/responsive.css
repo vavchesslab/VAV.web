@@ -61,7 +61,7 @@ body.navbar-menu-open .sticky-nav-header::before {
 	}
 
 	#galeria.galeria-section {
-		margin-top: 1rem;
+		margin-top: 3rem;
 	}
 
 	.version-two-shell .version-two-copy .mt-9 {
@@ -146,5 +146,12 @@ body.navbar-menu-open .sticky-nav-header::before {
 
 	.version-two-shell .sticky-nav-header .navbar-menu .nav-active-indicator {
 		display: block;
+	}
+}
+
+/* Footer: ocultar navegacion (Home, Laboratorio, Galeria, Contacto) solo en mobile. */
+@media (max-width: 640px) {
+	.version-two-shell .footer__nav {
+		display: none;
 	}
 }
