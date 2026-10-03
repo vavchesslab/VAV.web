@@ -24,11 +24,15 @@ const categories = await getCloudinaryGallery();
         <div class="galeria__select-shell">
           <button id="galeria-album" class="galeria__selector" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="galeria-album-options" aria-labelledby="galeria-album-label galeria-album-current">
             <span id="galeria-album-current">{categories[0].name}</span>
-            <svg class="galeria__selector-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg class="galeria__selector-icon galeria__selector-icon--chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <svg class="galeria__selector-icon galeria__selector-icon--filter" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 5h16M7 12h10M10 19h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
           <div id="galeria-album-options" class="galeria__options" role="listbox" aria-labelledby="galeria-album-label" hidden>
+            <button type="button" class="galeria__sheet-handle" aria-label="Cerrar selector de álbumes" tabindex="-1"></button>
             {categories.map((category, index) => (
               <button class="galeria__option" type="button" role="option" aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-album-value={`album-${index}`}>
                 {category.name}
@@ -156,6 +160,8 @@ const categories = await getCloudinaryGallery();
     if (!albumSelector || !albumOptions) return;
     albumSelector.setAttribute('aria-expanded', 'false');
     albumOptions.hidden = true;
+    albumOptions.style.transition = '';
+    albumOptions.style.transform = '';
     if (albumSelectorWrap?.classList.contains('is-sheet-open')) {
       albumSelectorWrap.classList.remove('is-sheet-open');
       if (albumSheetScrim) albumSheetScrim.hidden = true;
@@ -180,6 +186,56 @@ const categories = await getCloudinaryGallery();
   };
 
   albumSheetScrim?.addEventListener('click', () => closeAlbumOptions(true));
+
+  const albumSheetHandle = document.querySelector<HTMLButtonElement>('.galeria__sheet-handle');
+  let sheetDragging = false;
+  let sheetDragStartY = 0;
+  let sheetDragDistance = 0;
+  let sheetDragStartTime = 0;
+
+  albumSheetHandle?.addEventListener('pointerdown', (event) => {
+    if (!mobileAlbumSheet.matches || !albumOptions) return;
+    sheetDragging = true;
+    sheetDragStartY = event.clientY;
+    sheetDragDistance = 0;
+    sheetDragStartTime = Date.now();
+    albumSheetHandle.setPointerCapture(event.pointerId);
+  });
+
+  albumSheetHandle?.addEventListener('pointermove', (event) => {
+    if (!sheetDragging || !albumOptions) return;
+    sheetDragDistance = Math.max(0, event.clientY - sheetDragStartY);
+    albumOptions.style.transition = 'none';
+    albumOptions.style.transform = `translateY(${sheetDragDistance}px)`;
+  });
+
+  const finishSheetDrag = (event: PointerEvent) => {
+    if (!sheetDragging || !albumOptions) return;
+    sheetDragging = false;
+    if (albumSheetHandle?.hasPointerCapture(event.pointerId)) {
+      albumSheetHandle.releasePointerCapture(event.pointerId);
+    }
+    const elapsed = Date.now() - sheetDragStartTime;
+    const velocity = sheetDragDistance / Math.max(elapsed, 1);
+    const shouldClose = sheetDragDistance <= 4 || sheetDragDistance > 90 || velocity > 0.55;
+    albumOptions.style.transition = 'transform 200ms ease';
+    if (shouldClose) {
+      albumOptions.style.transform = 'translateY(100%)';
+      window.setTimeout(() => closeAlbumOptions(), 180);
+    } else {
+      albumOptions.style.transform = 'translateY(0px)';
+      window.setTimeout(() => {
+        if (albumOptions) {
+          albumOptions.style.transition = '';
+          albumOptions.style.transform = '';
+        }
+      }, 200);
+    }
+  };
+
+  albumSheetHandle?.addEventListener('pointerup', finishSheetDrag);
+  albumSheetHandle?.addEventListener('pointercancel', finishSheetDrag);
+
   mobileAlbumSheet.addEventListener('change', () => {
     if (!mobileAlbumSheet.matches) closeAlbumOptions();
   });
@@ -663,7 +719,7 @@ const categories = await getCloudinaryGallery();
     outline-offset: 3px;
   }
 
-  .galeria__selector[aria-expanded="true"] .galeria__selector-icon {
+  .galeria__selector[aria-expanded="true"] .galeria__selector-icon--chevron {
     color: var(--gold-light, #fff1a8);
     transform: rotate(180deg);
   }
@@ -675,6 +731,14 @@ const categories = await getCloudinaryGallery();
     color: var(--gold-base, #d4a72c);
     pointer-events: none;
     transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .galeria__selector-icon--filter {
+    display: none;
+  }
+
+  .galeria__sheet-handle {
+    display: none;
   }
 
   .galeria__options {
@@ -945,6 +1009,14 @@ const categories = await getCloudinaryGallery();
   }
 
   @media (max-width: 640px) {
+    .galeria__selector-icon--chevron {
+      display: none;
+    }
+
+    .galeria__selector-icon--filter {
+      display: block;
+    }
+
     .galeria__lightbox {
       padding: 0.75rem;
     }
@@ -1104,14 +1176,35 @@ const categories = await getCloudinaryGallery();
 
     .galeria__options[hidden] { display: none; }
 
-    .galeria__options::before {
-      content: '';
+    .galeria__sheet-handle {
+      position: relative;
       display: block;
+      width: 100%;
+      height: 1.6rem;
+      margin: -0.3rem 0 0.2rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .galeria__sheet-handle::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 2.5rem;
       height: 0.25rem;
-      margin: 0 auto 0.55rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.35);
+      transform: translate(-50%, -50%);
+      transition: background 0.15s ease;
+    }
+
+    .galeria__sheet-handle:active::before,
+    .galeria__sheet-handle:focus-visible::before {
+      background: rgba(255, 255, 255, 0.6);
     }
 
     .galeria__option { min-height: 3rem; padding: 0.85rem 0.75rem; }

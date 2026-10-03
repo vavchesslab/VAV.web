@@ -217,9 +217,9 @@ const {
         <div class="model-showcase__editor-summary">
           <span>Vista Completa 3D</span>
           <a class="model-showcase__action-button model-showcase__finish" href="#partidas">
-            FINALIZAR
+            <span class="model-showcase__finish-label">DESCARGAR</span>
             <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M12 4v11m0 0-5-5m5 5 5-5M5 20h14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </a>
         </div>
@@ -236,7 +236,7 @@ const {
       </div>
       <div id="model-showcase-final-message" class="model-showcase__final-message" aria-hidden="true">
         <div class="model-showcase__final-column model-showcase__final-column--left">
-          <p class="model-showcase__final-subtitle">SET CREADO CON ÉXITO</p>
+          <p class="model-showcase__final-subtitle">SET FABRICADO CON ÉXITO</p>
           <h3 class="model-showcase__final-title">¡Buena creatividad!</h3>
         </div>
         <div class="model-showcase__final-divider" aria-hidden="true"></div>
@@ -247,6 +247,7 @@ const {
             <span class="model-showcase__final-dot" id="final-message-dot-board-c1"></span><span class="model-showcase__final-dot" id="final-message-dot-board-c2"></span>Tablero (C1 / C2)
           </p>
         </div>
+        <button type="button" id="model-showcase-return" class="model-showcase__action-button model-showcase__return">Volver al Laboratorio</button>
       </div>
     </div>
   </div>
@@ -278,11 +279,28 @@ const {
 
 <style>
   .model-showcase {
+    position: relative;
     width: 100%;
     max-width: none;
     margin: 0;
     padding: 2rem 0 5rem;
     background: #050d0f;
+  }
+
+  .model-showcase::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 45%;
+    background: linear-gradient(to top, color-mix(in srgb, var(--accent) 60%, transparent) 0%, transparent 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 1;
+  }
+
+  .model-showcase.is-final-visible::after {
+    opacity: 1;
   }
 
   .model-showcase__inner {
@@ -1014,7 +1032,7 @@ const {
     justify-content: center;
     gap: 1.5rem;
     margin: auto;
-    padding: 0 1rem;
+    padding: 0 1rem 10% 1rem;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.6s ease;
@@ -1022,6 +1040,18 @@ const {
 
   .model-showcase__final-message.is-visible {
     opacity: 1;
+  }
+
+  .model-showcase__return {
+    position: absolute;
+    left: 50%;
+    bottom: 29%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .model-showcase__final-message.is-visible .model-showcase__return {
+    pointer-events: auto;
   }
 
   .model-showcase__final-column {
@@ -1720,6 +1750,7 @@ const {
   const exitLottieContainer = document.querySelector('#model-showcase-exit-lottie');
   const exitProgressFill = document.querySelector('#model-showcase-exit-progress-fill');
   const finalMessage = document.querySelector('#model-showcase-final-message');
+  const showcaseSection = finalMessage?.closest('.model-showcase');
   const colorPicker = document.querySelector('#piece-color-picker');
   const colorPickerPanel = document.querySelector('.model-color-picker');
   const colorPickerToggle = document.querySelector('.model-color-toggle');
@@ -1748,6 +1779,7 @@ const {
   const finalLightboxPrev = document.querySelector<HTMLButtonElement>('#final-model-lightbox-prev');
   const finalLightboxNext = document.querySelector<HTMLButtonElement>('#final-model-lightbox-next');
   const finishButton = document.querySelector<HTMLAnchorElement>('.model-showcase__finish');
+  const returnButton = document.querySelector<HTMLButtonElement>('#model-showcase-return');
   const viewerModeLabel = document.querySelector('#viewer-mode-label');
   let finalLightboxRenderer = null;
   let activeFinalViewIndex = 0;
@@ -1943,6 +1975,7 @@ const {
   let currentControls = null;
   let activeModelMode = 'piece';
   const modelCache = new Map();
+  let mainViewerRenderingPaused = false;
 
   // Final 3D Scene variables
   let finalScene = null;
@@ -2013,8 +2046,13 @@ const {
     resize();
 
     const tick = () => {
-      controls.update();
-      renderer.render(scene, camera);
+      // Evitamos seguir renderizando (y usando GPU/CPU) cuando la pestaña está en segundo plano
+      // o cuando el visor 3D queda oculto detrás de la pantalla de "Fabricando/Set listo",
+      // que es lo que provocaba que la página se trabara si se dejaba inactiva en esa vista.
+      if (!mainViewerRenderingPaused && document.visibilityState !== 'hidden') {
+        controls.update();
+        renderer.render(scene, camera);
+      }
       requestAnimationFrame(tick);
     };
 
@@ -2345,10 +2383,191 @@ const {
     reloadFinalScene();
   });
 
+  const pieceCatalog = [
+    { url: '/rey_regular.glb', name: 'Rey' },
+    { url: '/reina_regular.glb', name: 'Reina' },
+    { url: '/alfil_regular.glb', name: 'Alfil' },
+    { url: '/Caballo_Regular.glb', name: 'Caballo' },
+    { url: '/torre_regular.glb', name: 'Torre' },
+    { url: '/Peon_Regular.glb', name: 'Peón' }
+  ];
+
+  const loadGltfScene = async (url) => {
+    let source = modelCache.get(url);
+    if (!source) {
+      const gltf = await new GLTFLoader().loadAsync(url);
+      source = gltf.scene;
+      modelCache.set(url, source);
+    }
+    return cloneModelWithMaterials(source);
+  };
+
+  const waitForFinalModel = async () => {
+    if (finalResultDirty && !finalModelLoadPending) reloadFinalScene();
+    else ensureFinalScene();
+    for (let i = 0; i < 200 && (!finalModelRoot || finalModelLoadPending); i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  };
+
+  const buildPdfCaptures = async () => {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(1);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const addLights = (scene) => {
+      scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+      const key = new THREE.DirectionalLight(0xffffff, 1.8);
+      key.position.set(8, 12, 6);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0x9fc5e8, 1.0);
+      fill.position.set(-8, 6, -6);
+      scene.add(fill);
+    };
+
+    const capture = (scene, camera, width, height) => {
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+      return renderer.domElement.toDataURL('image/jpeg', 0.92);
+    };
+
+    const captureObject = (object, width, height, angle, elevation) => {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x081a1d);
+      addLights(scene);
+      object.rotation.y = angle;
+      scene.add(object);
+      object.updateMatrixWorld(true);
+      const sphere = new THREE.Box3().setFromObject(object).getBoundingSphere(new THREE.Sphere());
+      const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
+      const distance = (sphere.radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.05;
+      camera.position.copy(sphere.center).add(new THREE.Vector3(0, Math.sin(elevation), Math.cos(elevation)).multiplyScalar(distance));
+      camera.lookAt(sphere.center);
+      return capture(scene, camera, width, height);
+    };
+
+    const result = { black: [], white: [], board: null, views: [] };
+
+    try {
+      for (const piece of pieceCatalog) {
+        for (const team of ['Negras', 'Blancas']) {
+          const object = await loadGltfScene(piece.url);
+          object.traverse((child) => applyMeshColor(child, chessConfig.pieces[team]));
+          const image = captureObject(object, 600, 600, -0.6, 0.25);
+          (team === 'Negras' ? result.black : result.white).push({ name: piece.name, image });
+        }
+      }
+
+      const board = await loadGltfScene('/tablero.glb');
+      applyBoardColors(board);
+      result.board = captureObject(board, 1200, 750, -0.6, 0.6);
+
+      await waitForFinalModel();
+      if (finalScene) {
+        finalRenderers.forEach(({ camera }, index) => {
+          const title = finalViews[index]?.querySelector('figcaption')?.textContent || `Vista ${index + 1}`;
+          result.views.push({ title, image: capture(finalScene, camera.clone(), 1200, 750) });
+        });
+      }
+    } finally {
+      renderer.dispose();
+      renderer.forceContextLoss();
+    }
+
+    return result;
+  };
+
+  const downloadResultPdf = async () => {
+    const [{ jsPDF }, captures] = await Promise.all([import('jspdf'), buildPdfCaptures()]);
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
+    let y = margin;
+
+    const ensureSpace = (height) => {
+      if (y + height > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+    };
+
+    const heading = (text) => {
+      ensureSpace(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(20, 20, 20);
+      doc.text(text, margin, y + 6);
+      y += 12;
+    };
+
+    const pieceGrid = (items) => {
+      const columns = 3;
+      const gap = 6;
+      const cell = (contentWidth - gap * (columns - 1)) / columns;
+      for (let i = 0; i < items.length; i += columns) {
+        ensureSpace(cell + 8);
+        items.slice(i, i + columns).forEach((item, col) => {
+          const x = margin + col * (cell + gap);
+          doc.addImage(item.image, 'JPEG', x, y, cell, cell);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(60, 60, 60);
+          doc.text(item.name, x + cell / 2, y + cell + 5, { align: 'center' });
+        });
+        y += cell + 10;
+      }
+    };
+
+    const fullImage = (image, width = contentWidth) => {
+      const height = width * 0.625;
+      ensureSpace(height + 8);
+      doc.addImage(image, 'JPEG', margin, y, width, height);
+      y += height + 6;
+    };
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(20, 20, 20);
+    doc.text('Set de ajedrez personalizado', margin, y + 7);
+    y += 16;
+
+    heading('Piezas negras');
+    pieceGrid(captures.black);
+    heading('Piezas blancas');
+    pieceGrid(captures.white);
+
+    doc.addPage();
+    y = margin;
+    heading('Tablero');
+    if (captures.board) fullImage(captures.board);
+
+    if (captures.views.length) {
+      heading('Resultado final');
+      captures.views.forEach(({ title, image }) => {
+        ensureSpace(contentWidth * 0.625 + 14);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text(title, margin, y + 4);
+        y += 6;
+        fullImage(image);
+      });
+    }
+
+    doc.save('mi-set-de-ajedrez.pdf');
+  };
+
   finishButton?.addEventListener('click', async (event) => {
     if (!showcaseLayout || showcaseLayout.classList.contains('is-exiting')) return;
     event.preventDefault();
+
     showcaseLayout.classList.add('is-exiting');
+    mainViewerRenderingPaused = true;
 
     const { default: lottie } = await lottiePromise;
     const displayDuration = 3000;
@@ -2373,14 +2592,27 @@ const {
       setTimeout(() => {
         exitLottieContainer?.classList.add('is-fading-out');
 
-        setTimeout(() => {
+        setTimeout(async () => {
           exitAnims.forEach((anim) => anim.destroy());
           exitLottieContainer?.querySelectorAll('.model-showcase__exit-lottie-item').forEach((item) => { item.innerHTML = ''; });
+          try {
+            await downloadResultPdf();
+          } catch (error) {
+            console.error('No se pudo generar el PDF:', error);
+          }
           finalMessage?.classList.add('is-visible');
           finalMessage?.setAttribute('aria-hidden', 'false');
+          showcaseSection?.classList.add('is-final-visible');
         }, 900);
       }, displayDuration);
     }, 600);
+  });
+
+  returnButton?.addEventListener('click', () => {
+    // Forzamos una recarga completa de la página (en vez de solo resetear el estado del showcase)
+    // para que el usuario vuelva a un Laboratorio "limpio", pero manteniendo el foco en la sección.
+    window.location.hash = 'laboratorio';
+    window.location.reload();
   });
 
   continueButton?.addEventListener('click', () => {

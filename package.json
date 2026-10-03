@@ -19,6 +19,7 @@
     "@types/react-dom": "^19.2.5",
     "astro": "^7.3.5",
     "chess.js": "^1.4.0",
+    "jspdf": "^4.2.1",
     "lottie-web": "^5.13.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
