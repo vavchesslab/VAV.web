@@ -133,7 +133,7 @@ const {
         </div>
 
         <div class="model-showcase__controls">
-          <div class="model-color-picker">
+          <div class:list={['model-color-picker', continueOutsideViewer && 'model-color-picker--vertical']}>
             <div class="model-color-picker__header">
               <span>Color</span>
               <button type="button" class="model-color-toggle" aria-expanded="true" aria-controls="piece-color-palette" aria-label="Colapsar selector de color">
@@ -215,7 +215,7 @@ const {
       </div>
 
       {continueOutsideViewer && (
-        <button type="button" class="model-showcase__action-button model-showcase__continue model-showcase__continue--below" aria-controls="model-showcase-editor" aria-expanded="false">
+        <button type="button" class="model-showcase__action-button model-showcase__continue model-showcase__continue--edge" aria-controls="model-showcase-editor" aria-expanded="false">
           Continuar
           <svg class="model-showcase__button-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
             <path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -1027,17 +1027,16 @@ const {
     transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
-  /* Variante mobile (pagina /laboratorio): el boton "Continuar" sale del visor
-     y queda en flujo normal, centrado justo debajo del contenedor. */
-  .model-showcase__continue--below {
-    position: static;
+  /* Pagina /laboratorio: centrar el boton sobre el borde inferior del visor.
+     translate mantiene el anclaje incluso durante la animacion de hover. */
+  .model-showcase__continue--edge {
     right: auto;
-    bottom: auto;
-    justify-self: center;
-    margin-top: 1.25rem;
+    bottom: 0;
+    left: 50%;
+    translate: -50% 50%;
   }
 
-  .model-showcase__layout.is-revealed .model-showcase__continue--below {
+  .model-showcase__layout.is-revealed .model-showcase__continue--edge {
     display: none;
   }
 
@@ -1537,6 +1536,23 @@ const {
   .color-palette__column {
     display: grid;
     gap: 0.28rem;
+  }
+
+  /* En /laboratorio cada familia ocupa una fila, sin girar el texto. */
+  .model-color-picker--vertical {
+    width: 8rem;
+    padding-inline: 0.65rem;
+  }
+
+  .model-color-picker--vertical .color-palette {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.28rem;
+  }
+
+  .model-color-picker--vertical .color-palette__column {
+    grid-template-columns: repeat(4, 1.25rem);
+    justify-content: space-between;
+    gap: 0.2rem;
   }
 
   .color-swatch {
